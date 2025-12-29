@@ -2,8 +2,8 @@ import { z } from "zod";
 
 export const createCommentSchema = z.object({
   content: z.string().min(1).describe('Content of the comment'),
-  taskId: z.string().uuid().optional().describe('ID of the task to comment on (mutually exclusive with deliverableId)'),
-  deliverableId: z.string().uuid().optional().describe('ID of the deliverable to comment on (mutually exclusive with taskId)'),
+  taskId: z.uuid().optional().describe('ID of the task to comment on (mutually exclusive with deliverableId)'),
+  deliverableId: z.uuid().optional().describe('ID of the deliverable to comment on (mutually exclusive with taskId)'),
 }).refine((data) => {
   return (data.taskId && !data.deliverableId) || (!data.taskId && data.deliverableId);
 }, {
@@ -16,22 +16,23 @@ export const updateCommentSchema = z.object({
 }).describe('Schema for updating an existing comment');
 
 export const commentResponseSchema = z.object({
-  id: z.string().uuid().describe('Unique identifier for the comment'),
+  id: z.uuid().describe('Unique identifier for the comment'),
   content: z.string().describe('Content of the comment'),
-  authorId: z.string().uuid().describe('ID of the user who created the comment'),
-  taskId: z.string().uuid().nullable().describe('ID of the associated task (if any)'),
-  deliverableId: z.string().uuid().nullable().describe('ID of the associated deliverable (if any)'),
+  authorId: z.uuid().describe('ID of the user who created the comment'),
+  taskId: z.uuid().nullable().describe('ID of the associated task (if any)'),
+  deliverableId: z.uuid().nullable().describe('ID of the associated deliverable (if any)'),
   createdAt: z.date().describe('Comment creation timestamp'),
   updatedAt: z.date().describe('Last comment update timestamp'),
   author: z.object({
-    id: z.string().uuid(),
+    id: z.uuid(),
     name: z.string(),
+		role: z.enum(["MEMBER", "TEAM_LEAD", "ADVISER"]).optional(),
   }).optional().describe('Author details'),
 }).describe('Response object containing comment details');
 
 export const commentQuerySchema = z.object({
-  taskId: z.string().uuid().optional().describe('Filter comments by task ID'),
-  deliverableId: z.string().uuid().optional().describe('Filter comments by deliverable ID'),
+  taskId: z.uuid().optional().describe('Filter comments by task ID'),
+  deliverableId: z.uuid().optional().describe('Filter comments by deliverable ID'),
 }).refine((data) => {
   return (data.taskId && !data.deliverableId) || (!data.taskId && data.deliverableId);
 }, {

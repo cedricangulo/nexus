@@ -6,5 +6,6 @@
  */
 
 export type { MemberDeliverablesClientProps } from "./client";
+
 import { MemberDeliverablesClient as Client } from "./client";
 export { Client as MemberDeliverablesClient };

@@ -68,7 +68,8 @@ export function MemberTaskDetailDialog({
         status: task.status,
         blockReason:
           task.status === "BLOCKED"
-            ? (task as Task & { lastComment?: { content: string } }).lastComment?.content || ""
+            ? (task as Task & { lastComment?: { content: string } }).lastComment
+                ?.content || ""
             : "",
       });
     }

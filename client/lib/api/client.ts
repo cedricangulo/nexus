@@ -25,10 +25,27 @@ export const createApiClient = async (): Promise<AxiosInstance> => {
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
-      // Remove content-type for DELETE requests to avoid empty body issues
-      if (config.method?.toUpperCase() === "DELETE" && !config.data) {
-        config.headers["Content-Type"] = undefined;
+
+      const method = config.method?.toUpperCase();
+      const hasBody = config.data !== undefined && config.data !== null;
+
+      // Some servers reject DELETE with Content-Type but no body.
+      if (method === "DELETE" && !hasBody && config.headers) {
+        const headers: any = config.headers;
+
+        if (typeof headers.delete === "function") {
+          headers.delete("Content-Type");
+        } else {
+          headers["Content-Type"] = undefined;
+        }
       }
+
+      // Our API uses PATCH endpoints with no payload.
+      // Ensure an empty JSON body exists to satisfy strict servers.
+      if (method === "PATCH" && !hasBody) {
+        config.data = {};
+      }
+
       return config;
     },
     (error) => Promise.reject(error)
@@ -38,6 +55,10 @@ export const createApiClient = async (): Promise<AxiosInstance> => {
   client.interceptors.response.use(
     (response) => response,
     (error: AxiosError) => {
+      if (error.code === "ECONNABORTED") {
+        console.error("Request timed out. Check API availability.");
+      }
+
       if (error.response?.status === 401) {
         // Token expired or invalid - will be handled in middleware
         // Client-side logout can be triggered via server action

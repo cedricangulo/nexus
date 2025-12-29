@@ -23,8 +23,8 @@ export function TaskCard({
   return (
     <div
       className={`group space-y-2 rounded-md border p-3 transition-all ${cursorClass} ${
-        task.status === "BLOCKED" 
-          ? "border-destructive/70 bg-card/20" 
+        task.status === "BLOCKED"
+          ? "border-destructive/70 bg-card/20"
           : "bg-card hover:bg-accent/50"
       }`}
       onClick={() => onTaskClick(task)}

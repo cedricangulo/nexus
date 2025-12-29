@@ -16,19 +16,18 @@
  */
 "use client";
 
+import { FolderX } from "lucide-react";
 import { useMemo, useState } from "react";
-
 import {
   DeliverableCard,
   DeliverablesFilters,
   DeliverablesSummaryCards,
 } from "@/components/shared/deliverables";
+import { EmptyState } from "@/components/shared/empty-state";
 import type { Deliverable, Evidence, Phase } from "@/lib/types";
 import type { PhaseFilter, StatusFilter } from "@/lib/types/deliverables-types";
 import { getDeliverablesSummary } from "../../../hooks/get-deliverables-summary";
 import { getFilteredDeliverables } from "../../../hooks/get-filtered-deliverables";
-import { EmptyState } from "@/components/shared/empty-state";
-import { FolderX } from "lucide-react";
 
 /**
  * Props for the DeliverablesClient component
@@ -88,9 +87,9 @@ export function DeliverablesClient({
 
       {filtered.length === 0 ? (
         <EmptyState
-          title="No Deliverables Found"
           description="Try adjusting your filters or search query."
           icon={FolderX}
+          title="No Deliverables Found"
         />
       ) : (
         <section className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

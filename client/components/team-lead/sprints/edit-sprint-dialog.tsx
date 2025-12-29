@@ -54,7 +54,7 @@ export function EditSprintDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog onOpenChange={onOpenChange} open={isOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Sprint {sprint.number}</DialogTitle>
@@ -63,17 +63,17 @@ export function EditSprintDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="goal">Goal</Label>
             <Textarea
+              className="min-h-24"
               id="goal"
-              placeholder="Sprint goal"
-              value={formData.goal}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, goal: e.target.value }))
               }
-              className="min-h-24"
+              placeholder="Sprint goal"
+              value={formData.goal}
             />
           </div>
 
@@ -82,14 +82,14 @@ export function EditSprintDialog({
               <Label htmlFor="startDate">Start Date</Label>
               <Input
                 id="startDate"
-                type="date"
-                value={formData.startDate}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
                     startDate: e.target.value,
                   }))
                 }
+                type="date"
+                value={formData.startDate}
               />
             </div>
 
@@ -97,28 +97,28 @@ export function EditSprintDialog({
               <Label htmlFor="endDate">End Date</Label>
               <Input
                 id="endDate"
-                type="date"
-                value={formData.endDate}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
                     endDate: e.target.value,
                   }))
                 }
+                type="date"
+                value={formData.endDate}
               />
             </div>
           </div>
 
           <div className="flex justify-end gap-2">
             <Button
+              disabled={isSubmitting}
+              onClick={() => onOpenChange(false)}
               type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button disabled={isSubmitting} type="submit">
               {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </div>

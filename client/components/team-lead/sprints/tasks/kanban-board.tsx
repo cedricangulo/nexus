@@ -303,7 +303,7 @@ export function KanbanBoard({ tasks, users, sprintId }: KanbanBoardProps) {
         task={blockingTask}
       />
 
-      {(selectedTask && selectedTaskDetail) ? (
+      {selectedTask && selectedTaskDetail ? (
         <TaskDetailDialog
           onOpenChange={(open) => {
             if (!open) {
@@ -321,7 +321,7 @@ export function KanbanBoard({ tasks, users, sprintId }: KanbanBoardProps) {
           }}
           teamMembers={users}
         />
-      ): null}
+      ) : null}
     </>
   );
 }

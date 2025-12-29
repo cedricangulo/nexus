@@ -15,7 +15,7 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="grid size-8 place-content-center">
+      <div className="grid place-content-center">
         <LoaderIcon className="size-4 animate-spin text-foreground" />
       </div>
     );
@@ -25,8 +25,9 @@ export function ThemeToggle() {
 
   return (
     <Button
-      className="m-0 size-8 p-0 text-foreground"
+      className="m-0 p-0 text-foreground"
       onClick={() => setTheme(isLight ? "dark" : "light")}
+      size="icon"
       variant="ghost"
     >
       <svg

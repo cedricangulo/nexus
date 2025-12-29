@@ -9,18 +9,24 @@ import {
 } from "@/actions/deliverables";
 import { DeliverableDetails } from "@/components/shared/deliverables";
 import { RequestChangesDialog } from "@/components/team-lead/deliverables/request-changes-dialog";
-import type { Deliverable, Evidence, Phase } from "@/lib/types";
+import type { Comment, Deliverable, Evidence, Phase } from "@/lib/types";
 
-interface TeamLeadDeliverableActionsProps {
+type TeamLeadDeliverableActionsProps = {
   deliverable: Deliverable;
   evidence: Evidence[];
   phase?: Phase;
-}
+  comments: Comment[];
+  teamMembers: Array<{ id: string; label: string; value: string }>;
+  user?: { id?: string; role?: string };
+};
 
 export default function TeamLeadDeliverableActions({
   deliverable,
   evidence,
   phase,
+  comments,
+  teamMembers,
+  user,
 }: TeamLeadDeliverableActionsProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -63,15 +69,17 @@ export default function TeamLeadDeliverableActions({
   return (
     <>
       <DeliverableDetails
+        comments={comments}
+        controls={{ canReview: true, isPending }}
         deliverable={deliverable}
         evidence={evidence}
-        isPending={isPending}
-        canReview={true}
         onApprove={approve}
         onRequestChanges={() => {
           setRequestChangesOpen(true);
         }}
         phase={phase}
+        teamMembers={teamMembers}
+        user={user}
       />
 
       <RequestChangesDialog

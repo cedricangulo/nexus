@@ -12,6 +12,7 @@
  */
 
 export type { DeliverableCardProps } from "./deliverable-card";
+
 import { DeliverableCard as Card } from "./deliverable-card";
 export { Card as DeliverableCard };
 

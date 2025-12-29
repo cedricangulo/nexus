@@ -1,14 +1,17 @@
 import { notFound, unauthorized } from "next/navigation";
 import { Suspense } from "react";
+import { auth } from "@/auth";
 import { DeliverableDetails } from "@/components/shared/deliverables";
 import { getDeliverableDetail } from "@/lib/data/deliverables";
-import { auth } from "@/auth";
+import { getTeamMembersForMentions } from "@/lib/data/team-members";
 
 type PageProps = {
-	params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>;
 };
 
-export default async function MemberDeliverableDetailPage({ params }: PageProps) {
+export default async function MemberDeliverableDetailPage({
+  params,
+}: PageProps) {
   const session = await auth();
 
   // HARD GATE: Member only
@@ -16,23 +19,28 @@ export default async function MemberDeliverableDetailPage({ params }: PageProps)
     return unauthorized();
   }
 
-	const { id } = await params;
+  const { id } = await params;
 
-	const { deliverable, evidence, phase } = await getDeliverableDetail(id);
+  const [{ deliverable, evidence, phase, comments }, teamMembers] =
+    await Promise.all([getDeliverableDetail(id), getTeamMembersForMentions()]);
 
-	if (!deliverable) {
-		notFound();
-	}
+  if (!deliverable) {
+    notFound();
+  }
 
-	return (
-		<Suspense fallback={<div className="py-8 text-center">Loading deliverable...</div>}>
-			<DeliverableDetails
-				canReview={false}
-				deliverable={deliverable}
-				evidence={evidence}
-				isPending={false}
-				phase={phase}
-			/>
-		</Suspense>
-	);
+  return (
+    <Suspense
+      fallback={<div className="py-8 text-center">Loading deliverable...</div>}
+    >
+      <DeliverableDetails
+        comments={comments}
+        controls={{ canReview: false, isPending: false }}
+        deliverable={deliverable}
+        evidence={evidence}
+        phase={phase}
+        teamMembers={teamMembers}
+        user={session.user}
+      />
+    </Suspense>
+  );
 }

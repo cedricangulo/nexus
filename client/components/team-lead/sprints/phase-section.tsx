@@ -2,11 +2,10 @@
 
 import { Calendar, FolderXIcon } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
+import { EmptyState } from "@/components/shared/empty-state";
 import { EditSprintDialog } from "@/components/team-lead/sprints/edit-sprint-dialog";
 import { SprintActionsMenu } from "@/components/team-lead/sprints/sprint-actions-menu";
-import { EmptyState } from "@/components/shared/empty-state";
 import {
   FrameDescription,
   FramePanel,
@@ -85,11 +84,11 @@ export function PhaseSection({
                           </FrameTitle>
                         </div>
                         <SprintActionsMenu
-                          sprint={sprint}
                           onEditClick={() => {
                             setSelectedSprint(sprint);
                             setIsEditDialogOpen(true);
                           }}
+                          sprint={sprint}
                         />
                       </div>
                       <FrameDescription className="line-clamp-1">
@@ -100,7 +99,9 @@ export function PhaseSection({
                     <div className="space-y-4">
                       <div className="space-y-1">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Progress</span>
+                          <span className="text-muted-foreground">
+                            Progress
+                          </span>
                           <span className="font-medium">
                             {progress
                               ? `${progress.completedTasks}/${progress.totalTasks}`
@@ -127,11 +128,11 @@ export function PhaseSection({
 
       {selectedSprint ? (
         <EditSprintDialog
-          sprint={selectedSprint}
           isOpen={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
+          sprint={selectedSprint}
         />
-      ): null}
+      ) : null}
     </>
   );
 }

@@ -103,8 +103,12 @@ export function createMeetingColumns(context: ColumnsContext): {
       id: "scope",
       size: 120,
       accessorFn: (row) => {
-        if (row.sprintId) return "Sprint";
-        if (row.phaseId) return "Phase";
+        if (row.sprintId) {
+          return "Sprint";
+        }
+        if (row.phaseId) {
+          return "Phase";
+        }
         return "Unassigned";
       },
       filterFn: scopeFilterFn,

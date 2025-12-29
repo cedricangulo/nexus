@@ -21,6 +21,7 @@ export async function getComments(query: CommentQuery) {
           id: true,
           name: true,
           email: true,
+			    role: true,
         },
       },
     },
@@ -36,6 +37,7 @@ export async function getCommentById(id: string) {
           id: true,
           name: true,
           email: true,
+			    role: true,
         },
       },
     },
@@ -126,36 +128,50 @@ export async function createComment(userId: string, input: CreateCommentInput) {
  * Supports @"Full Name" and @username formats
  */
 async function parseMentions(content: string, authorId: string): Promise<string[]> {
-  // Match @"Full Name" or @SingleName patterns
-  const mentionPattern = /@"([^"]+)"|@(\w+)/g;
-  const matches = content.matchAll(mentionPattern);
+  const mentionedUserIds = new Set<string>();
+
+  // Storage format used by the client: @[Full Name](uuid)
+  const storageMentionPattern = /@\[[^\]]+\]\(([a-f0-9-]{36})\)/gi;
+  for (const match of content.matchAll(storageMentionPattern)) {
+    const id = match[1];
+    if (id && id !== authorId) {
+      mentionedUserIds.add(id);
+    }
+  }
+
+  // Legacy formats: @"Full Name" or @SingleName
+  // Remove storage mentions first so we do not accidentally parse parts of them.
+  const contentWithoutStorageMentions = content.replace(storageMentionPattern, "");
+  const legacyMentionPattern = /@"([^"]+)"|@(\w+)/g;
+  const matches = contentWithoutStorageMentions.matchAll(legacyMentionPattern);
   const names: string[] = [];
 
   for (const match of matches) {
-    // match[1] is the quoted name, match[2] is the unquoted name
     const name = match[1] || match[2];
     if (name) {
       names.push(name);
     }
   }
 
-  if (names.length === 0) {
-    return [];
+  if (names.length > 0) {
+    const users = await prisma.user.findMany({
+      where: {
+        OR: names.map((name) => ({
+          name: { equals: name, mode: "insensitive" as const },
+        })),
+        deletedAt: null,
+      },
+      select: { id: true },
+    });
+
+    for (const user of users) {
+      if (user.id !== authorId) {
+        mentionedUserIds.add(user.id);
+      }
+    }
   }
 
-  // Find users by name (case-insensitive)
-  const users = await prisma.user.findMany({
-    where: {
-      OR: names.map(name => ({
-        name: { equals: name, mode: 'insensitive' as const },
-      })),
-      deletedAt: null,
-    },
-    select: { id: true },
-  });
-
-  // Filter out the author
-  return users.map(u => u.id).filter(id => id !== authorId);
+  return Array.from(mentionedUserIds);
 }
 
 export async function updateComment(id: string, userId: string, input: UpdateCommentInput) {

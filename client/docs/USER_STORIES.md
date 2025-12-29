@@ -781,7 +781,8 @@ As an Adviser, I want to export a summary report showing project completion, tea
 | **Create Tasks**           | ✅         | ❌             | ❌                  |
 | **Update Task Status**     | ✅         | ✅ (own tasks) | ❌                  |
 | **Mark Task Blocked**      | ✅         | ✅ (own tasks) | ❌                  |
-| **Add Comments**           | ✅         | ✅             | ❌                  |
+| **Add Comments**           | ✅         | ✅             | ✅                  |
+| **Mention in Comments**    | ✅         | ❌             | ✅                  |
 | **View Dashboard**         | ✅ (full)  | ✅ (personal)  | ✅ (full read-only) |
 | **View Activity Log**      | ✅         | ❌             | ✅ (read-only)      |
 | **Export Data**            | ✅         | ❌             | ✅ (summary only)   |

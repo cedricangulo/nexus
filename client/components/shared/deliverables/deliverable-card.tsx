@@ -28,7 +28,7 @@ export function DeliverableCard({
 
   return (
     <Link href={`/deliverables/${deliverable.id}`}>
-      <FramePanel className="space-y-4 bg-card hover:bg-card/60 transition-colors">
+      <FramePanel className="space-y-4 bg-card transition-colors hover:bg-card/60">
         <div className="space-y-0">
           <FrameTitle className="w-full truncate font-semibold text-base">
             {deliverable.title}

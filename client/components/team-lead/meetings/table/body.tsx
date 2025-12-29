@@ -135,7 +135,7 @@ function MeetingsFilters({
             >
               <CircleXIcon aria-hidden="true" size={16} />
             </button>
-          ): null}
+          ) : null}
         </div>
 
         {/* Scope Filter Popover */}
@@ -152,7 +152,7 @@ function MeetingsFilters({
                 <span className="-me-1 inline-flex h-5 max-h-full items-center rounded border bg-background px-1 font-[inherit] font-medium text-[0.625rem] text-muted-foreground/70">
                   {selectedScopes.length}
                 </span>
-              ): null}
+              ) : null}
             </Button>
           </PopoverTrigger>
           <PopoverContent align="start" className="w-auto min-w-36 p-3">

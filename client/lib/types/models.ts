@@ -144,6 +144,7 @@ export type Comment = {
   author?: {
     id: string;
     name: string;
+    role?: string;
   };
   taskId?: string | null;
   deliverableId?: string | null;

@@ -11,10 +11,5 @@ export default async function Page() {
   const sprints = await getSprints();
   const progressById = await getSprintsProgress(sprints.map((s) => s.id));
 
-  return (
-    <SprintsClient
-      progressById={progressById}
-      sprints={sprints}
-    />
-  );
+  return <SprintsClient progressById={progressById} sprints={sprints} />;
 }

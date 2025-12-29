@@ -3,7 +3,6 @@
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { deleteSprintAction } from "@/actions/sprint";
-import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,6 +13,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,30 +52,29 @@ export function SprintActionsMenu({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            onClick={(e) => e.preventDefault()}
-          >
+          <Button onClick={(e) => e.preventDefault()} variant="ghost">
             <MoreVertical size={16} />
             <span className="sr-only">Sprint actions</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={(e) => {
-            e.preventDefault();
-            onEditClick();
-          }}>
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.preventDefault();
+              onEditClick();
+            }}
+          >
             <Pencil size={16} />
             Edit Sprint
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
+            className="text-destructive"
+            disabled={isDeleting}
             onClick={(e) => {
               e.preventDefault();
               setShowDeleteDialog(true);
             }}
-            disabled={isDeleting}
-            className="text-destructive"
           >
             <Trash2 size={16} />
             Delete Sprint
@@ -83,22 +82,21 @@ export function SprintActionsMenu({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+      <AlertDialog onOpenChange={setShowDeleteDialog} open={showDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Sprint {sprint.number}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. The sprint will be marked as deleted.
+              This action cannot be undone. The sprint will be marked as
+              deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>
-              Cancel
-            </AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDelete}
-              disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={isDeleting}
+              onClick={handleDelete}
             >
               {isDeleting ? "Deleting..." : "Delete"}
             </AlertDialogAction>

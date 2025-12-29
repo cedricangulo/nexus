@@ -31,14 +31,14 @@ export function ErrorState({
         <EmptyTitle>{title}</EmptyTitle>
         <EmptyDescription>{message}</EmptyDescription>
       </EmptyHeader>
-      {(showRetry && onRetry) ? (
+      {showRetry && onRetry ? (
         <EmptyContent>
           <Button onClick={onRetry} variant="outline">
             <RefreshCw size={16} />
             Try Again
           </Button>
         </EmptyContent>
-      ): null}
+      ) : null}
     </Empty>
   );
 }

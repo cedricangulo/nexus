@@ -16,10 +16,7 @@ type SprintsClientProps = {
   progressById: Record<string, SprintProgress | undefined>;
 };
 
-export function SprintsClient({
-  sprints,
-  progressById,
-}: SprintsClientProps) {
+export function SprintsClient({ sprints, progressById }: SprintsClientProps) {
   const [filter, setFilter] = useState<FilterKey>("all");
 
   const now = new Date();

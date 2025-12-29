@@ -681,7 +681,9 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
       };
     } else {
       const t = threeRef.current;
-      if (!t) return;
+      if (!t) {
+        return;
+      }
       t.uniforms.uShapeType.value = SHAPE_MAP[variant] ?? 0;
       t.uniforms.uPixelSize.value = pixelSize * t.renderer.getPixelRatio();
       t.uniforms.uColor.value.set(color);

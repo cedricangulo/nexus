@@ -40,7 +40,13 @@ function getPageTitle(pathname: string): string | undefined {
  * Provides main navigation header with sidebar toggle, search, notifications, and user avatar
  * Title updates dynamically based on current route - shows project name on dashboard
  */
-export function AppHeader({ project }: { project: Project | null }) {
+export function AppHeader({
+  project,
+  notificationComponent,
+}: {
+  project: Project | null;
+  notificationComponent: React.ReactNode;
+}) {
   const pathname = usePathname();
 
   // For dashboard, show project name; for other routes, use mapping
@@ -50,6 +56,7 @@ export function AppHeader({ project }: { project: Project | null }) {
   } else {
     title = getPageTitle(pathname);
   }
+
   return (
     <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-3 border-b bg-sidebar/60 backdrop-blur-2xl">
       <div className="flex items-center gap-2 px-3">
@@ -59,19 +66,20 @@ export function AppHeader({ project }: { project: Project | null }) {
         />
         <Separator aria-hidden="true" className="h-4" orientation="vertical" />
         {title ? (
-          <h1 className="text-muted-foreground font-medium text-sm md:text-lg">
+          <h1 className="font-medium text-muted-foreground text-sm md:text-lg">
             {title}
           </h1>
         ) : null}
       </div>
 
-      <div className="flex flex-1 items-center justify-end gap-3 px-4 md:gap-6">
+      <div className="flex flex-1 items-center justify-end gap-4 px-4">
         <div className="hidden w-full max-w-xs items-center gap-2 md:flex">
           <div className="relative w-full">
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input aria-label="Search" className="pl-9" placeholder="Search" />
           </div>
         </div>
+        {notificationComponent}
         <ThemeToggle />
       </div>
     </header>

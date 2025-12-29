@@ -63,7 +63,7 @@ export function AppHeader({ project }: { project: Project | null }) {
         />
         <Separator aria-hidden="true" className="h-4" orientation="vertical" />
         {title ? (
-          <h1 className="text-muted-foreground font-medium text-sm md:text-lg">
+          <h1 className="font-medium text-muted-foreground text-sm md:text-lg">
             {title}
           </h1>
         ) : null}
@@ -76,16 +76,6 @@ export function AppHeader({ project }: { project: Project | null }) {
             <Input aria-label="Search" className="pl-9" placeholder="Search" />
           </div>
         </div>
-
-        {/* <Button
-          aria-label="Notifications"
-          className="relative"
-          size="icon"
-          variant="ghost"
-        >
-          <Bell className="size-4" />
-          <span className="absolute rounded-full top-2 right-2 size-2 bg-destructive ring-2 ring-background" />
-        </Button> */}
         <ThemeToggle />
       </div>
     </header>

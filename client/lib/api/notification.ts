@@ -10,9 +10,18 @@ export type CreateNotificationInput = {
 
 export const notificationApi = {
   listNotifications: async (): Promise<Notification[]> => {
-    const client = await createApiClient();
-    const response = await client.get(API_ENDPOINTS.NOTIFICATIONS.LIST);
-    return response.data;
+    try {
+      const client = await createApiClient();
+      const response = await client.get(API_ENDPOINTS.NOTIFICATIONS.LIST);
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Notification API error:",
+        error instanceof Error ? error.message : error
+      );
+      // Return empty array on error to prevent crashes
+      return [];
+    }
   },
 
   createNotification: async (

@@ -101,7 +101,7 @@ function TeamMembersFilters({
             >
               <CircleXIcon aria-hidden="true" size={16} />
             </button>
-          ): null}
+          ) : null}
         </div>
 
         {/* Column Visibility Toggle */}
