@@ -46,8 +46,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { formatTitleCase } from "@/lib/helpers";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { formatTitleCase } from "@/lib/helpers";
 import { type Deliverable, DeliverableStatus } from "@/lib/types";
 import { deliverableSchema } from "@/lib/validation";
 
@@ -242,12 +242,14 @@ export function DeliverableDialog({
             </DrawerDescription>
           </DrawerHeader>
 
-          <div className="px-4">
-            {formContent}
-          </div>
+          <div className="px-4">{formContent}</div>
 
           <DrawerFooter>
-            <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} type="button">
+            <Button
+              disabled={isPending}
+              onClick={form.handleSubmit(onSubmit)}
+              type="button"
+            >
               {(() => {
                 if (isPending) {
                   return "Saving...";
@@ -292,7 +294,11 @@ export function DeliverableDialog({
           >
             Cancel
           </Button>
-          <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} type="button">
+          <Button
+            disabled={isPending}
+            onClick={form.handleSubmit(onSubmit)}
+            type="button"
+          >
             {(() => {
               if (isPending) {
                 return "Saving...";

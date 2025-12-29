@@ -127,10 +127,7 @@ export function CreateTaskDialog({ sprintId, users }: CreateTaskDialogProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Assignee (Optional)</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value || ""}
-              >
+              <Select onValueChange={field.onChange} value={field.value || ""}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Unassigned" />
@@ -183,12 +180,14 @@ export function CreateTaskDialog({ sprintId, users }: CreateTaskDialogProps) {
               </DrawerDescription>
             </DrawerHeader>
 
-            <div className="px-4">
-              {formContent}
-            </div>
+            <div className="px-4">{formContent}</div>
 
             <DrawerFooter>
-              <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} type="button">
+              <Button
+                disabled={isPending}
+                onClick={form.handleSubmit(onSubmit)}
+                type="button"
+              >
                 {isPending ? "Creating..." : "Add Task"}
               </Button>
               <DrawerClose asChild>
@@ -229,7 +228,11 @@ export function CreateTaskDialog({ sprintId, users }: CreateTaskDialogProps) {
           >
             Cancel
           </Button>
-          <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} type="button">
+          <Button
+            disabled={isPending}
+            onClick={form.handleSubmit(onSubmit)}
+            type="button"
+          >
             {isPending ? "Creating..." : "Add Task"}
           </Button>
         </DialogFooter>

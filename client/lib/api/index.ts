@@ -15,6 +15,7 @@ export { meetingLogApi } from "./meeting-log";
 export { notificationApi } from "./notification";
 export { phaseApi } from "./phase";
 export { projectApi } from "./project";
+export { searchApi } from "./search";
 export { sprintApi } from "./sprint";
 export { taskApi } from "./task";
 export { userApi } from "./user";

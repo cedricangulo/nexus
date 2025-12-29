@@ -65,7 +65,8 @@ export async function uploadEvidenceAction(
     if (!allowedTypes.includes(file.type)) {
       return {
         success: false,
-        error: "Invalid file type. Only PDF and images (JPEG, PNG, GIF, WEBP) are allowed.",
+        error:
+          "Invalid file type. Only PDF and images (JPEG, PNG, GIF, WEBP) are allowed.",
       };
     }
 

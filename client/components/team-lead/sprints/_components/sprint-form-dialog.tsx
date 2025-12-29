@@ -8,9 +8,7 @@ import type { DateValue, RangeValue } from "react-aria-components";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
-
-import { updateSprintAction } from "@/actions/sprints";
-import { createSprintAction } from "@/actions/sprints";
+import { createSprintAction, updateSprintAction } from "@/actions/sprints";
 import DateRange from "@/components/shared/date-range";
 import { Button } from "@/components/ui/button";
 import {
@@ -87,7 +85,7 @@ export function SprintFormDialog({
   const onSubmit = (values: z.infer<typeof createSprintSchema>) => {
     startTransition(async () => {
       let result;
-      
+
       if (isEditing && sprint) {
         result = await updateSprintAction({
           id: sprint.id,
@@ -105,7 +103,9 @@ export function SprintFormDialog({
           form.reset();
         }
       } else {
-        toast.error(result.error || `Failed to ${isEditing ? "update" : "create"} sprint`);
+        toast.error(
+          result.error || `Failed to ${isEditing ? "update" : "create"} sprint`
+        );
       }
     });
   };
@@ -150,8 +150,7 @@ export function SprintFormDialog({
                       form.setValue("endDate", range.end.toString());
                     }}
                     value={
-                      form.getValues("startDate") &&
-                      form.getValues("endDate")
+                      form.getValues("startDate") && form.getValues("endDate")
                         ? {
                             start: parseDate(form.getValues("startDate")),
                             end: parseDate(form.getValues("endDate")),
@@ -178,7 +177,9 @@ export function SprintFormDialog({
       <Drawer onOpenChange={onOpenChange} open={open}>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>{isEditing ? `Edit Sprint ${sprint?.number}` : "Create Sprint"}</DrawerTitle>
+            <DrawerTitle>
+              {isEditing ? `Edit Sprint ${sprint?.number}` : "Create Sprint"}
+            </DrawerTitle>
             <DrawerDescription>
               {isEditing
                 ? "Update the sprint goal and timeline."
@@ -186,9 +187,7 @@ export function SprintFormDialog({
             </DrawerDescription>
           </DrawerHeader>
 
-          <div className="px-4">
-            {formContent}
-          </div>
+          <div className="px-4">{formContent}</div>
 
           <DrawerFooter>
             <Button
@@ -196,7 +195,13 @@ export function SprintFormDialog({
               onClick={form.handleSubmit(onSubmit)}
               type="button"
             >
-              {isPending ? (isEditing ? "Saving..." : "Creating...") : (isEditing ? "Save Changes" : "Create Sprint")}
+              {isPending
+                ? isEditing
+                  ? "Saving..."
+                  : "Creating..."
+                : isEditing
+                  ? "Save Changes"
+                  : "Create Sprint"}
             </Button>
             <DrawerClose asChild>
               <Button disabled={isPending} variant="outline">
@@ -213,7 +218,9 @@ export function SprintFormDialog({
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEditing ? `Edit Sprint ${sprint?.number}` : "Create Sprint"}</DialogTitle>
+          <DialogTitle>
+            {isEditing ? `Edit Sprint ${sprint?.number}` : "Create Sprint"}
+          </DialogTitle>
           <DialogDescription>
             {isEditing
               ? "Update the sprint goal and timeline."
@@ -232,8 +239,18 @@ export function SprintFormDialog({
           >
             Cancel
           </Button>
-          <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} type="button">
-            {isPending ? (isEditing ? "Saving..." : "Creating...") : (isEditing ? "Save Changes" : "Create Sprint")}
+          <Button
+            disabled={isPending}
+            onClick={form.handleSubmit(onSubmit)}
+            type="button"
+          >
+            {isPending
+              ? isEditing
+                ? "Saving..."
+                : "Creating..."
+              : isEditing
+                ? "Save Changes"
+                : "Create Sprint"}
           </Button>
         </DialogFooter>
       </DialogContent>

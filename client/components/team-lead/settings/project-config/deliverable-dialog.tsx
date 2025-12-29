@@ -154,9 +154,7 @@ export default function DeliverableDialog({
             <DrawerDescription>{description}</DrawerDescription>
           </DrawerHeader>
 
-          <div className="px-4">
-            {formContent}
-          </div>
+          <div className="px-4">{formContent}</div>
 
           <DrawerFooter>
             <Button
@@ -170,9 +168,7 @@ export default function DeliverableDialog({
               Save
             </Button>
             <DrawerClose asChild>
-              <Button variant="outline">
-                Cancel
-              </Button>
+              <Button variant="outline">Cancel</Button>
             </DrawerClose>
           </DrawerFooter>
         </DrawerContent>

@@ -1,9 +1,10 @@
 "use client";
 
-import { Search } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { GlobalSearch } from "@/components/search/global-search";
+import { SearchTrigger } from "@/components/search/search-trigger";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { Project } from "@/lib/types";
@@ -52,6 +53,20 @@ export function AppHeader({
   notificationComponent: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Keyboard shortcut for search (Cmd/Ctrl + K)
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setSearchOpen((open) => !open);
+      }
+    };
+
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   // For dashboard, show project name; for other routes, use mapping
   let title: string | undefined;
@@ -76,15 +91,14 @@ export function AppHeader({
       </div>
 
       <div className="flex flex-1 items-center justify-end gap-3 px-4 md:gap-6">
-        <div className="hidden w-full max-w-xs items-center gap-2 md:flex">
-          <div className="relative w-full">
-            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input aria-label="Search" className="pl-9" placeholder="Search" />
-          </div>
+        <div className="w-full max-w-xs items-center gap-2 md:flex">
+          <SearchTrigger onOpenSearch={() => setSearchOpen(true)} />
         </div>
         {notificationComponent}
         <ThemeToggle />
       </div>
+
+      <GlobalSearch onOpenChange={setSearchOpen} open={searchOpen} />
     </header>
   );
 }

@@ -1,13 +1,13 @@
 "use client";
 
+import { UploadIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { DeliverableDetails } from "@/components/shared/deliverables";
-import { UploadEvidenceDialog } from "./upload-evidence-dialog";
 import { Button } from "@/components/ui/button";
-import { UploadIcon } from "lucide-react";
 import type { Comment, Deliverable, Evidence, Phase } from "@/lib/types";
 import { DeliverableStatus } from "@/lib/types";
+import { UploadEvidenceDialog } from "./upload-evidence-dialog";
 
 type MemberDeliverableActionsProps = {
   deliverable: Deliverable;

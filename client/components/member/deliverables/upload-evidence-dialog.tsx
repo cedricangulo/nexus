@@ -57,7 +57,9 @@ export function UploadEvidenceDialog({
 
   const handleUpload = useCallback(async () => {
     const file = files[0];
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     try {
       // Create FormData for server action
@@ -66,10 +68,7 @@ export function UploadEvidenceDialog({
       formData.append("file", file);
 
       startTransition(async () => {
-        const result = await uploadEvidenceAction(
-          { success: false },
-          formData
-        );
+        const result = await uploadEvidenceAction({ success: false }, formData);
 
         if (result.success) {
           toast.success("Evidence uploaded successfully", {
@@ -91,7 +90,7 @@ export function UploadEvidenceDialog({
         error instanceof Error ? error.message : "An unknown error occurred"
       );
     }
-  }, [files, deliverableId, onSuccess]);
+  }, [files, deliverableId, onSuccess, handleOpenChange]);
 
   const onFileReject = useCallback((file: File, message: string) => {
     toast.error(message, {
@@ -100,7 +99,7 @@ export function UploadEvidenceDialog({
   }, []);
 
   const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen && !isPending) {
+    if (!(newOpen || isPending)) {
       setFiles([]);
       onOpenChange(false);
     } else if (newOpen) {
@@ -171,9 +170,9 @@ export function UploadEvidenceDialog({
           <DrawerHeader>
             <DrawerTitle>Upload Evidence</DrawerTitle>
             <DrawerDescription>
-              Upload a file to fulfill this deliverable. The status will
-              Select a file to fulfill this deliverable. The status will
-              automatically change to Review after upload.
+              Upload a file to fulfill this deliverable. The status will Select
+              a file to fulfill this deliverable. The status will automatically
+              change to Review after upload.
             </DrawerDescription>
           </DrawerHeader>
           <div className="px-4 pb-4">{formContent}</div>

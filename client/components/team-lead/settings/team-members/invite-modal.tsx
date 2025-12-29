@@ -196,12 +196,14 @@ export function InviteMemberModal({
             </DrawerDescription>
           </DrawerHeader>
 
-          <div className="px-4">
-            {formContent}
-          </div>
+          <div className="px-4">{formContent}</div>
 
           <DrawerFooter>
-            <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} type="button">
+            <Button
+              disabled={isPending}
+              onClick={form.handleSubmit(onSubmit)}
+              type="button"
+            >
               {isPending ? "Inviting..." : "Send Invitation"}
             </Button>
             <DrawerClose asChild>
@@ -237,7 +239,11 @@ export function InviteMemberModal({
           >
             Cancel
           </Button>
-          <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} type="button">
+          <Button
+            disabled={isPending}
+            onClick={form.handleSubmit(onSubmit)}
+            type="button"
+          >
             {isPending ? "Inviting..." : "Send Invitation"}
           </Button>
         </DialogFooter>

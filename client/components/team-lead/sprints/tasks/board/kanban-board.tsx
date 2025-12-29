@@ -8,9 +8,9 @@ import type { KanbanMoveEvent } from "@/components/ui/kanban";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Task, TaskStatus, User } from "@/lib/types";
 import { TaskBlockDialog } from "../task-block-dialog";
+import { TaskDetailDialog } from "../task-details";
 import { TaskBoardDesktop } from "./board-desktop";
 import { TaskBoardMobile } from "./board-mobile";
-import { TaskDetailDialog } from "../task-details";
 
 type TaskColumns = Record<TaskStatus, Task[]>;
 
@@ -300,8 +300,8 @@ export function KanbanBoard({ tasks, users, sprintId }: KanbanBoardProps) {
         }}
         open={Boolean(blockingTask)}
         sprintId={sprintId}
-        taskId={blockingTask?.id ?? null}
         targetStatus="BLOCKED"
+        taskId={blockingTask?.id ?? null}
       />
 
       {selectedTask && selectedTaskDetail ? (

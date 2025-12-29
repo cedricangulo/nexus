@@ -1,9 +1,8 @@
 "use client";
 
-import { PlusIcon } from "lucide-react";
-import { useState } from "react";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { MoreVertical, Pencil, PlusIcon, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 import { deleteSprintAction } from "@/actions/sprints";
 import { showPendingActionToast } from "@/components/shared/pending-action-toast";
@@ -102,8 +101,8 @@ export function SprintActionsMenu({
               e.preventDefault();
               e.stopPropagation();
             }}
-            variant="ghost"
             size="icon"
+            variant="ghost"
           >
             <MoreVertical size={16} />
             <span className="sr-only">Sprint actions</span>
