@@ -55,6 +55,15 @@ export function UploadEvidenceDialog({
 
   const maxSize = 10 * 1024 * 1024; // 10MB
 
+  const handleOpenChange = useCallback((newOpen: boolean) => {
+    if (!(newOpen || isPending)) {
+      setFiles([]);
+      onOpenChange(false);
+    } else if (newOpen) {
+      onOpenChange(true);
+    }
+  }, [isPending, onOpenChange]);
+
   const handleUpload = useCallback(async () => {
     const file = files[0];
     if (!file) {
@@ -97,15 +106,6 @@ export function UploadEvidenceDialog({
       description: `"${file.name.length > 30 ? `${file.name.slice(0, 30)}...` : file.name}" was rejected`,
     });
   }, []);
-
-  const handleOpenChange = (newOpen: boolean) => {
-    if (!(newOpen || isPending)) {
-      setFiles([]);
-      onOpenChange(false);
-    } else if (newOpen) {
-      onOpenChange(true);
-    }
-  };
 
   const formContent = (
     <FileUpload
