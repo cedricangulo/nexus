@@ -86,6 +86,7 @@ model User {
   comments         Comment[]
   activityLogs     ActivityLog[]
   notifications    Notification[]
+  deviceTokens     DeviceToken[]
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -308,4 +309,16 @@ model Notification {
   @@index([userId])
   @@index([isRead])
   @@index([createdAt])
+}
+
+model DeviceToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  platform  String   // "web" | "android" | "ios"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }

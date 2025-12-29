@@ -1,6 +1,7 @@
 import { unauthorized } from "next/navigation";
 import type { ReactNode } from "react";
 import { auth } from "@/auth";
+import { PushNotificationProvider } from "@/providers/push-notification-provider";
 
 export default async function AuthLayout({
   children,
@@ -40,11 +41,12 @@ export default async function AuthLayout({
   }
 
   return (
-    <>
+    <PushNotificationProvider>
       {/* 3. Render children so Next.js can manage route states and sub-routes */}
       {children}
       {/* 4. Render the role-specific dashboard/UI */}
       {roleSlot}
-    </>
+    </PushNotificationProvider>
   );
 }
+

@@ -22,6 +22,7 @@ import { notificationRoutes } from './modules/notification/notification.routes.j
 import { activityLogRoutes } from './modules/activity-log/activity-log.routes.js';
 import { backupRoutes } from './modules/backup/backup.routes.js';
 import { searchRoutes } from './modules/search/search.routes.js';
+import { deviceTokenRoutes } from './modules/device-token/device-token.routes.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = fastify({
@@ -42,7 +43,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   app.setSerializerCompiler(serializerCompiler);
 
   // Register Plugins
-  
+
   // CORS
   await app.register(cors, {
     origin: [env.FRONTEND_URL],
@@ -101,14 +102,14 @@ export async function buildApp(): Promise<FastifyInstance> {
 
     // Handle Fastify multipart errors specifically
     if (error.code === 'FST_FMP_PARTS_LIMIT' || error.code === 'FST_FMP_FILE_SIZE_LIMIT' || error.code === 'FST_FMP_TOO_MANY_BYTES' || error.code === 'FST_REQ_FILE_TOO_LARGE') {
-        return reply.status(413).send({
-            success: false,
-            message: 'File payload too large',
-            statusCode: 413,
-            code: error.code,
-        });
+      return reply.status(413).send({
+        success: false,
+        message: 'File payload too large',
+        statusCode: 413,
+        code: error.code,
+      });
     }
-    
+
     const statusCode = error.statusCode || 500;
     const message = error.message || 'Internal Server Error';
 
@@ -130,7 +131,7 @@ export async function buildApp(): Promise<FastifyInstance> {
     api.get('/', async () => {
       return { message: 'Welcome to Nexus API v1' };
     });
-    
+
     // Auth Routes
     api.register(authRoutes, { prefix: '/auth' });
 
@@ -175,6 +176,9 @@ export async function buildApp(): Promise<FastifyInstance> {
 
     // Search Routes
     api.register(searchRoutes, { prefix: '/search' });
+
+    // Device Token Routes (Push Notifications)
+    api.register(deviceTokenRoutes, { prefix: '/device-tokens' });
   }, { prefix: '/api/v1' });
 
   return app;

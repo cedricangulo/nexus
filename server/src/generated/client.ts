@@ -94,3 +94,8 @@ export type ActivityLog = Prisma.ActivityLogModel
  * 
  */
 export type Notification = Prisma.NotificationModel
+/**
+ * Model DeviceToken
+ * 
+ */
+export type DeviceToken = Prisma.DeviceTokenModel

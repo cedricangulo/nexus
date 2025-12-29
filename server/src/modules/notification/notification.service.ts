@@ -1,4 +1,6 @@
 import { getPrismaClient, NotFoundError } from "../../utils/database.js";
+import { sendPushToUser } from "../../services/push.service.js";
+import logger from "../../utils/logger.js";
 
 const prisma = getPrismaClient();
 
@@ -9,9 +11,20 @@ interface CreateNotificationInput {
 }
 
 export async function createNotification(input: CreateNotificationInput) {
-  return prisma.notification.create({
+  const notification = await prisma.notification.create({
     data: input,
   });
+
+  // Send push notification (fire and forget - don't block response)
+  sendPushToUser(input.userId, {
+    title: "Nexus",
+    body: input.message,
+    link: input.link,
+  }).catch((err) => {
+    logger.warn({ err, userId: input.userId }, "Push notification failed");
+  });
+
+  return notification;
 }
 
 export async function getUserNotifications(userId: string) {

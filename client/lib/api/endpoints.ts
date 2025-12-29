@@ -130,6 +130,12 @@ export const API_ENDPOINTS = {
     EXPORT: "/backup/export",
     FILES: "/backup/files",
   },
+
+  // Device Token Endpoints (Push Notifications)
+  DEVICE_TOKENS: {
+    REGISTER: "/device-tokens",
+    UNREGISTER: (token: string) => `/device-tokens/${token}`,
+  },
 } as const;
 
 /**

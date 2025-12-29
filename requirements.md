@@ -145,6 +145,16 @@ The dashboard must display:
 *   **Validation:** Empty search queries must be rejected with a 400 error.
 *   Results must be returned grouped by entity type.
 
+### 5.14 Push Notifications
+*   Users must be able to receive browser push notifications for important events.
+*   **Supported Platforms:** Web browsers (Chrome, Firefox, Edge). iOS Safari requires PWA installation.
+*   **Technology:** Firebase Cloud Messaging (FCM) for cross-platform delivery.
+*   **Trigger Events:** Notifications are sent when in-app notifications are created (task assignments, mentions, blockers, etc.).
+*   **Device Token Management:**
+    *   Device tokens are registered automatically after login.
+    *   Invalid/expired tokens are cleaned up automatically.
+*   **User Control:** Users can deny browser notification permission; the system gracefully handles this.
+
 ## 6. Non-Functional Requirements
 
 ### 6.1 Usability
@@ -178,6 +188,7 @@ The dashboard must display:
 *   **MeetingLog** (Links to Sprint OR Phase; contains `fileUrl` for PDF/Image)
 *   **ActivityLog** (Audit Trail)
 *   **Notification** (In-app alerts)
+*   **DeviceToken** (FCM tokens for push notifications; linked to User)
 
 ### 7.2 API Capabilities
 *   CRUD operations for all core entities.
