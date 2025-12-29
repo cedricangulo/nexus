@@ -21,6 +21,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import {
   Form,
   FormControl,
   FormField,
@@ -38,6 +47,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { formatTitleCase } from "@/lib/helpers";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { type Deliverable, DeliverableStatus } from "@/lib/types";
 import { deliverableSchema } from "@/lib/validation";
 
@@ -56,6 +66,7 @@ export function DeliverableDialog({
 }: DeliverableDialogProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const isMobile = useIsMobile();
   const isEditing = !!deliverable;
 
   const form = useForm({
@@ -141,6 +152,123 @@ export function DeliverableDialog({
     });
   };
 
+  const formContent = (
+    <Form {...form}>
+      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="dueDate"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Due Date</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {isEditing ? (
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <Select
+                  defaultValue={field.value}
+                  onValueChange={field.onChange}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {Object.values(DeliverableStatus).map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {formatTitleCase(status)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        ) : null}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </form>
+    </Form>
+  );
+
+  if (isMobile) {
+    return (
+      <Drawer onOpenChange={onOpenChange} open={open}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>
+              {isEditing ? "Edit Deliverable" : "Add Deliverable"}
+            </DrawerTitle>
+            <DrawerDescription>
+              {isEditing
+                ? "Update the details for this deliverable."
+                : "Create a new deliverable for this phase."}
+            </DrawerDescription>
+          </DrawerHeader>
+
+          <div className="px-4">
+            {formContent}
+          </div>
+
+          <DrawerFooter>
+            <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} type="button">
+              {(() => {
+                if (isPending) {
+                  return "Saving...";
+                }
+                if (isEditing) {
+                  return "Save Changes";
+                }
+                return "Create Deliverable";
+              })()}
+            </Button>
+            <DrawerClose asChild>
+              <Button disabled={isPending} variant="outline">
+                Cancel
+              </Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
@@ -154,99 +282,28 @@ export function DeliverableDialog({
               : "Create a new deliverable for this phase."}
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="dueDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Due Date</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {isEditing ? (
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select
-                      defaultValue={field.value}
-                      onValueChange={field.onChange}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.values(DeliverableStatus).map((status) => (
-                          <SelectItem key={status} value={status}>
-                            {formatTitleCase(status)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ) : null}
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <DialogFooter>
-              <Button
-                disabled={isPending}
-                onClick={() => onOpenChange(false)}
-                type="button"
-                variant="outline"
-              >
-                Cancel
-              </Button>
-              <Button disabled={isPending} type="submit">
-                {(() => {
-                  if (isPending) {
-                    return "Saving...";
-                  }
-                  if (isEditing) {
-                    return "Save Changes";
-                  }
-                  return "Create Deliverable";
-                })()}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+        {formContent}
+        <DialogFooter>
+          <Button
+            disabled={isPending}
+            onClick={() => onOpenChange(false)}
+            type="button"
+            variant="outline"
+          >
+            Cancel
+          </Button>
+          <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} type="button">
+            {(() => {
+              if (isPending) {
+                return "Saving...";
+              }
+              if (isEditing) {
+                return "Save Changes";
+              }
+              return "Create Deliverable";
+            })()}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

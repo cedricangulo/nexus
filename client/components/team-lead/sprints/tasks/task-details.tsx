@@ -18,6 +18,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import {
   Form,
   FormControl,
   FormField,
@@ -34,6 +43,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { Task, User } from "@/lib/types";
 import { taskDetailSchema } from "@/lib/validation";
 
@@ -61,6 +71,7 @@ export function TaskDetailDialog({
 }: TaskDetailDialogProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   const assigneeOptions = useMemo(
     () =>
@@ -172,6 +183,158 @@ export function TaskDetailDialog({
     });
   };
 
+  const formContent = (
+    <Form {...form}>
+      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Task title" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  placeholder="Optional details"
+                  rows={3}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ""}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {statusOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="assigneeId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Assignee</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ""}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Unassigned" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {assigneeOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {isBlockReasonVisible ? (
+          <FormField
+            control={form.control}
+            name="blockReason"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Reason for Block</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder="Explain why this task is blocked"
+                    rows={3}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        ) : null}
+      </form>
+    </Form>
+  );
+
+  if (isMobile) {
+    return (
+      <Drawer onOpenChange={onOpenChange} open={open}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Edit Task</DrawerTitle>
+            <DrawerDescription>
+              Update task details, status, assignee, or provide a reason if
+              blocked.
+            </DrawerDescription>
+          </DrawerHeader>
+
+          <div className="px-4">
+            {formContent}
+          </div>
+
+          <DrawerFooter>
+            <Button
+              disabled={isPending}
+              onClick={form.handleSubmit(onSubmit)}
+              type="button"
+              variant={isMovingToBlocked ? "destructive" : "default"}
+            >
+              {isPending ? "Updating..." : "Update"}
+            </Button>
+            <DrawerClose asChild>
+              <Button disabled={isPending} variant="outline">
+                Cancel
+              </Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent className="max-w-2xl">
@@ -183,137 +346,26 @@ export function TaskDetailDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Task title" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {formContent}
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Optional details"
-                      rows={3}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value || ""}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {statusOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="assigneeId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Assignee</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value || ""}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Unassigned" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {assigneeOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {isBlockReasonVisible ? (
-              <FormField
-                control={form.control}
-                name="blockReason"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Reason for Block</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        placeholder="Explain why this task is blocked"
-                        rows={3}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ) : null}
-
-            <DialogFooter>
-              <Button
-                disabled={isPending}
-                onClick={() => onOpenChange(false)}
-                type="button"
-                variant="outline"
-              >
-                Cancel
-              </Button>
-              <Button
-                disabled={isPending}
-                type="submit"
-                variant={isMovingToBlocked ? "destructive" : "default"}
-              >
-                {isPending ? "Updating..." : "Update"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+        <DialogFooter>
+          <Button
+            disabled={isPending}
+            onClick={() => onOpenChange(false)}
+            type="button"
+            variant="outline"
+          >
+            Cancel
+          </Button>
+          <Button
+            disabled={isPending}
+            onClick={form.handleSubmit(onSubmit)}
+            type="button"
+            variant={isMovingToBlocked ? "destructive" : "default"}
+          >
+            {isPending ? "Updating..." : "Update"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

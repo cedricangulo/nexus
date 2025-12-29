@@ -29,6 +29,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { showPendingActionToast } from "@/components/shared/pending-action-toast";
 import type { ActionConfig, GenericRowActionsProps } from "./types";
 
 const defaultActionIcons: Record<string, LucideIcon> = {
@@ -39,6 +40,17 @@ const defaultActionIcons: Record<string, LucideIcon> = {
   approve: Check,
   reject: X,
 };
+
+function getActionDescription(label: string): string {
+  const descriptions: Record<string, string> = {
+    delete: "This item will be permanently removed.",
+    restore: "This item will be restored and become active again.",
+    approve: "You are about to approve this item.",
+    reject: "You are about to reject this item.",
+  };
+
+  return descriptions[label.toLowerCase()] || "This action cannot be undone.";
+}
 
 export function GenericRowActions<T>({
   row,
@@ -72,8 +84,22 @@ export function GenericRowActions<T>({
       return;
     }
 
-    onAction(pendingAction.id, row);
+    // Close alert dialog first
     setIsAlertOpen(false);
+
+    // Show pending action toast with countdown
+    showPendingActionToast({
+      title: `${pendingAction.label} in progress`,
+      description: "This action will complete shortly. Click cancel to undo.",
+      duration: 5000,
+      onTimeout: async () => {
+        onAction(pendingAction.id, row);
+        setPendingAction(null);
+      },
+      onCancel: () => {
+        setPendingAction(null);
+      },
+    });
   };
 
   if (actions.length === 0) {
@@ -134,7 +160,7 @@ export function GenericRowActions<T>({
               {`Confirm ${pendingAction?.label}`}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone.
+              {pendingAction && getActionDescription(pendingAction.label)}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

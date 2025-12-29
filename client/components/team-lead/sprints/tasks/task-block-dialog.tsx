@@ -17,6 +17,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import {
   Form,
   FormControl,
   FormField,
@@ -25,6 +34,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { TaskStatus } from "@/lib/types";
 import { updateTaskStatusSchema } from "@/lib/validation";
 
@@ -48,6 +58,7 @@ export function TaskBlockDialog({
   onSuccess,
 }: TaskBlockDialogProps) {
   const [isPending, startTransition] = useTransition();
+  const isMobile = useIsMobile();
 
   const form = useForm<z.infer<typeof updateTaskStatusSchema>>({
     resolver: zodResolver(updateTaskStatusSchema),
@@ -98,6 +109,65 @@ export function TaskBlockDialog({
 
   const isBlocked = targetStatus === "BLOCKED";
 
+  const formContent = (
+    <Form {...form}>
+      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+        <FormField
+          control={form.control}
+          name="comment"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{isBlocked ? "Reason" : "Note"}</FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  placeholder={
+                    isBlocked
+                      ? "e.g. Waiting for API endpoint from backend team"
+                      : "Optional comment"
+                  }
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </form>
+    </Form>
+  );
+
+  if (isMobile) {
+    return (
+      <Drawer onOpenChange={onOpenChange} open={open}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{isBlocked ? "Block Task" : "Update Task"}</DrawerTitle>
+            <DrawerDescription>
+              {isBlocked
+                ? "Explain why this task is blocked. This helps the team understand dependencies."
+                : "Provide an optional note for this status change."}
+            </DrawerDescription>
+          </DrawerHeader>
+
+          <div className="px-4">
+            {formContent}
+          </div>
+
+          <DrawerFooter>
+            <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} type="button">
+              {isPending ? (isBlocked ? "Blocking..." : "Saving...") : (isBlocked ? "Block Task" : "Save")}
+            </Button>
+            <DrawerClose asChild>
+              <Button disabled={isPending} variant="outline">
+                Cancel
+              </Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
@@ -110,44 +180,21 @@ export function TaskBlockDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
-              control={form.control}
-              name="comment"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{isBlocked ? "Reason" : "Note"}</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder={
-                        isBlocked
-                          ? "e.g. Waiting for API endpoint from backend team"
-                          : "Optional comment"
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {formContent}
 
-            <DialogFooter>
-              <Button
-                disabled={isPending}
-                onClick={() => onOpenChange(false)}
-                type="button"
-                variant="outline"
-              >
-                Cancel
-              </Button>
-              <Button disabled={isPending} type="submit">
-                {isPending ? (isBlocked ? "Blocking..." : "Saving...") : (isBlocked ? "Block Task" : "Save")}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+        <DialogFooter>
+          <Button
+            disabled={isPending}
+            onClick={() => onOpenChange(false)}
+            type="button"
+            variant="outline"
+          >
+            Cancel
+          </Button>
+          <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} type="button">
+            {isPending ? (isBlocked ? "Blocking..." : "Saving...") : (isBlocked ? "Block Task" : "Save")}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
