@@ -3,8 +3,10 @@
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { deleteDeliverableAction } from "@/actions/phases";
+import { showPendingActionToast } from "@/components/shared/pending-action-toast";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,12 +43,40 @@ export function DeliverableItem({
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
+    const deliverable = deliverables.find((d) => d.id === id);
+    const itemToDelete = deliverable?.title || "this deliverable";
+
     setIsDeleting(id);
-    const result = await deleteDeliverableAction(id);
-    setIsDeleting(null);
-    if (result.success) {
-      router.refresh();
-    }
+
+    showPendingActionToast({
+      title: "Delete deliverable",
+      description: `We'll delete "${itemToDelete}" in 10 seconds. Click Cancel to stop this action.`,
+      duration: 10_000,
+      onTimeout: async () => {
+        try {
+          const result = await deleteDeliverableAction(id);
+
+          if (result.success) {
+            toast.success(`Deleted: ${itemToDelete}`);
+            router.refresh();
+          } else {
+            toast.error(
+              result.error ||
+                "Could not delete the deliverable. Please try again."
+            );
+          }
+        } catch (error) {
+          console.error("Error deleting deliverable:", error);
+          toast.error("An unexpected error occurred");
+        } finally {
+          setIsDeleting(null);
+        }
+      },
+      onCancel: () => {
+        setIsDeleting(null);
+        toast.info("Deletion cancelled, no changes were made.");
+      },
+    });
   };
 
   if (deliverables.length === 0) {

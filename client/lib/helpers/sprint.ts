@@ -1,4 +1,4 @@
-import type { Phase, PhaseType, Sprint } from "@/lib/types";
+import type { Phase, PhaseType, Sprint, TaskStatus } from "@/lib/types";
 import { PhaseType as PhaseTypeEnum } from "@/lib/types";
 
 export type SprintStatus = "ACTIVE" | "PLANNED" | "COMPLETED";
@@ -60,4 +60,22 @@ export function getPhaseTypeForSprint(
     return PhaseTypeEnum.FALL;
   }
   return PhaseTypeEnum.SCRUM;
+}
+
+/**
+ * Map sprint status to task status for badge display
+ */
+export function mapSprintStatusToTaskStatus(
+  sprintStatus: "ACTIVE" | "PLANNED" | "COMPLETED"
+): TaskStatus {
+  switch (sprintStatus) {
+    case "ACTIVE":
+      return "IN_PROGRESS";
+    case "PLANNED":
+      return "TODO";
+    case "COMPLETED":
+      return "DONE";
+    default:
+      return "TODO";
+  }
 }

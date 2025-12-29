@@ -63,9 +63,8 @@ export function GenericRowActions<T>({
     onAction(action.id, row);
   };
 
-  const handleDialogClose = () => {
+  const _handleDialogClose = () => {
     setIsAlertOpen(false);
-    setPendingAction(null);
   };
 
   const handleConfirm = () => {
@@ -74,7 +73,7 @@ export function GenericRowActions<T>({
     }
 
     onAction(pendingAction.id, row);
-    handleDialogClose();
+    setIsAlertOpen(false);
   };
 
   if (actions.length === 0) {
@@ -123,7 +122,8 @@ export function GenericRowActions<T>({
       <AlertDialog
         onOpenChange={(open) => {
           if (!open) {
-            handleDialogClose();
+            setIsAlertOpen(false);
+            setPendingAction(null);
           }
         }}
         open={isAlertOpen}
@@ -131,18 +131,14 @@ export function GenericRowActions<T>({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {pendingAction
-                ? `Confirm ${pendingAction.label}`
-                : "Confirm action"}
+              {`Confirm ${pendingAction?.label}`}
             </AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleDialogClose}>
-              Cancel
-            </AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction disabled={isLoading} onClick={handleConfirm}>
               {isLoading ? "Working..." : "Confirm"}
             </AlertDialogAction>

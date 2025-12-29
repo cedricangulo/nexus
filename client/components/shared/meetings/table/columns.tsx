@@ -1,11 +1,8 @@
 "use client";
 
 import type { ColumnDef, FilterFn } from "@tanstack/react-table";
-import { CopyIcon, ExternalLinkIcon, TrashIcon } from "lucide-react";
-import {
-  type ActionConfig,
-  GenericRowActions,
-} from "@/components/shared/table";
+import type { AppRole } from "@/auth";
+import { MeetingRowActions } from "@/components/shared/meetings/table/row-actions";
 import { formatDateTime } from "@/lib/helpers/format-date";
 import type { MeetingLog, Phase, Sprint } from "@/lib/types";
 
@@ -74,6 +71,7 @@ type ColumnsContext = {
   sprints: Sprint[];
   onAction?: (actionId: string, row: MeetingsTableRow) => Promise<void>;
   loadingIds?: Set<string>;
+  currentUserRole: AppRole;
 };
 
 export function createMeetingColumns(context: ColumnsContext): {
@@ -135,7 +133,7 @@ export function createMeetingColumns(context: ColumnsContext): {
     },
     {
       id: "uploader",
-      size: 220,
+      size: 160,
       accessorFn: (row) => row.uploader?.name ?? "",
       header: "Uploaded by",
       cell: ({ row }) => {
@@ -159,35 +157,17 @@ export function createMeetingColumns(context: ColumnsContext): {
       enableHiding: false,
       enableSorting: false,
       header: () => <span className="sr-only">Actions</span>,
-      cell: ({ row }) => {
-        const actions: ActionConfig[] = [
-          {
-            id: "view",
-            label: "Open minutes",
-            icon: ExternalLinkIcon,
-          },
-          {
-            id: "copy",
-            label: "Copy link",
-            icon: CopyIcon,
-          },
-          {
-            id: "delete",
-            label: "Delete",
-            icon: TrashIcon,
-            variant: "destructive",
-          },
-        ];
-
-        return (
-          <GenericRowActions
-            actions={actions}
-            isLoading={context.loadingIds?.has(row.original.id) ?? false}
-            onAction={(actionId) => context.onAction?.(actionId, row.original)}
-            row={row}
-          />
-        );
-      },
+      cell: ({ row }) => (
+        <MeetingRowActions
+          currentUserRole={context.currentUserRole}
+          isLoading={context.loadingIds?.has(row.original.id) ?? false}
+          meeting={row.original}
+          onAction={async (actionId) => {
+            await (context.onAction?.(actionId, row.original) ??
+              Promise.resolve());
+          }}
+        />
+      ),
     },
   ];
 

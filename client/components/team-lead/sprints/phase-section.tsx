@@ -15,23 +15,11 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/components/ui/status";
 import { formatDateRange } from "@/lib/helpers/format-date";
-import { getSprintStatus } from "@/lib/helpers/sprint";
-import type { Sprint, SprintProgress, TaskStatus } from "@/lib/types";
-
-export function mapSprintStatusToTaskStatus(
-  sprintStatus: "ACTIVE" | "PLANNED" | "COMPLETED"
-): TaskStatus {
-  switch (sprintStatus) {
-    case "ACTIVE":
-      return "IN_PROGRESS";
-    case "PLANNED":
-      return "TODO";
-    case "COMPLETED":
-      return "DONE";
-    default:
-      return "TODO";
-  }
-}
+import {
+  getSprintStatus,
+  mapSprintStatusToTaskStatus,
+} from "@/lib/helpers/sprint";
+import type { Sprint, SprintProgress } from "@/lib/types";
 
 type PhaseSectionProps = {
   sprints: Sprint[];
@@ -79,7 +67,7 @@ export function PhaseSection({
                           <StatusBadge
                             status={mapSprintStatusToTaskStatus(sprintStatus)}
                           />
-                          <FrameTitle className="truncate font-semibold text-base">
+                          <FrameTitle className="mt-2 truncate font-semibold text-base">
                             Sprint {sprint.number}
                           </FrameTitle>
                         </div>
@@ -102,7 +90,7 @@ export function PhaseSection({
                           <span className="text-muted-foreground">
                             Progress
                           </span>
-                          <span className="font-medium">
+                          <span className="font-medium font-sora">
                             {progress
                               ? `${progress.completedTasks}/${progress.totalTasks}`
                               : "0/0"}
