@@ -92,9 +92,9 @@ function PendingActionToastContent({
           </svg>
         </button>
       </div>
-      <div className="absolute inset-x-0 bottom-0 h-1 overflow-hidden bg-amber-100 dark:bg-amber-900">
+      <div className="absolute inset-x-0 bottom-0 h-1 overflow-hidden bg-phase-waterfall/20">
         <div
-          className="h-full bg-amber-500 transition-all dark:bg-amber-400"
+          className="h-full bg-phase-waterfall transition-all"
           style={{
             width: `${progress}%`,
             transitionDuration: "50ms",

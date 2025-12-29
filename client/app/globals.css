@@ -44,6 +44,18 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  /* Status color utilities */
+  --color-status-completed: var(--status-completed);
+  --color-status-in-progress: var(--status-in-progress);
+  --color-status-review: var(--status-review);
+  --color-status-blocked: var(--status-blocked);
+  --color-status-not-started: var(--status-not-started);
+
+  /* Phase type color utilities */
+  --color-phase-waterfall: var(--phase-waterfall);
+  --color-phase-scrum: var(--phase-scrum);
+  --color-phase-fall: var(--phase-fall);
 }
 
 :root {
@@ -79,6 +91,18 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Status Colors */
+  --status-completed: oklch(0.65 0.19 155);
+  --status-in-progress: oklch(0.55 0.19 250);
+  --status-review: oklch(78.976% 0.17028 70.424);
+  --status-blocked: oklch(58.019% 0.22003 27.086);
+  --status-not-started: oklch(84.212% 0.0001 271.152);
+
+  /* Phase Type Colors */
+  --phase-waterfall: oklch(0.6 0.12 195);
+  --phase-scrum: oklch(0.62 0.22 300);
+  --phase-fall: oklch(0.64 0.18 45);
 }
 
 .dark {
@@ -113,6 +137,18 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* Status Colors */
+  --status-completed: oklch(0.7 0.19 155);
+  --status-in-progress: oklch(0.6 0.19 250);
+  --status-review: oklch(0.63 0.18 295);
+  --status-blocked: oklch(0.63 0.22 27);
+  --status-not-started: oklch(0.6 0.01 260);
+
+  /* Phase Type Colors */
+  --phase-waterfall: oklch(0.7 0.12 195);
+  --phase-scrum: oklch(0.72 0.22 300);
+  --phase-fall: oklch(0.74 0.18 45);
 }
 
 @layer base {

@@ -2,7 +2,7 @@
  * Phase Progress Cards
  * Server component that fetches phase data and displays progress
  */
-import { Droplet, RefreshCw, Rocket } from "lucide-react";
+// import { Droplet, RefreshCw, Rocket } from "lucide-react";
 import { Suspense } from "react";
 import { CategoryBar } from "@/components/ui/category-bar";
 import {
@@ -20,11 +20,23 @@ import type { DeliverableStatus, TaskStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { PhaseCardsSkeleton } from "./skeletons";
 
-const PHASE_ICONS = {
-  WATERFALL: Droplet,
-  SCRUM: RefreshCw,
-  FALL: Rocket,
-} as const;
+// const PHASE_ICONS = {
+//   WATERFALL: Droplet,
+//   SCRUM: RefreshCw,
+//   FALL: Rocket,
+// } as const;
+
+// Get phase-specific gradient classes
+// function getPhaseGradientClass(type: keyof typeof PHASE_ICONS): string {
+//   switch (type) {
+//     case "WATERFALL":
+//       return "bg-linear-120 from-phase-waterfall to-phase-waterfall/80";
+//     case "SCRUM":
+//       return "bg-linear-120 from-phase-scrum to-phase-scrum/80";
+//     case "FALL":
+//       return "bg-linear-120 from-phase-fall to-phase-fall/80";
+//   }
+// }
 
 // Map phase status to deliverable status enum, with actual work as fallback
 function mapPhaseStatusToEnum(
@@ -55,18 +67,27 @@ function PhaseProgressNormal({
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
       {phasesWithProgress.map((phase) => {
-        const Icon = PHASE_ICONS[phase.type];
+        // const Icon = PHASE_ICONS[phase.type];
         const isActive = phase.status === "Active";
 
         return (
           <Frame className="relative transition-all" key={phase.id}>
-            <FrameHeader className="flex-row items-center gap-2">
-              <div className="rounded-md bg-linear-120 from-primary to-primary/60 p-2 shadow-sm">
-                <Icon className="text-white" size={16} />
+            <FrameHeader className="flex-row items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                {/* <div className={cn("rounded-md p-2 shadow-sm", getPhaseGradientClass(phase.type))}>
+                  <Icon className="text-white" size={16} />
+                </div> */}
+                <FrameTitle className="line-clamp-1 text-sm">
+                  {phase.name}
+                </FrameTitle>
               </div>
-              <FrameTitle className="line-clamp-1 text-sm">
-                {phase.name}
-              </FrameTitle>
+              <StatusBadge
+                status={mapPhaseStatusToEnum(
+                  phase.status,
+                  phase.completionPercentage,
+                  phase.inProgressDeliverables
+                )}
+              />
             </FrameHeader>
 
             <FramePanel
@@ -75,14 +96,11 @@ function PhaseProgressNormal({
                 isActive ? "border-primary shadow-primary/50" : null
               )}
             >
-              <div className="flex items-center justify-between">
-                <StatusBadge
-                  status={mapPhaseStatusToEnum(
-                    phase.status,
-                    phase.completionPercentage,
-                    phase.inProgressDeliverables
-                  )}
-                />
+              <div className="flex items-end justify-between">
+                <p className="font-sora text-muted-foreground text-xs">
+                  {phase.completedDeliverables + phase.inProgressDeliverables} /{" "}
+                  {phase.totalDeliverables}
+                </p>
                 <span className="font-bold font-sora text-xl tabular-nums">
                   {phase.completionPercentage}%
                 </span>
@@ -91,7 +109,12 @@ function PhaseProgressNormal({
               <div className="space-y-2">
                 <CategoryBar
                   className="h-2"
-                  colors={["emerald", "blue", "violet", "gray"]}
+                  colors={[
+                    "status-completed",
+                    "status-in-progress",
+                    "status-review",
+                    "status-not-started",
+                  ]}
                   showLabels={false}
                   values={[
                     phase.completedDeliverables,
@@ -100,10 +123,6 @@ function PhaseProgressNormal({
                     phase.notStartedDeliverables,
                   ]}
                 />
-                <p className="font-sora text-muted-foreground text-xs">
-                  {phase.completedDeliverables + phase.inProgressDeliverables} /{" "}
-                  {phase.totalDeliverables}
-                </p>
               </div>
             </FramePanel>
           </Frame>

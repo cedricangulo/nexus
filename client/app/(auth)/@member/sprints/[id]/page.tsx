@@ -4,14 +4,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { MemberKanbanBoard } from "@/components/member/sprints/member-kanban-board";
-import { mapSprintStatusToTaskStatus } from "@/components/team-lead/sprints/phase-section";
 import { Button } from "@/components/ui/button";
 import { FramePanel } from "@/components/ui/frame";
 import { StatusBadge } from "@/components/ui/status";
 import { authApi } from "@/lib/api/auth";
 import { sprintApi } from "@/lib/api/sprint";
 import { taskApi } from "@/lib/api/task";
-import { getSprintStatus } from "@/lib/helpers/sprint";
+import {
+  getSprintStatus,
+  mapSprintStatusToTaskStatus,
+} from "@/lib/helpers/sprint";
 
 async function SprintBoardContent({ sprintId }: { sprintId: string }) {
   const [sprint, currentUser, allTasks] = await Promise.all([

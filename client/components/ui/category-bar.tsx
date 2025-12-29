@@ -6,17 +6,11 @@
 import { cn } from "@/lib/utils";
 
 const COLOR_VARIANTS = {
-  emerald: "bg-emerald-500 dark:bg-emerald-600",
-  blue: "bg-blue-500 dark:bg-blue-600",
-  violet: "bg-violet-500 dark:bg-violet-600",
-  gray: "bg-accent",
-  destructive: "bg-destructive",
-  primary: "bg-primary",
-  "chart-1": "bg-chart-1",
-  "chart-2": "bg-chart-2",
-  "chart-3": "bg-chart-3",
-  "chart-4": "bg-chart-4",
-  "chart-5": "bg-chart-5",
+  "status-completed": "bg-status-completed",
+  "status-in-progress": "bg-status-in-progress",
+  "status-review": "bg-status-review",
+  "status-blocked": "bg-status-blocked",
+  "status-not-started": "bg-status-not-started",
 } as const;
 
 export type ColorVariant = keyof typeof COLOR_VARIANTS;

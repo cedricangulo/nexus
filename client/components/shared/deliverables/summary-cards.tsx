@@ -16,17 +16,17 @@ const getStatusColor = (status: string): string => {
   switch (status) {
     case "COMPLETED":
     case "DONE":
-      return "bg-emerald-500";
+      return "bg-status-completed";
     case "IN_PROGRESS":
-      return "bg-primary";
+      return "bg-status-in-progress";
     case "REVIEW":
-      return "bg-purple-500";
+      return "bg-status-review";
     case "BLOCKED":
-      return "bg-red-500";
+      return "bg-status-blocked";
     case "TODO":
-      return "bg-accent";
+      return "bg-status-not-started";
     default:
-      return "bg-accent";
+      return "bg-status-not-started";
   }
 };
 
@@ -60,7 +60,7 @@ export function DeliverablesSummaryCards({
     <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <Frame>
         <FrameHeader className="flex-row items-center gap-2">
-          <div className="rounded-md bg-linear-120 from-blue-500 to-blue-400 p-2 shadow-sm">
+          <div className="rounded-md bg-linear-120 from-status-in-progress to-status-in-progress/80 p-2 shadow-sm">
             <Blocks className="size-4 text-white" />
           </div>
           <FrameTitle>Total Deliverables</FrameTitle>
@@ -72,7 +72,7 @@ export function DeliverablesSummaryCards({
 
       <Frame>
         <FrameHeader className="flex-row items-center gap-2">
-          <div className="rounded-md bg-linear-120 from-red-500 to-red-400 p-2 shadow-sm">
+          <div className="rounded-md bg-linear-120 from-status-blocked to-status-blocked/80 p-2 shadow-sm">
             <TriangleAlert className="size-4 text-white" />
           </div>
           <div className="space-y-0">
@@ -89,7 +89,7 @@ export function DeliverablesSummaryCards({
 
       <Frame className="sm:col-span-2 lg:col-span-1">
         <FrameHeader className="flex-row items-center gap-2">
-          <div className="rounded-md bg-linear-120 from-emerald-500 to-emerald-400 p-2 shadow-sm">
+          <div className="rounded-md bg-linear-120 from-status-completed to-status-completed/80 p-2 shadow-sm">
             <Barcode className="size-4 text-white" />
           </div>
           <div className="space-y-0">

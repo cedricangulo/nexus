@@ -15,7 +15,7 @@ import {
   FramePanel,
   FrameTitle,
 } from "@/components/ui/frame";
-import { activityLogApi } from "@/lib/api/activity-log";
+import { getActivityLogs } from "@/lib/data/activity-logs";
 import { formatTitleCase } from "@/lib/helpers/format-title-case";
 import type { ActivityLog } from "@/lib/types";
 
@@ -46,7 +46,7 @@ function ActivityLogsDisplay({
       <Frame>
         <FrameHeader className="flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="rounded-md bg-linear-120 from-blue-500 to-blue-400 p-2 shadow-sm dark:from-blue-800 dark:to-blue-700">
+            <div className="rounded-md bg-linear-120 from-status-in-progress to-status-in-progress/80 p-2 shadow-sm">
               <Logs className="size-4 text-white" />
             </div>
             <FrameTitle className="text-sm">Activity Logs</FrameTitle>
@@ -107,11 +107,7 @@ function ActivityLogsDisplay({
 }
 
 export async function ActivityLogs() {
-  const activities = await activityLogApi.listActivityLogs();
+  const activities = await getActivityLogs();
 
-  const sortedActivities = activities.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
-
-  return <ActivityLogsDisplay activities={sortedActivities} limit={5} />;
+  return <ActivityLogsDisplay activities={activities} limit={5} />;
 }

@@ -42,8 +42,8 @@ export default function MissingMeetingsCard({
         <div
           className={`rounded-md p-2 shadow-sm ${
             isAlert
-              ? "bg-linear-120 from-red-500 to-red-400 dark:from-red-800 dark:to-red-700"
-              : "bg-linear-120 from-gray-500 to-gray-400 dark:from-gray-800 dark:to-gray-700"
+              ? "bg-linear-120 from-status-blocked to-status-blocked/80"
+              : "bg-linear-120 from-status-not-started to-status-not-started/80"
           }`}
         >
           <AlertCircle className="size-4 text-white" />

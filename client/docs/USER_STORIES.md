@@ -225,7 +225,6 @@ As a Team Lead, I want to create tasks within a sprint and assign them to team m
    - Task title (e.g., "Implement user authentication")
    - Description
    - Assigned member
-   - Priority (Low, Medium, High)
    - Due date (within sprint)
    - Labels/tags
 4. Save
@@ -445,7 +444,6 @@ As a Team Member, I want to see a Kanban-style board showing all tasks in the cu
 3. See task cards showing:
    - Task title
    - Assignee avatar
-   - Priority indicator
    - Due date
    - Labels
 4. Drag task between columns to update status
@@ -456,7 +454,7 @@ As a Team Member, I want to see a Kanban-style board showing all tasks in the cu
 - Status updates immediately
 - Can't move blocked tasks without unblocking
 - Can filter by assignee
-- Can sort by priority/date
+- Can sort by date
 
 ---
 

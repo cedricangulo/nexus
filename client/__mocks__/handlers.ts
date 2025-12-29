@@ -462,7 +462,6 @@ export const handlers = [
         title: "Task 1",
         description: null,
         status: "TODO",
-        priority: "HIGH",
         createdAt: "2025-01-01T00:00:00Z",
         updatedAt: "2025-01-01T00:00:00Z",
         deletedAt: null,
@@ -478,7 +477,6 @@ export const handlers = [
       title: "Task 1",
       description: null,
       status: "TODO",
-      priority: "HIGH",
       createdAt: "2025-01-01T00:00:00Z",
       updatedAt: "2025-01-01T00:00:00Z",
       deletedAt: null,
@@ -728,13 +726,108 @@ export const handlers = [
   http.get(`${BASE_URL}/activity-logs`, () =>
     HttpResponse.json([
       {
+        id: "activity-8",
+        userId: "2",
+        action: "EVIDENCE_UPLOADED",
+        entityType: "Deliverable",
+        entityId: "del-3",
+        details: null,
+        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+        user: {
+          name: "Grace Wilsonin",
+          email: "grace@example.com",
+        },
+      },
+      {
+        id: "activity-7",
+        userId: "3",
+        action: "EVIDENCE_UPLOADED",
+        entityType: "Deliverable",
+        entityId: "del-2",
+        details: null,
+        createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
+        user: {
+          name: "Henry Taylorin",
+          email: "henry@example.com",
+        },
+      },
+      {
+        id: "activity-6",
+        userId: "4",
+        action: "EVIDENCE_UPLOADED",
+        entityType: "Deliverable",
+        entityId: "del-1",
+        details: null,
+        createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(), // 12 hours ago
+        user: {
+          name: "Bob Smithin",
+          email: "bob@example.com",
+        },
+      },
+      {
+        id: "activity-5",
+        userId: "1",
+        action: "EVIDENCE_UPLOADED",
+        entityType: "Deliverable",
+        entityId: "del-4",
+        details: null,
+        createdAt: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(), // 18 hours ago
+        user: {
+          name: "Frank Millerin",
+          email: "frank@example.com",
+        },
+      },
+      {
+        id: "activity-4",
+        userId: "1",
+        action: "EVIDENCE_UPLOADED",
+        entityType: "Deliverable",
+        entityId: "del-5",
+        details: null,
+        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+        user: {
+          name: "Frank Millerin",
+          email: "frank@example.com",
+        },
+      },
+      {
+        id: "activity-3",
+        userId: "5",
+        action: "TASK_COMPLETED",
+        entityType: "Task",
+        entityId: "task-3",
+        details: null,
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
+        user: {
+          name: "Alice Johnson",
+          email: "alice@example.com",
+        },
+      },
+      {
+        id: "activity-2",
+        userId: "2",
+        action: "COMMENT_ADDED",
+        entityType: "Deliverable",
+        entityId: "del-2",
+        details: null,
+        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
+        user: {
+          name: "Bob Smith",
+          email: "bob@example.com",
+        },
+      },
+      {
         id: "activity-1",
         userId: "1",
         action: "CREATED_TASK",
         entityType: "Task",
         entityId: "task-1",
         details: null,
-        createdAt: "2025-01-01T00:00:00Z",
+        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 1 week ago
+        user: {
+          name: "Frank Millerin",
+          email: "frank@example.com",
+        },
       },
     ])
   ),
@@ -748,7 +841,11 @@ export const handlers = [
         entityType: "Task",
         entityId: "task-1",
         details: null,
-        createdAt: "2025-01-01T00:00:00Z",
+        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+        user: {
+          name: "Frank Millerin",
+          email: "frank@example.com",
+        },
       },
     ])
   ),

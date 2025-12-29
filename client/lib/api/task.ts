@@ -7,14 +7,12 @@ export type CreateTaskInput = {
   assigneeId?: string;
   title: string;
   description?: string;
-  priority?: "High" | "Medium" | "Low";
 };
 
 export type UpdateTaskInput = {
   assigneeId?: string | null;
   title?: string;
   description?: string;
-  priority?: "High" | "Medium" | "Low";
   status?: TaskStatus;
 };
 

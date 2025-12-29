@@ -31,13 +31,13 @@ function SprintHealthNormal({
   const hasBlockedTasks = sprintHealth.blockedTasks > 0;
 
   const trackerData = sprintTasks.map((task) => {
-    let color = "bg-accent";
+    let color = "bg-status-not-started";
     if (task.status === "DONE") {
-      color = "bg-emerald-500";
+      color = "bg-status-completed";
     } else if (task.status === "IN_PROGRESS") {
-      color = "bg-primary";
+      color = "bg-status-in-progress";
     } else if (task.status === "BLOCKED") {
-      color = "bg-destructive";
+      color = "bg-status-blocked";
     }
 
     return {
@@ -122,7 +122,12 @@ function SprintHealthNormal({
           </div>
           <CategoryBar
             className="h-2"
-            colors={["emerald", "blue", "destructive", "gray"]}
+            colors={[
+              "status-completed",
+              "status-in-progress",
+              "status-blocked",
+              "status-not-started",
+            ]}
             showLabels={false}
             values={[
               sprintHealth.doneTasks,

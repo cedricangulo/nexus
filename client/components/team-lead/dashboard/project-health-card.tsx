@@ -27,17 +27,17 @@ function ProjectHealthNormal({
   const trackerData = [
     ...Array.from({ length: completion.completedDeliverables }, (_, i) => ({
       key: `completed-${i}`,
-      color: "bg-emerald-500",
+      color: "bg-status-completed",
       tooltip: "Completed",
     })),
     ...Array.from({ length: completion.inProgressDeliverables }, (_, i) => ({
       key: `progress-${i}`,
-      color: "bg-primary",
+      color: "bg-status-in-progress",
       tooltip: "In Progress",
     })),
     ...Array.from({ length: completion.reviewDeliverables }, (_, i) => ({
       key: `review-${i}`,
-      color: "bg-purple-500",
+      color: "bg-status-review",
       tooltip: "In Review",
     })),
     ...Array.from(
@@ -52,7 +52,7 @@ function ProjectHealthNormal({
       },
       (_, i) => ({
         key: `pending-${i}`,
-        color: "bg-accent",
+        color: "bg-status-not-started",
         tooltip: "Not Started",
       })
     ),

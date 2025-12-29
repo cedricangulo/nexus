@@ -22,14 +22,14 @@ const getStatusClass = (status: StatusType): string => {
     case "BLOCKED":
       return "blocked";
     case "TODO":
-      return "todo";
+    case "NOT_STARTED":
+      return "not-started";
     case "WATERFALL":
       return "waterfall";
     case "SCRUM":
       return "scrum";
     case "FALL":
       return "fall";
-    case "NOT_STARTED":
     default:
       return "not-started";
   }
@@ -60,29 +60,27 @@ export const StatusIndicator = ({
     <span
       className={cn(
         "absolute inline-flex h-full w-full animate-ping rounded-full opacity-75",
-        "group-[.completed]:bg-green-500",
-        "group-[.in-progress]:bg-blue-500",
-        "group-[.review]:bg-purple-500",
-        "group-[.blocked]:bg-red-500",
-        "group-[.todo]:bg-slate-500",
-        "group-[.not-started]:bg-slate-500",
-        "group-[.waterfall]:bg-amber-500",
-        "group-[.scrum]:bg-cyan-500",
-        "group-[.fall]:bg-orange-500"
+        "group-[.completed]:bg-status-completed",
+        "group-[.in-progress]:bg-status-in-progress",
+        "group-[.review]:bg-status-review",
+        "group-[.blocked]:bg-status-blocked",
+        "group-[.not-started]:bg-status-not-started",
+        "group-[.waterfall]:bg-phase-waterfall",
+        "group-[.scrum]:bg-phase-scrum",
+        "group-[.fall]:bg-phase-fall"
       )}
     />
     <span
       className={cn(
         "relative inline-flex size-2 rounded-full",
-        "group-[.completed]:bg-green-500",
-        "group-[.in-progress]:bg-blue-500",
-        "group-[.review]:bg-purple-500",
-        "group-[.blocked]:bg-red-500",
-        "group-[.todo]:bg-slate-500",
-        "group-[.not-started]:bg-slate-500",
-        "group-[.waterfall]:bg-amber-500",
-        "group-[.scrum]:bg-cyan-500",
-        "group-[.fall]:bg-orange-500"
+        "group-[.completed]:bg-status-completed",
+        "group-[.in-progress]:bg-status-in-progress",
+        "group-[.review]:bg-status-review",
+        "group-[.blocked]:bg-status-blocked",
+        "group-[.not-started]:bg-status-not-started",
+        "group-[.waterfall]:bg-phase-waterfall",
+        "group-[.scrum]:bg-phase-scrum",
+        "group-[.fall]:bg-phase-fall"
       )}
     />
   </span>

@@ -129,7 +129,6 @@ export type Task = {
   title: string;
   description?: string | null;
   status: TaskStatus;
-  priority?: string | null;
   lastComment?: Comment | null;
   createdAt: string;
   updatedAt: string;

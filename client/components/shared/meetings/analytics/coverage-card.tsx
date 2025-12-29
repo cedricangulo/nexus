@@ -38,7 +38,7 @@ export default function CoverageCard({
   return (
     <Frame>
       <FrameHeader className="flex-row items-center gap-2">
-        <div className="rounded-md bg-linear-120 from-emerald-500 to-emerald-400 p-2 shadow-sm dark:from-emerald-800 dark:to-emerald-700">
+        <div className="rounded-md bg-linear-120 from-status-completed to-status-completed/80 p-2 shadow-sm">
           <CheckCircle2 className="size-4 text-white" />
         </div>
         <div className="space-y-0">

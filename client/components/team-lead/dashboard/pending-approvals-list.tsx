@@ -28,7 +28,7 @@ function PendingApprovalsListDisplay({ items }: PendingApprovalsListProps) {
       <Frame>
         <FrameHeader className="flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="rounded-md bg-linear-120 from-amber-500 to-amber-400 p-2 shadow-sm dark:from-amber-800 dark:to-amber-700">
+            <div className="rounded-md bg-linear-120 from-phase-waterfall to-phase-waterfall/80 p-2 shadow-sm">
               <CheckCircle2 className="size-4 text-white" />
             </div>
             <FrameTitle className="text-sm">Pending Approvals</FrameTitle>
@@ -55,7 +55,7 @@ function PendingApprovalsListDisplay({ items }: PendingApprovalsListProps) {
     <Frame>
       <FrameHeader className="flex-row items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <div className="rounded-md bg-linear-120 from-amber-500 to-amber-400 p-2 shadow-sm dark:from-amber-800 dark:to-amber-700">
+          <div className="rounded-md bg-linear-120 from-phase-waterfall to-phase-waterfall/80 p-2 shadow-sm">
             <CheckCircle2 className="size-4 text-white" />
           </div>
           <div className="flex items-center gap-2">
