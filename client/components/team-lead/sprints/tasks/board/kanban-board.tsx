@@ -7,10 +7,10 @@ import { getTaskDetailAction, updateTaskStatusAction } from "@/actions/tasks";
 import type { KanbanMoveEvent } from "@/components/ui/kanban";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Task, TaskStatus, User } from "@/lib/types";
-import { BlockReasonDialog } from "./block-reason-dialog";
-import { TaskBoardDesktop } from "./task-board-desktop";
-import { TaskBoardMobile } from "./task-board-mobile";
-import { TaskDetailDialog } from "./task-detail-dialog";
+import { TaskBlockDialog } from "../task-block-dialog";
+import { TaskBoardDesktop } from "./board-desktop";
+import { TaskBoardMobile } from "./board-mobile";
+import { TaskDetailDialog } from "../task-details";
 
 type TaskColumns = Record<TaskStatus, Task[]>;
 
@@ -257,7 +257,7 @@ export function KanbanBoard({ tasks, users, sprintId }: KanbanBoardProps) {
         )}
       </div>
 
-      <BlockReasonDialog
+      <TaskBlockDialog
         onOpenChange={(open) => {
           if (!open) {
             setBlockingTask(null);
@@ -300,7 +300,8 @@ export function KanbanBoard({ tasks, users, sprintId }: KanbanBoardProps) {
         }}
         open={Boolean(blockingTask)}
         sprintId={sprintId}
-        task={blockingTask}
+        taskId={blockingTask?.id ?? null}
+        targetStatus="BLOCKED"
       />
 
       {selectedTask && selectedTaskDetail ? (

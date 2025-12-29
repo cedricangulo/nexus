@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Task, TaskStatus, User } from "@/lib/types";
-import { TaskCard } from "./task-card";
+import { TaskCard } from "../task-card";
 
 export type MobileColumnDef = {
   status: TaskStatus;

@@ -1,8 +1,9 @@
 "use client";
 
+import { PlusIcon } from "lucide-react";
+import { useState } from "react";
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { toast } from "sonner";
 import { deleteSprintAction } from "@/actions/sprint";
 import { showPendingActionToast } from "@/components/shared/pending-action-toast";
@@ -25,6 +26,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { Sprint } from "@/lib/types";
+import { SprintFormDialog } from "./sprint-form-dialog";
+
+export function CreateSprintButton() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>
+        <PlusIcon className="mr-2 size-4" />
+        Create Sprint
+      </Button>
+      <SprintFormDialog onOpenChange={setOpen} open={open} />
+    </>
+  );
+}
 
 type SprintActionsMenuProps = {
   sprint: Sprint;
@@ -87,6 +103,7 @@ export function SprintActionsMenu({
               e.stopPropagation();
             }}
             variant="ghost"
+            size="icon"
           >
             <MoreVertical size={16} />
             <span className="sr-only">Sprint actions</span>
@@ -100,7 +117,7 @@ export function SprintActionsMenu({
               onEditClick();
             }}
           >
-            <Pencil size={16} />
+            <Pencil className="mr-2 size-4" />
             Edit Sprint
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -113,7 +130,7 @@ export function SprintActionsMenu({
               setShowDeleteDialog(true);
             }}
           >
-            <Trash2 size={16} />
+            <Trash2 className="mr-2 size-4" />
             Delete Sprint
           </DropdownMenuItem>
         </DropdownMenuContent>

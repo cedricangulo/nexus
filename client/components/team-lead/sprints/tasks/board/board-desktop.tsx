@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/kanban";
 import type { Task, TaskStatus, User } from "@/lib/types";
 
-import { TaskCard } from "./task-card";
+import { TaskCard } from "../task-card";
 
 export type DesktopColumnDef = {
   status: TaskStatus;

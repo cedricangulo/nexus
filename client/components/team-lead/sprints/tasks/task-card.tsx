@@ -3,6 +3,7 @@
 import { GripVertical } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Task, User } from "@/lib/types";
+import { TaskDescription } from "@/components/shared/sprints/task-description";
 
 export type TaskCardProps = {
   task: Task;
@@ -33,9 +34,7 @@ export function TaskCard({
         <div className="space-y-1">
           <p className="line-clamp-2 font-medium">{task.title}</p>
           {task.description ? (
-            <p className="line-clamp-1 text-muted-foreground text-sm">
-              {task.description}
-            </p>
+            <TaskDescription content={task.description} />
           ) : null}
         </div>
         <GripVertical className="hidden size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground md:block" />

@@ -3,12 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useEffect, useTransition } from "react";
 import type { DateValue, RangeValue } from "react-aria-components";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 
+import { updateSprintAction } from "@/actions/sprint";
 import { createSprintAction } from "@/actions/sprints";
 import DateRange from "@/components/shared/date-range";
 import { Button } from "@/components/ui/button";
@@ -29,19 +30,23 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
+import type { Sprint } from "@/lib/types";
 import { createSprintSchema } from "@/lib/validation";
 
-type CreateSprintDialogProps = {
+type SprintFormDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  sprint?: Sprint; // If provided, we are in edit mode
 };
 
-export function CreateSprintDialog({
+export function SprintFormDialog({
   open,
   onOpenChange,
-}: CreateSprintDialogProps) {
+  sprint,
+}: SprintFormDialogProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const isEditing = !!sprint;
 
   const form = useForm<z.infer<typeof createSprintSchema>>({
     resolver: zodResolver(createSprintSchema),
@@ -52,19 +57,44 @@ export function CreateSprintDialog({
     },
   });
 
-  const onSubmit = (values: z.infer<typeof createSprintSchema>) => {
-    onOpenChange(false);
+  useEffect(() => {
+    if (open && sprint) {
+      form.reset({
+        goal: sprint.goal || "",
+        startDate: sprint.startDate.split("T")[0],
+        endDate: sprint.endDate.split("T")[0],
+      });
+    } else if (open && !sprint) {
+      form.reset({
+        goal: "",
+        startDate: "",
+        endDate: "",
+      });
+    }
+  }, [open, sprint, form]);
 
+  const onSubmit = (values: z.infer<typeof createSprintSchema>) => {
     startTransition(async () => {
-      const result = await createSprintAction(values);
+      let result;
+      
+      if (isEditing && sprint) {
+        result = await updateSprintAction({
+          id: sprint.id,
+          ...values,
+        });
+      } else {
+        result = await createSprintAction(values);
+      }
 
       if (result.success) {
-        toast.success("Sprint created");
+        toast.success(isEditing ? "Sprint updated" : "Sprint created");
+        onOpenChange(false);
         router.refresh();
-        form.reset();
+        if (!isEditing) {
+          form.reset();
+        }
       } else {
-        toast.error(result.error || "Failed to create sprint");
-        onOpenChange(true);
+        toast.error(result.error || `Failed to ${isEditing ? "update" : "create"} sprint`);
       }
     });
   };
@@ -73,9 +103,11 @@ export function CreateSprintDialog({
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Sprint</DialogTitle>
+          <DialogTitle>{isEditing ? `Edit Sprint ${sprint?.number}` : "Create Sprint"}</DialogTitle>
           <DialogDescription>
-            Create a new sprint with a goal and date range.
+            {isEditing
+              ? "Update the sprint goal and timeline."
+              : "Create a new sprint with a goal and date range."}
           </DialogDescription>
         </DialogHeader>
 
@@ -148,7 +180,7 @@ export function CreateSprintDialog({
                 Cancel
               </Button>
               <Button disabled={isPending} type="submit">
-                {isPending ? "Creating..." : "Create Sprint"}
+                {isPending ? (isEditing ? "Saving..." : "Creating...") : (isEditing ? "Save Changes" : "Create Sprint")}
               </Button>
             </DialogFooter>
           </form>

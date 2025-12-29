@@ -28,23 +28,25 @@ import { Textarea } from "@/components/ui/textarea";
 import type { TaskStatus } from "@/lib/types";
 import { updateTaskStatusSchema } from "@/lib/validation";
 
-type BlockedReasonDialogProps = {
+type TaskBlockDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   taskId: string | null;
   sprintId: string;
   targetStatus: TaskStatus;
+  currentComment?: string;
   onSuccess?: () => void;
 };
 
-export function BlockedReasonDialog({
+export function TaskBlockDialog({
   open,
   onOpenChange,
   taskId,
   sprintId,
   targetStatus,
+  currentComment,
   onSuccess,
-}: BlockedReasonDialogProps) {
+}: TaskBlockDialogProps) {
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof updateTaskStatusSchema>>({
@@ -66,9 +68,9 @@ export function BlockedReasonDialog({
       taskId: taskId ?? "",
       sprintId,
       status: targetStatus,
-      comment: "",
+      comment: currentComment || "",
     });
-  }, [open, taskId, sprintId, targetStatus, form]);
+  }, [open, taskId, sprintId, targetStatus, currentComment, form]);
 
   const onSubmit = (values: z.infer<typeof updateTaskStatusSchema>) => {
     if (!taskId) {
@@ -84,7 +86,8 @@ export function BlockedReasonDialog({
       });
 
       if (result.success) {
-        toast.success("Task updated");
+        const isBlocked = targetStatus === "BLOCKED";
+        toast.success(isBlocked ? "Task blocked" : "Task updated");
         onOpenChange(false);
         onSuccess?.();
       } else {
@@ -102,8 +105,8 @@ export function BlockedReasonDialog({
           <DialogTitle>{isBlocked ? "Block Task" : "Update Task"}</DialogTitle>
           <DialogDescription>
             {isBlocked
-              ? "Add a reason so others can unblock quickly."
-              : "Provide an optional note."}
+              ? "Explain why this task is blocked. This helps the team understand dependencies."
+              : "Provide an optional note for this status change."}
           </DialogDescription>
         </DialogHeader>
 
@@ -119,7 +122,9 @@ export function BlockedReasonDialog({
                     <Textarea
                       {...field}
                       placeholder={
-                        isBlocked ? "Why is this blocked?" : "Optional"
+                        isBlocked
+                          ? "e.g. Waiting for API endpoint from backend team"
+                          : "Optional comment"
                       }
                     />
                   </FormControl>
@@ -138,7 +143,7 @@ export function BlockedReasonDialog({
                 Cancel
               </Button>
               <Button disabled={isPending} type="submit">
-                {isPending ? "Saving..." : "Save"}
+                {isPending ? (isBlocked ? "Blocking..." : "Saving...") : (isBlocked ? "Block Task" : "Save")}
               </Button>
             </DialogFooter>
           </form>

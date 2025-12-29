@@ -4,8 +4,8 @@ import { Calendar, FolderXIcon } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState } from "react";
 import { EmptyState } from "@/components/shared/empty-state";
-import { EditSprintDialog } from "@/components/team-lead/sprints/edit-sprint-dialog";
-import { SprintActionsMenu } from "@/components/team-lead/sprints/sprint-actions-menu";
+import { SprintActionsMenu } from "@/components/team-lead/sprints/_components/sprint-actions";
+import { SprintFormDialog } from "@/components/team-lead/sprints/_components/sprint-form-dialog";
 import {
   FrameDescription,
   FramePanel,
@@ -21,19 +21,22 @@ import {
 } from "@/lib/helpers/sprint";
 import type { Sprint, SprintProgress } from "@/lib/types";
 
-type PhaseSectionProps = {
+type PhaseListProps = {
   sprints: Sprint[];
   progressById: Record<string, SprintProgress | undefined>;
   now: Date;
+  userRole: string;
 };
 
-export function PhaseSection({
+export function PhaseList({
   sprints,
   progressById,
   now,
-}: PhaseSectionProps) {
+  userRole,
+}: PhaseListProps) {
   const [selectedSprint, setSelectedSprint] = useState<Sprint | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const isTeamLead = userRole === "teamLead";
 
   if (sprints.length === 0) {
     return (
@@ -71,13 +74,15 @@ export function PhaseSection({
                             Sprint {sprint.number}
                           </FrameTitle>
                         </div>
-                        <SprintActionsMenu
-                          onEditClick={() => {
-                            setSelectedSprint(sprint);
-                            setIsEditDialogOpen(true);
-                          }}
-                          sprint={sprint}
-                        />
+                        {isTeamLead ? (
+                          <SprintActionsMenu
+                            onEditClick={() => {
+                              setSelectedSprint(sprint);
+                              setIsEditDialogOpen(true);
+                            }}
+                            sprint={sprint}
+                          />
+                        ) : null}
                       </div>
                       <FrameDescription className="line-clamp-1">
                         {sprint.goal || "No goal set"}
@@ -115,8 +120,8 @@ export function PhaseSection({
       </section>
 
       {selectedSprint ? (
-        <EditSprintDialog
-          isOpen={isEditDialogOpen}
+        <SprintFormDialog
+          open={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
           sprint={selectedSprint}
         />
