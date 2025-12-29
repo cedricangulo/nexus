@@ -1,3 +1,4 @@
+import axios from "axios";
 import { format } from "date-fns";
 import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
@@ -18,11 +19,20 @@ import {
 } from "@/lib/helpers/sprint";
 
 async function SprintBoardContent({ sprintId }: { sprintId: string }) {
-  const [sprint, tasks, users] = await Promise.all([
-    sprintApi.getSprintById(sprintId),
-    taskApi.listTasks({ sprintId }),
-    userApi.listUsers(),
-  ]);
+  let sprint, tasks, users;
+
+  try {
+    [sprint, tasks, users] = await Promise.all([
+      sprintApi.getSprintById(sprintId),
+      taskApi.listTasks({ sprintId }),
+      userApi.listUsers(),
+    ]);
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      notFound();
+    }
+    throw error;
+  }
 
   if (!sprint) {
     notFound();

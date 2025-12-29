@@ -3,10 +3,11 @@
 import { Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { UserMenu } from "@/components/layouts/member/user-menu";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import type { Project } from "@/lib/types";
+import type { Project, User } from "@/lib/types";
 
 // Centralized route-to-title mapping (excludes /dashboard which gets project name)
 const ROUTE_TITLES: Record<string, string> = {
@@ -43,9 +44,11 @@ function getPageTitle(pathname: string): string | undefined {
 export function AppHeader({
   project,
   notificationComponent,
+  user,
 }: {
   project: Project | null;
   notificationComponent: React.ReactNode;
+  user: User | null;
 }) {
   const pathname = usePathname();
 
@@ -79,8 +82,9 @@ export function AppHeader({
             <Input aria-label="Search" className="pl-9" placeholder="Search" />
           </div>
         </div>
-        {notificationComponent}
         <ThemeToggle />
+        {notificationComponent}
+        <UserMenu user={user} />
       </div>
     </header>
   );

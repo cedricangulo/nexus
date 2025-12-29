@@ -1,4 +1,4 @@
-import { createApiClient } from "./client";
+import { apiClient } from "./client";
 import { API_ENDPOINTS } from "./endpoints";
 
 export type DeviceTokenResponse = {
@@ -18,8 +18,7 @@ export async function registerDeviceToken(
   token: string,
   platform: "web" | "android" | "ios" = "web"
 ): Promise<DeviceTokenResponse> {
-  const client = await createApiClient();
-  const response = await client.post(API_ENDPOINTS.DEVICE_TOKENS.REGISTER, {
+  const response = await apiClient.post(API_ENDPOINTS.DEVICE_TOKENS.REGISTER, {
     token,
     platform,
   });
@@ -32,8 +31,7 @@ export async function registerDeviceToken(
 export async function unregisterDeviceToken(
   token: string
 ): Promise<DeviceTokenResponse> {
-  const client = await createApiClient();
-  const response = await client.delete(
+  const response = await apiClient.delete(
     API_ENDPOINTS.DEVICE_TOKENS.UNREGISTER(token)
   );
   return response.data as DeviceTokenResponse;

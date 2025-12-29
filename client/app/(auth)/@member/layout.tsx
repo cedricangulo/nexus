@@ -20,7 +20,7 @@ export default async function TeamLeadLayout({
       <AppSidebar user={user} />
       <MemberMobileNav />
       <SidebarInset suppressHydrationWarning>
-        <AppHeader notificationComponent={<Notification />} project={project} />
+        <AppHeader notificationComponent={<Notification />} project={project} user={user} />
         <main className="p-4 pb-32 sm:p-8 md:pb-0" suppressHydrationWarning>
           {children}
         </main>

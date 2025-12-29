@@ -1,5 +1,5 @@
 import type { Evidence } from "@/lib/types";
-import { createApiClient } from "./client";
+import { apiClient } from "./client";
 import { API_ENDPOINTS } from "./endpoints";
 
 export const evidenceApi = {
@@ -7,12 +7,11 @@ export const evidenceApi = {
     deliverableId: string,
     file: File
   ): Promise<Evidence> => {
-    const client = await createApiClient();
     const formData = new FormData();
     formData.append("deliverableId", deliverableId);
     formData.append("file", file);
 
-    const response = await client.post(
+    const response = await apiClient.post(
       API_ENDPOINTS.EVIDENCE.CREATE,
       formData,
       {
@@ -36,21 +35,18 @@ export const evidenceApi = {
   getEvidenceByDeliverable: async (
     deliverableId: string
   ): Promise<Evidence[]> => {
-    const client = await createApiClient();
-    const response = await client.get(
+    const response = await apiClient.get(
       API_ENDPOINTS.EVIDENCE.BY_DELIVERABLE(deliverableId)
     );
     return response.data;
   },
 
   deleteEvidence: async (id: string): Promise<void> => {
-    const client = await createApiClient();
-    await client.delete(API_ENDPOINTS.EVIDENCE.DELETE(id));
+    await apiClient.delete(API_ENDPOINTS.EVIDENCE.DELETE(id));
   },
 
   restoreEvidence: async (id: string): Promise<Evidence> => {
-    const client = await createApiClient();
-    const response = await client.post(API_ENDPOINTS.EVIDENCE.RESTORE(id));
+    const response = await apiClient.post(API_ENDPOINTS.EVIDENCE.RESTORE(id));
     return response.data;
   },
 };

@@ -72,7 +72,7 @@ describe("Sprint Integration Tests", () => {
         if (error.message === "Sprint should have been deleted") {
           throw error;
         }
-        expect(error.response.status).toBe(404);
+        expect(error.response?.status).toBe(404);
       }
     } catch (error: any) {
       if (error.code === "ECONNREFUSED") {

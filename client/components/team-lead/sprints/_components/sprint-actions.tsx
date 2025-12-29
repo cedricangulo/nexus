@@ -5,7 +5,7 @@ import { useState } from "react";
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { deleteSprintAction } from "@/actions/sprint";
+import { deleteSprintAction } from "@/actions/sprints";
 import { showPendingActionToast } from "@/components/shared/pending-action-toast";
 import {
   AlertDialog,

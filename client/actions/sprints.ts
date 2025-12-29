@@ -1,11 +1,18 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-
 import { sprintApi } from "@/lib/api/sprint";
+import { getErrorMessage } from "@/lib/api/error-handler";
 import { cleanDateInput, toISODateTime } from "@/lib/helpers/date";
 import { requireTeamLead } from "@/lib/helpers/rbac";
 import { createSprintSchema } from "@/lib/validation";
+
+export type UpdateSprintActionInput = {
+  id: string;
+  goal?: string;
+  startDate?: string;
+  endDate?: string;
+};
 
 export async function createSprintAction(input: unknown) {
   try {
@@ -32,6 +39,39 @@ export async function createSprintAction(input: unknown) {
     return { success: true } as const;
   } catch (error) {
     console.error("[createSprintAction] Error:", error);
-    return { success: false, error: "Failed to create sprint" } as const;
+    return { success: false, error: getErrorMessage(error) } as const;
+  }
+}
+
+export async function updateSprintAction(input: UpdateSprintActionInput) {
+  try {
+    await requireTeamLead();
+
+    const parsed = createSprintSchema.parse({
+      goal: input.goal,
+      startDate: input.startDate,
+      endDate: input.endDate,
+    });
+
+    await sprintApi.updateSprint(input.id, parsed);
+    revalidatePath("/sprints");
+
+    return { success: true } as const;
+  } catch (error) {
+    console.error("[updateSprintAction] Error:", error);
+    return { success: false, error: "Failed to update sprint" } as const;
+  }
+}
+
+export async function deleteSprintAction(id: string) {
+  try {
+    await requireTeamLead();
+    await sprintApi.deleteSprint(id);
+    revalidatePath("/sprints");
+
+    return { success: true } as const;
+  } catch (error) {
+    console.error("[deleteSprintAction] Error:", error);
+    return { success: false, error: "Failed to delete sprint" } as const;
   }
 }

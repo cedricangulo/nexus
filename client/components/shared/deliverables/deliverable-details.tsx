@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { StatusBadge } from "@/components/ui/status";
-import { formatDate } from "@/lib/helpers/format-date";
+import { formatDate, formatRelativeTime } from "@/lib/helpers/format-date";
 import type { Comment, Deliverable, Evidence, Phase } from "@/lib/types";
 import { DeliverableStatus } from "@/lib/types";
 import { isDeliverableOverdue } from "@/lib/types/deliverables-utils";
@@ -21,6 +21,7 @@ type DeliverableDetailsProps = {
   controls: { isPending: boolean; canReview: boolean };
   onApprove?: () => void;
   onRequestChanges?: () => void;
+  uploadButton?: React.ReactNode;
 };
 
 export function DeliverableDetails({
@@ -33,6 +34,7 @@ export function DeliverableDetails({
   controls,
   onApprove,
   onRequestChanges,
+  uploadButton,
 }: DeliverableDetailsProps) {
   const overdue = isDeliverableOverdue(deliverable);
   const showReviewActions =
@@ -119,9 +121,12 @@ export function DeliverableDetails({
 
       <div className="mb-4 grid grid-cols-1 gap-6 lg:grid-cols-12">
         <div className="space-y-2 lg:col-span-5">
-          <h3 className="font-semibold text-foreground text-sm">
-            Evidence Files
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-foreground text-sm">
+              Evidence Files
+            </h3>
+            {uploadButton}
+          </div>
           {evidence.length === 0 ? (
             <EmptyState
               description=""
@@ -140,7 +145,7 @@ export function DeliverableDetails({
                       {item.fileName}
                     </p>
                     <p className="text-muted-foreground text-xs">
-                      Uploaded {formatDate(item.createdAt)}
+                      Uploaded {formatRelativeTime(item.createdAt)}
                     </p>
                   </div>
                   <Button asChild variant="outline">

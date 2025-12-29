@@ -9,7 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 
-import { updateSprintAction } from "@/actions/sprint";
+import { updateSprintAction } from "@/actions/sprints";
 import { createSprintAction } from "@/actions/sprints";
 import DateRange from "@/components/shared/date-range";
 import { Button } from "@/components/ui/button";

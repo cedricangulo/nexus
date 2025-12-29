@@ -51,7 +51,7 @@ export default function Notification() {
           aria-label="Open notifications"
           className="relative"
           size="icon"
-          variant="outline"
+          variant="secondary"
         >
           <BellIcon aria-hidden="true" size={16} />
           <Suspense>

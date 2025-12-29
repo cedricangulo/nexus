@@ -1,7 +1,7 @@
 import { notFound, unauthorized } from "next/navigation";
 import { Suspense } from "react";
 import { auth } from "@/auth";
-import { DeliverableDetails } from "@/components/shared/deliverables";
+import MemberDeliverableActions from "@/components/member/deliverables/actions";
 import { getDeliverableDetail } from "@/lib/data/deliverables";
 import { getTeamMembersForMentions } from "@/lib/data/team-members";
 
@@ -32,9 +32,8 @@ export default async function MemberDeliverableDetailPage({
     <Suspense
       fallback={<div className="py-8 text-center">Loading deliverable...</div>}
     >
-      <DeliverableDetails
+      <MemberDeliverableActions
         comments={comments}
-        controls={{ canReview: false, isPending: false }}
         deliverable={deliverable}
         evidence={evidence}
         phase={phase}

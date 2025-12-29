@@ -44,7 +44,13 @@ function getPageTitle(pathname: string): string | undefined {
  * Provides main navigation header with sidebar toggle, search, notifications, and user avatar
  * Title updates dynamically based on current route - shows project name on dashboard
  */
-export function AppHeader({ project }: { project: Project | null }) {
+export function AppHeader({
+  project,
+  notificationComponent,
+}: {
+  project: Project | null;
+  notificationComponent: React.ReactNode;
+}) {
   const pathname = usePathname();
 
   // For dashboard, show project name; for other routes, use mapping
@@ -76,6 +82,7 @@ export function AppHeader({ project }: { project: Project | null }) {
             <Input aria-label="Search" className="pl-9" placeholder="Search" />
           </div>
         </div>
+        {notificationComponent}
         <ThemeToggle />
       </div>
     </header>
