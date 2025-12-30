@@ -35,7 +35,6 @@ export type TaskBoardDesktopProps = {
 export function TaskBoardDesktop({
   columns,
   columnsValue,
-  userMap,
   isPending,
   onMove,
   onValueChange,
@@ -75,31 +74,21 @@ export function TaskBoardDesktop({
                     No tasks
                   </p>
                 ) : (
-                  columnTasks.map((task) => {
-                    const assignee = task.assigneeId
-                      ? userMap[task.assigneeId]
-                      : undefined;
-                    const card = (
-                      <TaskCard
-                        assignee={assignee}
-                        onBlockClick={onEditReason}
-                        onTaskClick={onTaskClick}
-                        task={task}
-                      />
-                    );
-
-                    return (
-                      <KanbanItem
-                        className="rounded-lg bg-card"
-                        key={task.id}
-                        value={task.id}
-                      >
-                        <KanbanItemHandle className="w-full">
-                          {card}
-                        </KanbanItemHandle>
-                      </KanbanItem>
-                    );
-                  })
+                  columnTasks.map((task) => (
+                    <KanbanItem
+                      className="rounded-lg bg-card"
+                      key={task.id}
+                      value={task.id}
+                    >
+                      <KanbanItemHandle className="w-full">
+                        <TaskCard
+                          onBlockClick={onEditReason}
+                          onTaskClick={onTaskClick}
+                          task={task}
+                        />
+                      </KanbanItemHandle>
+                    </KanbanItem>
+                  ))
                 )}
               </KanbanColumnContent>
             </KanbanColumn>
@@ -122,13 +111,8 @@ export function TaskBoardDesktop({
             return null;
           }
 
-          const assignee = task.assigneeId
-            ? userMap[task.assigneeId]
-            : undefined;
-
           return (
             <TaskCard
-              assignee={assignee}
               onBlockClick={onEditReason}
               onTaskClick={onTaskClick}
               task={task}

@@ -206,7 +206,7 @@ export type UserWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
-  assignedTasks?: Prisma.TaskListRelationFilter
+  taskAssignments?: Prisma.TaskAssignmentListRelationFilter
   uploadedEvidence?: Prisma.EvidenceListRelationFilter
   uploadedMeetings?: Prisma.MeetingLogListRelationFilter
   comments?: Prisma.CommentListRelationFilter
@@ -224,7 +224,7 @@ export type UserOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  assignedTasks?: Prisma.TaskOrderByRelationAggregateInput
+  taskAssignments?: Prisma.TaskAssignmentOrderByRelationAggregateInput
   uploadedEvidence?: Prisma.EvidenceOrderByRelationAggregateInput
   uploadedMeetings?: Prisma.MeetingLogOrderByRelationAggregateInput
   comments?: Prisma.CommentOrderByRelationAggregateInput
@@ -245,7 +245,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
-  assignedTasks?: Prisma.TaskListRelationFilter
+  taskAssignments?: Prisma.TaskAssignmentListRelationFilter
   uploadedEvidence?: Prisma.EvidenceListRelationFilter
   uploadedMeetings?: Prisma.MeetingLogListRelationFilter
   comments?: Prisma.CommentListRelationFilter
@@ -291,7 +291,7 @@ export type UserCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
+  taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutUserInput
   uploadedEvidence?: Prisma.EvidenceCreateNestedManyWithoutUploaderInput
   uploadedMeetings?: Prisma.MeetingLogCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
@@ -309,7 +309,7 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutUserInput
   uploadedEvidence?: Prisma.EvidenceUncheckedCreateNestedManyWithoutUploaderInput
   uploadedMeetings?: Prisma.MeetingLogUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
@@ -327,7 +327,7 @@ export type UserUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutUserNestedInput
   uploadedEvidence?: Prisma.EvidenceUpdateManyWithoutUploaderNestedInput
   uploadedMeetings?: Prisma.MeetingLogUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
@@ -345,7 +345,7 @@ export type UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutUserNestedInput
   uploadedEvidence?: Prisma.EvidenceUncheckedUpdateManyWithoutUploaderNestedInput
   uploadedMeetings?: Prisma.MeetingLogUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
@@ -420,11 +420,6 @@ export type UserMinOrderByAggregateInput = {
   deletedAt?: Prisma.SortOrder
 }
 
-export type UserNullableScalarRelationFilter = {
-  is?: Prisma.UserWhereInput | null
-  isNot?: Prisma.UserWhereInput | null
-}
-
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
@@ -434,20 +429,18 @@ export type EnumRoleFieldUpdateOperationsInput = {
   set?: $Enums.Role
 }
 
-export type UserCreateNestedOneWithoutAssignedTasksInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedTasksInput, Prisma.UserUncheckedCreateWithoutAssignedTasksInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedTasksInput
+export type UserCreateNestedOneWithoutTaskAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTaskAssignmentsInput, Prisma.UserUncheckedCreateWithoutTaskAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTaskAssignmentsInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneWithoutAssignedTasksNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedTasksInput, Prisma.UserUncheckedCreateWithoutAssignedTasksInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedTasksInput
-  upsert?: Prisma.UserUpsertWithoutAssignedTasksInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
+export type UserUpdateOneRequiredWithoutTaskAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTaskAssignmentsInput, Prisma.UserUncheckedCreateWithoutTaskAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTaskAssignmentsInput
+  upsert?: Prisma.UserUpsertWithoutTaskAssignmentsInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignedTasksInput, Prisma.UserUpdateWithoutAssignedTasksInput>, Prisma.UserUncheckedUpdateWithoutAssignedTasksInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTaskAssignmentsInput, Prisma.UserUpdateWithoutTaskAssignmentsInput>, Prisma.UserUncheckedUpdateWithoutTaskAssignmentsInput>
 }
 
 export type UserCreateNestedOneWithoutUploadedEvidenceInput = {
@@ -534,7 +527,7 @@ export type UserUpdateOneRequiredWithoutDeviceTokensNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeviceTokensInput, Prisma.UserUpdateWithoutDeviceTokensInput>, Prisma.UserUncheckedUpdateWithoutDeviceTokensInput>
 }
 
-export type UserCreateWithoutAssignedTasksInput = {
+export type UserCreateWithoutTaskAssignmentsInput = {
   id?: string
   email: string
   passwordHash: string
@@ -551,7 +544,7 @@ export type UserCreateWithoutAssignedTasksInput = {
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutAssignedTasksInput = {
+export type UserUncheckedCreateWithoutTaskAssignmentsInput = {
   id?: string
   email: string
   passwordHash: string
@@ -568,23 +561,23 @@ export type UserUncheckedCreateWithoutAssignedTasksInput = {
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutAssignedTasksInput = {
+export type UserCreateOrConnectWithoutTaskAssignmentsInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedTasksInput, Prisma.UserUncheckedCreateWithoutAssignedTasksInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutTaskAssignmentsInput, Prisma.UserUncheckedCreateWithoutTaskAssignmentsInput>
 }
 
-export type UserUpsertWithoutAssignedTasksInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutAssignedTasksInput, Prisma.UserUncheckedUpdateWithoutAssignedTasksInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedTasksInput, Prisma.UserUncheckedCreateWithoutAssignedTasksInput>
+export type UserUpsertWithoutTaskAssignmentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutTaskAssignmentsInput, Prisma.UserUncheckedUpdateWithoutTaskAssignmentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutTaskAssignmentsInput, Prisma.UserUncheckedCreateWithoutTaskAssignmentsInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutAssignedTasksInput = {
+export type UserUpdateToOneWithWhereWithoutTaskAssignmentsInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutAssignedTasksInput, Prisma.UserUncheckedUpdateWithoutAssignedTasksInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutTaskAssignmentsInput, Prisma.UserUncheckedUpdateWithoutTaskAssignmentsInput>
 }
 
-export type UserUpdateWithoutAssignedTasksInput = {
+export type UserUpdateWithoutTaskAssignmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -601,7 +594,7 @@ export type UserUpdateWithoutAssignedTasksInput = {
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutAssignedTasksInput = {
+export type UserUncheckedUpdateWithoutTaskAssignmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -627,7 +620,7 @@ export type UserCreateWithoutUploadedEvidenceInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
+  taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutUserInput
   uploadedMeetings?: Prisma.MeetingLogCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutUserInput
@@ -644,7 +637,7 @@ export type UserUncheckedCreateWithoutUploadedEvidenceInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutUserInput
   uploadedMeetings?: Prisma.MeetingLogUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutUserInput
@@ -677,7 +670,7 @@ export type UserUpdateWithoutUploadedEvidenceInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutUserNestedInput
   uploadedMeetings?: Prisma.MeetingLogUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   activityLogs?: Prisma.ActivityLogUpdateManyWithoutUserNestedInput
@@ -694,7 +687,7 @@ export type UserUncheckedUpdateWithoutUploadedEvidenceInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutUserNestedInput
   uploadedMeetings?: Prisma.MeetingLogUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutUserNestedInput
@@ -711,7 +704,7 @@ export type UserCreateWithoutUploadedMeetingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
+  taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutUserInput
   uploadedEvidence?: Prisma.EvidenceCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutUserInput
@@ -728,7 +721,7 @@ export type UserUncheckedCreateWithoutUploadedMeetingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutUserInput
   uploadedEvidence?: Prisma.EvidenceUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutUserInput
@@ -761,7 +754,7 @@ export type UserUpdateWithoutUploadedMeetingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutUserNestedInput
   uploadedEvidence?: Prisma.EvidenceUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   activityLogs?: Prisma.ActivityLogUpdateManyWithoutUserNestedInput
@@ -778,7 +771,7 @@ export type UserUncheckedUpdateWithoutUploadedMeetingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutUserNestedInput
   uploadedEvidence?: Prisma.EvidenceUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutUserNestedInput
@@ -795,7 +788,7 @@ export type UserCreateWithoutCommentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
+  taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutUserInput
   uploadedEvidence?: Prisma.EvidenceCreateNestedManyWithoutUploaderInput
   uploadedMeetings?: Prisma.MeetingLogCreateNestedManyWithoutUploaderInput
   activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutUserInput
@@ -812,7 +805,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutUserInput
   uploadedEvidence?: Prisma.EvidenceUncheckedCreateNestedManyWithoutUploaderInput
   uploadedMeetings?: Prisma.MeetingLogUncheckedCreateNestedManyWithoutUploaderInput
   activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutUserInput
@@ -845,7 +838,7 @@ export type UserUpdateWithoutCommentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutUserNestedInput
   uploadedEvidence?: Prisma.EvidenceUpdateManyWithoutUploaderNestedInput
   uploadedMeetings?: Prisma.MeetingLogUpdateManyWithoutUploaderNestedInput
   activityLogs?: Prisma.ActivityLogUpdateManyWithoutUserNestedInput
@@ -862,7 +855,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutUserNestedInput
   uploadedEvidence?: Prisma.EvidenceUncheckedUpdateManyWithoutUploaderNestedInput
   uploadedMeetings?: Prisma.MeetingLogUncheckedUpdateManyWithoutUploaderNestedInput
   activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutUserNestedInput
@@ -879,7 +872,7 @@ export type UserCreateWithoutActivityLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
+  taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutUserInput
   uploadedEvidence?: Prisma.EvidenceCreateNestedManyWithoutUploaderInput
   uploadedMeetings?: Prisma.MeetingLogCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
@@ -896,7 +889,7 @@ export type UserUncheckedCreateWithoutActivityLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutUserInput
   uploadedEvidence?: Prisma.EvidenceUncheckedCreateNestedManyWithoutUploaderInput
   uploadedMeetings?: Prisma.MeetingLogUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
@@ -929,7 +922,7 @@ export type UserUpdateWithoutActivityLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutUserNestedInput
   uploadedEvidence?: Prisma.EvidenceUpdateManyWithoutUploaderNestedInput
   uploadedMeetings?: Prisma.MeetingLogUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
@@ -946,7 +939,7 @@ export type UserUncheckedUpdateWithoutActivityLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutUserNestedInput
   uploadedEvidence?: Prisma.EvidenceUncheckedUpdateManyWithoutUploaderNestedInput
   uploadedMeetings?: Prisma.MeetingLogUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
@@ -963,7 +956,7 @@ export type UserCreateWithoutNotificationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
+  taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutUserInput
   uploadedEvidence?: Prisma.EvidenceCreateNestedManyWithoutUploaderInput
   uploadedMeetings?: Prisma.MeetingLogCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
@@ -980,7 +973,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutUserInput
   uploadedEvidence?: Prisma.EvidenceUncheckedCreateNestedManyWithoutUploaderInput
   uploadedMeetings?: Prisma.MeetingLogUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
@@ -1013,7 +1006,7 @@ export type UserUpdateWithoutNotificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutUserNestedInput
   uploadedEvidence?: Prisma.EvidenceUpdateManyWithoutUploaderNestedInput
   uploadedMeetings?: Prisma.MeetingLogUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
@@ -1030,7 +1023,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutUserNestedInput
   uploadedEvidence?: Prisma.EvidenceUncheckedUpdateManyWithoutUploaderNestedInput
   uploadedMeetings?: Prisma.MeetingLogUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1047,7 +1040,7 @@ export type UserCreateWithoutDeviceTokensInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
+  taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutUserInput
   uploadedEvidence?: Prisma.EvidenceCreateNestedManyWithoutUploaderInput
   uploadedMeetings?: Prisma.MeetingLogCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
@@ -1064,7 +1057,7 @@ export type UserUncheckedCreateWithoutDeviceTokensInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutUserInput
   uploadedEvidence?: Prisma.EvidenceUncheckedCreateNestedManyWithoutUploaderInput
   uploadedMeetings?: Prisma.MeetingLogUncheckedCreateNestedManyWithoutUploaderInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
@@ -1097,7 +1090,7 @@ export type UserUpdateWithoutDeviceTokensInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutUserNestedInput
   uploadedEvidence?: Prisma.EvidenceUpdateManyWithoutUploaderNestedInput
   uploadedMeetings?: Prisma.MeetingLogUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
@@ -1114,7 +1107,7 @@ export type UserUncheckedUpdateWithoutDeviceTokensInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutUserNestedInput
   uploadedEvidence?: Prisma.EvidenceUncheckedUpdateManyWithoutUploaderNestedInput
   uploadedMeetings?: Prisma.MeetingLogUncheckedUpdateManyWithoutUploaderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1128,7 +1121,7 @@ export type UserUncheckedUpdateWithoutDeviceTokensInput = {
  */
 
 export type UserCountOutputType = {
-  assignedTasks: number
+  taskAssignments: number
   uploadedEvidence: number
   uploadedMeetings: number
   comments: number
@@ -1138,7 +1131,7 @@ export type UserCountOutputType = {
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  assignedTasks?: boolean | UserCountOutputTypeCountAssignedTasksArgs
+  taskAssignments?: boolean | UserCountOutputTypeCountTaskAssignmentsArgs
   uploadedEvidence?: boolean | UserCountOutputTypeCountUploadedEvidenceArgs
   uploadedMeetings?: boolean | UserCountOutputTypeCountUploadedMeetingsArgs
   comments?: boolean | UserCountOutputTypeCountCommentsArgs
@@ -1160,8 +1153,8 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountAssignedTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.TaskWhereInput
+export type UserCountOutputTypeCountTaskAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TaskAssignmentWhereInput
 }
 
 /**
@@ -1216,7 +1209,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
-  assignedTasks?: boolean | Prisma.User$assignedTasksArgs<ExtArgs>
+  taskAssignments?: boolean | Prisma.User$taskAssignmentsArgs<ExtArgs>
   uploadedEvidence?: boolean | Prisma.User$uploadedEvidenceArgs<ExtArgs>
   uploadedMeetings?: boolean | Prisma.User$uploadedMeetingsArgs<ExtArgs>
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
@@ -1261,7 +1254,7 @@ export type UserSelectScalar = {
 
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "name" | "role" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  assignedTasks?: boolean | Prisma.User$assignedTasksArgs<ExtArgs>
+  taskAssignments?: boolean | Prisma.User$taskAssignmentsArgs<ExtArgs>
   uploadedEvidence?: boolean | Prisma.User$uploadedEvidenceArgs<ExtArgs>
   uploadedMeetings?: boolean | Prisma.User$uploadedMeetingsArgs<ExtArgs>
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
@@ -1276,7 +1269,7 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-    assignedTasks: Prisma.$TaskPayload<ExtArgs>[]
+    taskAssignments: Prisma.$TaskAssignmentPayload<ExtArgs>[]
     uploadedEvidence: Prisma.$EvidencePayload<ExtArgs>[]
     uploadedMeetings: Prisma.$MeetingLogPayload<ExtArgs>[]
     comments: Prisma.$CommentPayload<ExtArgs>[]
@@ -1687,7 +1680,7 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  assignedTasks<T extends Prisma.User$assignedTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  taskAssignments<T extends Prisma.User$taskAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$taskAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   uploadedEvidence<T extends Prisma.User$uploadedEvidenceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$uploadedEvidenceArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EvidencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   uploadedMeetings<T extends Prisma.User$uploadedMeetingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$uploadedMeetingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MeetingLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   comments<T extends Prisma.User$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2119,27 +2112,27 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * User.assignedTasks
+ * User.taskAssignments
  */
-export type User$assignedTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$taskAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Task
+   * Select specific fields to fetch from the TaskAssignment
    */
-  select?: Prisma.TaskSelect<ExtArgs> | null
+  select?: Prisma.TaskAssignmentSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Task
+   * Omit specific fields from the TaskAssignment
    */
-  omit?: Prisma.TaskOmit<ExtArgs> | null
+  omit?: Prisma.TaskAssignmentOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.TaskInclude<ExtArgs> | null
-  where?: Prisma.TaskWhereInput
-  orderBy?: Prisma.TaskOrderByWithRelationInput | Prisma.TaskOrderByWithRelationInput[]
-  cursor?: Prisma.TaskWhereUniqueInput
+  include?: Prisma.TaskAssignmentInclude<ExtArgs> | null
+  where?: Prisma.TaskAssignmentWhereInput
+  orderBy?: Prisma.TaskAssignmentOrderByWithRelationInput | Prisma.TaskAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.TaskAssignmentWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.TaskScalarFieldEnum | Prisma.TaskScalarFieldEnum[]
+  distinct?: Prisma.TaskAssignmentScalarFieldEnum | Prisma.TaskAssignmentScalarFieldEnum[]
 }
 
 /**

@@ -70,6 +70,11 @@ export type Sprint = Prisma.SprintModel
  */
 export type Task = Prisma.TaskModel
 /**
+ * Model TaskAssignment
+ * 
+ */
+export type TaskAssignment = Prisma.TaskAssignmentModel
+/**
  * Model Evidence
  * 
  */

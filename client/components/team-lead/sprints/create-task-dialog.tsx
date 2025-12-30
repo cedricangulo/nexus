@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -44,6 +44,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { User } from "@/lib/types";
 import { createSprintTaskSchema } from "@/lib/validation";
@@ -74,7 +75,7 @@ export function CreateTaskDialog({ sprintId, users }: CreateTaskDialogProps) {
       sprintId,
       title: "",
       description: "",
-      assigneeId: "",
+      assigneeIds: [],
     },
   });
 
@@ -84,10 +85,29 @@ export function CreateTaskDialog({ sprintId, users }: CreateTaskDialogProps) {
         sprintId,
         title: "",
         description: "",
-        assigneeId: "",
+        assigneeIds: [],
       });
     }
   }, [open, sprintId, form]);
+
+  const selectedAssigneeIds = form.watch("assigneeIds") || [];
+
+  const handleAddAssignee = (userId: string) => {
+    if (!selectedAssigneeIds.includes(userId)) {
+      form.setValue("assigneeIds", [...selectedAssigneeIds, userId]);
+    }
+  };
+
+  const handleRemoveAssignee = (userId: string) => {
+    form.setValue(
+      "assigneeIds",
+      selectedAssigneeIds.filter((id) => id !== userId)
+    );
+  };
+
+  const availableAssignees = assigneeOptions.filter(
+    (o) => !selectedAssigneeIds.includes(o.value)
+  );
 
   const onSubmit = (values: z.infer<typeof createSprintTaskSchema>) => {
     startTransition(async () => {
@@ -123,24 +143,49 @@ export function CreateTaskDialog({ sprintId, users }: CreateTaskDialogProps) {
 
         <FormField
           control={form.control}
-          name="assigneeId"
-          render={({ field }) => (
+          name="assigneeIds"
+          render={() => (
             <FormItem>
-              <FormLabel>Assignee (Optional)</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value || ""}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Unassigned" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {assigneeOptions.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>
-                      {o.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormLabel>Assignees (Optional)</FormLabel>
+              {selectedAssigneeIds.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {selectedAssigneeIds.map((id) => {
+                    const user = users.find((u) => u.id === id);
+                    return (
+                      <Badge
+                        key={id}
+                        variant="secondary"
+                        className="flex items-center gap-1"
+                      >
+                        {user?.name || "Unknown"}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveAssignee(id)}
+                          className="ml-1 hover:bg-muted rounded-full"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    );
+                  })}
+                </div>
+              )}
+              {availableAssignees.length > 0 && (
+                <Select onValueChange={handleAddAssignee} value="">
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Add assignee..." />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {availableAssignees.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>
+                        {o.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
               <FormMessage />
             </FormItem>
           )}
@@ -176,7 +221,7 @@ export function CreateTaskDialog({ sprintId, users }: CreateTaskDialogProps) {
             <DrawerHeader>
               <DrawerTitle>Add Task</DrawerTitle>
               <DrawerDescription>
-                Create a task and assign it to a team member.
+                Create a task and assign it to team members.
               </DrawerDescription>
             </DrawerHeader>
 
@@ -213,7 +258,7 @@ export function CreateTaskDialog({ sprintId, users }: CreateTaskDialogProps) {
         <DialogHeader>
           <DialogTitle>Add Task</DialogTitle>
           <DialogDescription>
-            Create a task and assign it to a team member.
+            Create a task and assign it to team members.
           </DialogDescription>
         </DialogHeader>
 

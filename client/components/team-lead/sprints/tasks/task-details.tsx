@@ -6,6 +6,7 @@ import { useEffect, useMemo, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
+import { X } from "lucide-react";
 
 import { updateTaskAction, updateTaskStatusAction } from "@/actions/tasks";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Task, User } from "@/lib/types";
 import { taskDetailSchema } from "@/lib/validation";
@@ -50,7 +52,7 @@ import { taskDetailSchema } from "@/lib/validation";
 type TaskDetailDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  task: Task & { assignee?: User | null };
+  task: Task;
   sprintId: string;
   teamMembers: User[];
 };
@@ -82,6 +84,12 @@ export function TaskDetailDialog({
     [teamMembers]
   );
 
+  // Extract assignee IDs from task.assignees
+  const initialAssigneeIds = useMemo(
+    () => task.assignees?.map((a) => a.id) || [],
+    [task.assignees]
+  );
+
   const form = useForm<z.infer<typeof taskDetailSchema>>({
     resolver: zodResolver(taskDetailSchema),
     defaultValues: {
@@ -90,7 +98,7 @@ export function TaskDetailDialog({
       title: task.title,
       description: task.description || "",
       status: task.status,
-      assigneeId: task.assigneeId || "",
+      assigneeIds: initialAssigneeIds,
       blockReason:
         task.status === "BLOCKED" ? task.lastComment?.content || "" : "",
     },
@@ -107,24 +115,46 @@ export function TaskDetailDialog({
       title: task.title,
       description: task.description || "",
       status: task.status,
-      assigneeId: task.assigneeId || "",
+      assigneeIds: task.assignees?.map((a) => a.id) || [],
       blockReason:
         task.status === "BLOCKED" ? task.lastComment?.content || "" : "",
     });
   }, [open, task, sprintId, form]);
 
   const currentStatus = form.watch("status");
+  const selectedAssigneeIds = form.watch("assigneeIds") || [];
   const isBlockReasonVisible = currentStatus === "BLOCKED";
   const isMovingToBlocked =
     task.status !== "BLOCKED" && currentStatus === "BLOCKED";
 
+  const handleAddAssignee = (userId: string) => {
+    if (!selectedAssigneeIds.includes(userId)) {
+      form.setValue("assigneeIds", [...selectedAssigneeIds, userId]);
+    }
+  };
+
+  const handleRemoveAssignee = (userId: string) => {
+    form.setValue(
+      "assigneeIds",
+      selectedAssigneeIds.filter((id) => id !== userId)
+    );
+  };
+
+  const availableAssignees = assigneeOptions.filter(
+    (o) => !selectedAssigneeIds.includes(o.value)
+  );
+
   const onSubmit = (values: z.infer<typeof taskDetailSchema>) => {
     startTransition(async () => {
       const statusChanged = values.status !== task.status;
+      const currentAssigneeIds = task.assignees?.map((a) => a.id) || [];
+      const assigneesChanged =
+        JSON.stringify(values.assigneeIds?.sort()) !==
+        JSON.stringify(currentAssigneeIds.sort());
       const dataChanged =
         values.title !== task.title ||
         values.description !== (task.description || "") ||
-        values.assigneeId !== (task.assigneeId || "");
+        assigneesChanged;
 
       const previousBlockReason =
         task.status === "BLOCKED" ? task.lastComment?.content || "" : "";
@@ -157,7 +187,7 @@ export function TaskDetailDialog({
           sprintId: values.sprintId,
           title: values.title,
           description: values.description,
-          assigneeId: values.assigneeId,
+          assigneeIds: values.assigneeIds,
         });
         results.push(result);
       }
@@ -245,27 +275,49 @@ export function TaskDetailDialog({
 
           <FormField
             control={form.control}
-            name="assigneeId"
-            render={({ field }) => (
+            name="assigneeIds"
+            render={() => (
               <FormItem>
-                <FormLabel>Assignee</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value || ""}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Unassigned" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {assigneeOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormLabel>Assignees</FormLabel>
+                {selectedAssigneeIds.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {selectedAssigneeIds.map((id) => {
+                      const user = teamMembers.find((u) => u.id === id);
+                      return (
+                        <Badge
+                          key={id}
+                          variant="secondary"
+                          className="flex items-center gap-1"
+                        >
+                          {user?.name || "Unknown"}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveAssignee(id)}
+                            className="ml-1 hover:bg-muted rounded-full"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                )}
+                {availableAssignees.length > 0 && (
+                  <Select onValueChange={handleAddAssignee} value="">
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Add assignee..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {availableAssignees.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
                 <FormMessage />
               </FormItem>
             )}
@@ -302,7 +354,7 @@ export function TaskDetailDialog({
           <DrawerHeader>
             <DrawerTitle>Edit Task</DrawerTitle>
             <DrawerDescription>
-              Update task details, status, assignee, or provide a reason if
+              Update task details, status, assignees, or provide a reason if
               blocked.
             </DrawerDescription>
           </DrawerHeader>
@@ -335,7 +387,7 @@ export function TaskDetailDialog({
         <DialogHeader>
           <DialogTitle>Edit Task</DialogTitle>
           <DialogDescription>
-            Update task details, status, assignee, or provide a reason if
+            Update task details, status, assignees, or provide a reason if
             blocked.
           </DialogDescription>
         </DialogHeader>

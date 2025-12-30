@@ -21,7 +21,7 @@ export async function getComments(query: CommentQuery) {
           id: true,
           name: true,
           email: true,
-			    role: true,
+          role: true,
         },
       },
     },
@@ -37,7 +37,7 @@ export async function getCommentById(id: string) {
           id: true,
           name: true,
           email: true,
-			    role: true,
+          role: true,
         },
       },
     },
@@ -57,13 +57,20 @@ export async function createComment(userId: string, input: CreateCommentInput) {
   let recipientId: string | null = null;
 
   if (input.taskId) {
-    const task = await prisma.task.findUnique({ where: { id: input.taskId } });
+    const task = await prisma.task.findUnique({
+      where: { id: input.taskId },
+      include: {
+        assignments: { select: { userId: true } }
+      }
+    });
     if (!task) throw new NotFoundError("Task", input.taskId);
     entityType = "Task";
     entityId = task.id;
     entityTitle = task.title;
-    if (task.assigneeId && task.assigneeId !== userId) {
-      recipientId = task.assigneeId;
+    // Get first assignee that isn't the commenter for backwards compatibility
+    const otherAssignee = task.assignments.find(a => a.userId !== userId);
+    if (otherAssignee) {
+      recipientId = otherAssignee.userId;
     }
   }
 

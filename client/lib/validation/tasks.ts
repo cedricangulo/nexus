@@ -6,7 +6,7 @@ export const createSprintTaskSchema = z.object({
   sprintId: z.string().uuid(),
   title: z.string().trim().min(1, "Title is required"),
   description: z.string().trim().optional().or(z.literal("")),
-  assigneeId: z.string().uuid().optional().or(z.literal("")),
+  assigneeIds: z.array(z.string().uuid()).optional(),
 });
 
 export const updateTaskStatusSchema = z
@@ -34,7 +34,7 @@ export const updateTaskSchema = z.object({
   taskId: z.string().uuid(),
   title: z.string().trim().min(1, "Title is required"),
   description: z.string().trim().optional().or(z.literal("")),
-  assigneeId: z.string().uuid().optional().or(z.literal("")),
+  assigneeIds: z.array(z.string().uuid()).optional(),
 });
 
 export const taskDetailSchema = z
@@ -44,7 +44,7 @@ export const taskDetailSchema = z
     title: z.string().trim().min(1, "Title is required"),
     description: z.string().trim().optional().or(z.literal("")),
     status: taskStatusSchema,
-    assigneeId: z.string().uuid().optional().or(z.literal("")),
+    assigneeIds: z.array(z.string().uuid()).optional(),
     blockReason: z.string().trim().optional().or(z.literal("")),
   })
   .refine(

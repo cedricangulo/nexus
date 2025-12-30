@@ -4,7 +4,7 @@ import { TaskStatus } from "../../generated/client.js";
 export const createTaskSchema = z.object({
   sprintId: z.uuid().optional().describe('ID of the sprint the task belongs to'),
   phaseId: z.uuid().optional().describe('ID of the phase the task belongs to'),
-  assigneeId: z.uuid().optional().describe('ID of the user assigned to the task'),
+  assigneeIds: z.array(z.uuid()).optional().default([]).describe('IDs of users assigned to the task'),
   title: z.string().min(1).describe('Title of the task'),
   description: z.string().optional().describe('Detailed description of the task'),
   status: z.nativeEnum(TaskStatus).optional().default(TaskStatus.TODO).describe('Current status of the task'),
@@ -14,7 +14,7 @@ export const createTaskSchema = z.object({
 }).describe('Schema for creating a new task');
 
 export const updateTaskSchema = z.object({
-  assigneeId: z.uuid().optional().nullable().describe('ID of the user assigned to the task (or null to unassign)'),
+  assigneeIds: z.array(z.uuid()).optional().describe('IDs of users assigned to the task'),
   title: z.string().min(1).optional().describe('Updated title of the task'),
   description: z.string().optional().describe('Updated description of the task'),
   status: z.nativeEnum(TaskStatus).optional().describe('Updated status of the task'),
@@ -33,22 +33,23 @@ export const updateTaskStatusSchema = z.object({
   path: ["comment"],
 }).describe('Schema for updating task status with conditional comment requirement');
 
+const assigneeSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  email: z.email(),
+}).describe('Assigned user details');
+
 export const taskResponseSchema = z.object({
   id: z.uuid().describe('Unique identifier for the task'),
   sprintId: z.uuid().nullable().optional().describe('ID of the associated sprint'),
   phaseId: z.uuid().nullable().optional().describe('ID of the associated phase'),
-  assigneeId: z.uuid().nullable().describe('ID of the assigned user'),
   title: z.string().describe('Title of the task'),
   description: z.string().nullable().describe('Description of the task'),
   status: z.nativeEnum(TaskStatus).describe('Current status of the task'),
   createdAt: z.date().describe('Task creation timestamp'),
   updatedAt: z.date().describe('Last task update timestamp'),
   deletedAt: z.date().nullable().optional().describe('Timestamp when the task was soft deleted, or null if active'),
-  assignee: z.object({
-    id: z.uuid(),
-    name: z.string(),
-    email: z.email(),
-  }).nullable().optional().describe('Assigned user details'),
+  assignees: z.array(assigneeSchema).describe('List of assigned users'),
   lastComment: z.object({
     id: z.uuid(),
     content: z.string(),

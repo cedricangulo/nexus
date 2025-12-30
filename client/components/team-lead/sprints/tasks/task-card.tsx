@@ -3,11 +3,10 @@
 import { GripVertical } from "lucide-react";
 import { TaskDescription } from "@/components/shared/sprints/task-description";
 import { Badge } from "@/components/ui/badge";
-import type { Task, User } from "@/lib/types";
+import type { Task } from "@/lib/types";
 
 export type TaskCardProps = {
   task: Task;
-  assignee: User | undefined;
   onTaskClick: (task: Task) => void;
   onBlockClick: (task: Task) => void;
   interaction?: "drag" | "tap";
@@ -15,19 +14,18 @@ export type TaskCardProps = {
 
 export function TaskCard({
   task,
-  assignee,
   onTaskClick,
   interaction = "drag",
 }: TaskCardProps) {
   const cursorClass = interaction === "tap" ? "cursor-pointer" : "cursor-move";
+  const assignees = task.assignees || [];
 
   return (
     <div
-      className={`group space-y-2 rounded-md border p-3 transition-all ${cursorClass} ${
-        task.status === "BLOCKED"
+      className={`group space-y-2 rounded-md border p-3 transition-all ${cursorClass} ${task.status === "BLOCKED"
           ? "border-destructive/70 bg-card/20"
           : "bg-card hover:bg-accent/50"
-      }`}
+        }`}
       onClick={() => onTaskClick(task)}
     >
       <div className="flex justify-between gap-2">
@@ -40,10 +38,14 @@ export function TaskCard({
         <GripVertical className="hidden size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground md:block" />
       </div>
 
-      {assignee ? (
-        <Badge className="text-xs" variant="secondary">
-          {assignee.name}
-        </Badge>
+      {assignees.length > 0 ? (
+        <div className="flex flex-wrap gap-1">
+          {assignees.map((assignee) => (
+            <Badge key={assignee.id} className="text-xs" variant="secondary">
+              {assignee.name}
+            </Badge>
+          ))}
+        </div>
       ) : null}
     </div>
   );

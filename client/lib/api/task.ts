@@ -4,13 +4,13 @@ import { API_ENDPOINTS } from "./endpoints";
 
 export type CreateTaskInput = {
   sprintId: string;
-  assigneeId?: string;
+  assigneeIds?: string[];
   title: string;
   description?: string;
 };
 
 export type UpdateTaskInput = {
-  assigneeId?: string | null;
+  assigneeIds?: string[];
   title?: string;
   description?: string;
   status?: TaskStatus;

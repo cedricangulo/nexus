@@ -304,8 +304,10 @@ export function getBlockedTasks(tasks: Task[], users: User[]): BlockedItem[] {
   );
 
   return blockedTasks.map((task) => {
-    const assignee = task.assigneeId
-      ? users.find((u) => u.id === task.assigneeId)
+    // Use first assignee from the assignees array if available
+    const firstAssignee = task.assignees?.[0];
+    const assignee = firstAssignee
+      ? users.find((u) => u.id === firstAssignee.id)
       : null;
 
     return {
@@ -370,7 +372,7 @@ export function computeTeamMemberSummary(
   lastActivityDate?: string
 ): TeamMemberSummary {
   const userTasks = tasks.filter(
-    (t) => t.assigneeId === user.id && !t.deletedAt
+    (t) => t.assignees?.some((a) => a.id === user.id) && !t.deletedAt
   );
   const tasksAssigned = userTasks.length;
 

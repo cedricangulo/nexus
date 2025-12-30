@@ -125,7 +125,7 @@ export type Task = {
   id: string;
   sprintId?: string | null;
   phaseId?: string | null;
-  assigneeId?: string | null;
+  assignees?: Array<{ id: string; name: string; email: string }>;
   title: string;
   description?: string | null;
   status: TaskStatus;

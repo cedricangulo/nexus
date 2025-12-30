@@ -24,7 +24,6 @@ export type TaskBoardMobileProps = {
 export function TaskBoardMobile({
   columns,
   columnsValue,
-  userMap,
   onEditReason,
   onTaskClick,
 }: TaskBoardMobileProps) {
@@ -68,34 +67,27 @@ export function TaskBoardMobile({
               </p>
             ) : (
               <div className="space-y-2">
-                {columnTasks.map((task) => {
-                  const assignee = task.assigneeId
-                    ? userMap[task.assigneeId]
-                    : undefined;
-
-                  return (
-                    <div
-                      aria-label={`Open ${task.title}`}
-                      className="block w-full"
-                      key={task.id}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                        }
-                      }}
-                      role="button"
-                      tabIndex={0}
-                    >
-                      <TaskCard
-                        assignee={assignee}
-                        interaction="tap"
-                        onBlockClick={onEditReason}
-                        onTaskClick={onTaskClick}
-                        task={task}
-                      />
-                    </div>
-                  );
-                })}
+                {columnTasks.map((task) => (
+                  <div
+                    aria-label={`Open ${task.title}`}
+                    className="block w-full"
+                    key={task.id}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <TaskCard
+                      interaction="tap"
+                      onBlockClick={onEditReason}
+                      onTaskClick={onTaskClick}
+                      task={task}
+                    />
+                  </div>
+                ))}
               </div>
             )}
           </TabsContent>

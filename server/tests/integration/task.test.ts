@@ -13,6 +13,7 @@ describe("Task Integration Tests", () => {
   let teamLeadToken: string;
   let memberToken: string;
   let memberId: string;
+  let member2Id: string;
   let projectId: string;
   let sprintId: string;
   let phaseId: string;
@@ -50,7 +51,7 @@ describe("Task Integration Tests", () => {
     });
     teamLeadToken = leadLogin.body.token;
 
-    // Create a Member
+    // Create Member 1
     const member = await prisma.user.upsert({
       where: { email: "member@example.com" },
       update: {},
@@ -62,6 +63,19 @@ describe("Task Integration Tests", () => {
       },
     });
     memberId = member.id;
+
+    // Create Member 2
+    const member2 = await prisma.user.upsert({
+      where: { email: "member2@example.com" },
+      update: {},
+      create: {
+        email: "member2@example.com",
+        passwordHash: await hashPassword("password123"),
+        name: "Member 2",
+        role: "MEMBER",
+      },
+    });
+    member2Id = member2.id;
 
     // Login as Member
     const memberLogin = await request.post("/api/v1/auth/login").send({
@@ -100,7 +114,7 @@ describe("Task Integration Tests", () => {
   }, 30000);
 
   describe("POST /api/v1/tasks", () => {
-    it("should create a sprint task when authenticated as TEAM_LEAD", async () => {
+    it("should create a sprint task with multiple assignees", async () => {
       const res = await request
         .post("/api/v1/tasks")
         .set("Authorization", `Bearer ${teamLeadToken}`)
@@ -109,13 +123,15 @@ describe("Task Integration Tests", () => {
           title: "New Sprint Task",
           description: "Task description",
           status: TaskStatus.TODO,
-          assigneeId: memberId,
+          assigneeIds: [memberId, member2Id],
         });
 
       expect(res.status).toBe(201);
       expect(res.body.title).toBe("New Sprint Task");
       expect(res.body.sprintId).toBe(sprintId);
-      expect(res.body.assigneeId).toBe(memberId);
+      expect(res.body.assignees).toHaveLength(2);
+      expect(res.body.assignees.map((a: any) => a.id)).toContain(memberId);
+      expect(res.body.assignees.map((a: any) => a.id)).toContain(member2Id);
       expect(res.body.id).toBeDefined();
     });
 
@@ -128,15 +144,31 @@ describe("Task Integration Tests", () => {
           title: "New Phase Task",
           description: "Task description",
           status: TaskStatus.TODO,
-          assigneeId: memberId,
+          assigneeIds: [memberId],
         });
 
       expect(res.status).toBe(201);
       expect(res.body.title).toBe("New Phase Task");
       expect(res.body.phaseId).toBe(phaseId);
       expect(res.body.sprintId).toBeNull();
-      expect(res.body.assigneeId).toBe(memberId);
+      expect(res.body.assignees).toHaveLength(1);
+      expect(res.body.assignees[0].id).toBe(memberId);
       expect(res.body.id).toBeDefined();
+    });
+
+    it("should create a task without assignees", async () => {
+      const res = await request
+        .post("/api/v1/tasks")
+        .set("Authorization", `Bearer ${teamLeadToken}`)
+        .send({
+          sprintId,
+          title: "Unassigned Task",
+          status: TaskStatus.TODO,
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body.title).toBe("Unassigned Task");
+      expect(res.body.assignees).toHaveLength(0);
     });
 
     it("should fail if neither sprintId nor phaseId is provided", async () => {
@@ -184,6 +216,37 @@ describe("Task Integration Tests", () => {
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body.length).toBe(1);
       expect(res.body[0].title).toBe("Sprint Task 1");
+      expect(res.body[0].assignees).toBeDefined();
+    });
+
+    it("should list tasks filtered by assignee", async () => {
+      const task = await prisma.task.create({
+        data: {
+          sprintId,
+          title: "Assigned Task",
+          status: TaskStatus.TODO,
+          assignments: {
+            create: [{ userId: memberId }],
+          },
+        },
+      });
+
+      // Create another task without this assignee
+      await prisma.task.create({
+        data: {
+          sprintId,
+          title: "Other Task",
+          status: TaskStatus.TODO,
+        },
+      });
+
+      const res = await request
+        .get(`/api/v1/tasks?assigneeId=${memberId}`)
+        .set("Authorization", `Bearer ${memberToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBe(1);
+      expect(res.body[0].title).toBe("Assigned Task");
     });
 
     it("should list tasks filtered by phase", async () => {
@@ -207,12 +270,15 @@ describe("Task Integration Tests", () => {
   });
 
   describe("GET /api/v1/tasks/:id", () => {
-    it("should return a specific task", async () => {
+    it("should return a specific task with assignees", async () => {
       const task = await prisma.task.create({
         data: {
           sprintId,
           title: "Target Task",
           status: TaskStatus.IN_PROGRESS,
+          assignments: {
+            create: [{ userId: memberId }, { userId: member2Id }],
+          },
         },
       });
 
@@ -223,6 +289,7 @@ describe("Task Integration Tests", () => {
       expect(res.status).toBe(200);
       expect(res.body.id).toBe(task.id);
       expect(res.body.title).toBe("Target Task");
+      expect(res.body.assignees).toHaveLength(2);
     });
   });
 
@@ -248,6 +315,36 @@ describe("Task Integration Tests", () => {
       expect(res.body.title).toBe("Updated Title");
       expect(res.body.status).toBe(TaskStatus.IN_PROGRESS);
     });
+
+    it("should update task assignees", async () => {
+      const task = await prisma.task.create({
+        data: {
+          sprintId,
+          title: "Task with Assignees",
+          status: TaskStatus.TODO,
+          assignments: {
+            create: [{ userId: memberId }],
+          },
+        },
+      });
+
+      const res = await request
+        .put(`/api/v1/tasks/${task.id}`)
+        .set("Authorization", `Bearer ${teamLeadToken}`)
+        .send({
+          assigneeIds: [member2Id],
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.assignees).toHaveLength(1);
+      expect(res.body.assignees[0].id).toBe(member2Id);
+
+      // Verify notification was created for new assignee
+      const notifications = await prisma.notification.findMany({
+        where: { userId: member2Id },
+      });
+      expect(notifications.length).toBeGreaterThan(0);
+    });
   });
 
   describe("PATCH /api/v1/tasks/:id/status", () => {
@@ -257,7 +354,9 @@ describe("Task Integration Tests", () => {
           sprintId,
           title: "Status Task",
           status: TaskStatus.TODO,
-          assigneeId: memberId,
+          assignments: {
+            create: [{ userId: memberId }],
+          },
         },
       });
 
@@ -278,7 +377,9 @@ describe("Task Integration Tests", () => {
           sprintId,
           title: "Blocked Task",
           status: TaskStatus.IN_PROGRESS,
-          assigneeId: memberId,
+          assignments: {
+            create: [{ userId: memberId }],
+          },
         },
       });
 
@@ -299,7 +400,9 @@ describe("Task Integration Tests", () => {
           sprintId,
           title: "Blocked Task",
           status: TaskStatus.IN_PROGRESS,
-          assigneeId: memberId,
+          assignments: {
+            create: [{ userId: memberId }],
+          },
         },
       });
 

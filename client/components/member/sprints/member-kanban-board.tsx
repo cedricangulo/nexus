@@ -106,7 +106,7 @@ export function MemberKanbanBoard({
     }
 
     // RBAC: Verify user owns the task
-    if (task.assigneeId !== currentUserId) {
+    if (!task.assignees?.some((a) => a.id === currentUserId)) {
       toast.error("You can only update your own tasks");
       return;
     }
@@ -133,7 +133,7 @@ export function MemberKanbanBoard({
     }
 
     // RBAC: Verify user owns the task
-    if (task.assigneeId !== currentUserId) {
+    if (!task.assignees?.some((a) => a.id === currentUserId)) {
       toast.error("You can only update your own tasks");
       return;
     }

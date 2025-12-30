@@ -37,8 +37,8 @@ async function SprintBoardContent({ sprintId }: { sprintId: string }) {
   }
 
   // Filter tasks to only show those assigned to the current user
-  const userTasks = allTasks.filter(
-    (task) => task.assigneeId === currentUser.id
+  const userTasks = allTasks.filter((task) =>
+    task.assignees?.some((a) => a.id === currentUser.id)
   );
 
   const status = getSprintStatus(sprint);

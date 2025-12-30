@@ -390,6 +390,7 @@ export const ModelName = {
   Deliverable: 'Deliverable',
   Sprint: 'Sprint',
   Task: 'Task',
+  TaskAssignment: 'TaskAssignment',
   Evidence: 'Evidence',
   MeetingLog: 'MeetingLog',
   Comment: 'Comment',
@@ -411,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "project" | "user" | "phase" | "deliverable" | "sprint" | "task" | "evidence" | "meetingLog" | "comment" | "activityLog" | "notification" | "deviceToken"
+    modelProps: "project" | "user" | "phase" | "deliverable" | "sprint" | "task" | "taskAssignment" | "evidence" | "meetingLog" | "comment" | "activityLog" | "notification" | "deviceToken"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -856,6 +857,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.TaskCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.TaskCountAggregateOutputType> | number
+        }
+      }
+    }
+    TaskAssignment: {
+      payload: Prisma.$TaskAssignmentPayload<ExtArgs>
+      fields: Prisma.TaskAssignmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TaskAssignmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskAssignmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TaskAssignmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskAssignmentPayload>
+        }
+        findFirst: {
+          args: Prisma.TaskAssignmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskAssignmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TaskAssignmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskAssignmentPayload>
+        }
+        findMany: {
+          args: Prisma.TaskAssignmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskAssignmentPayload>[]
+        }
+        create: {
+          args: Prisma.TaskAssignmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskAssignmentPayload>
+        }
+        createMany: {
+          args: Prisma.TaskAssignmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TaskAssignmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskAssignmentPayload>[]
+        }
+        delete: {
+          args: Prisma.TaskAssignmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskAssignmentPayload>
+        }
+        update: {
+          args: Prisma.TaskAssignmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskAssignmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.TaskAssignmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TaskAssignmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TaskAssignmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskAssignmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.TaskAssignmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskAssignmentPayload>
+        }
+        aggregate: {
+          args: Prisma.TaskAssignmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTaskAssignment>
+        }
+        groupBy: {
+          args: Prisma.TaskAssignmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TaskAssignmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TaskAssignmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TaskAssignmentCountAggregateOutputType> | number
         }
       }
     }
@@ -1420,7 +1495,6 @@ export const TaskScalarFieldEnum = {
   id: 'id',
   sprintId: 'sprintId',
   phaseId: 'phaseId',
-  assigneeId: 'assigneeId',
   title: 'title',
   description: 'description',
   status: 'status',
@@ -1430,6 +1504,16 @@ export const TaskScalarFieldEnum = {
 } as const
 
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
+
+
+export const TaskAssignmentScalarFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type TaskAssignmentScalarFieldEnum = (typeof TaskAssignmentScalarFieldEnum)[keyof typeof TaskAssignmentScalarFieldEnum]
 
 
 export const EvidenceScalarFieldEnum = {
@@ -1774,6 +1858,7 @@ export type GlobalOmitConfig = {
   deliverable?: Prisma.DeliverableOmit
   sprint?: Prisma.SprintOmit
   task?: Prisma.TaskOmit
+  taskAssignment?: Prisma.TaskAssignmentOmit
   evidence?: Prisma.EvidenceOmit
   meetingLog?: Prisma.MeetingLogOmit
   comment?: Prisma.CommentOmit

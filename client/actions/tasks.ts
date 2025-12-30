@@ -23,7 +23,9 @@ export async function createSprintTaskAction(input: unknown) {
       sprintId: parsed.sprintId,
       title: parsed.title,
       description: parsed.description ? parsed.description : undefined,
-      assigneeId: parsed.assigneeId ? parsed.assigneeId : undefined,
+      assigneeIds: parsed.assigneeIds && parsed.assigneeIds.length > 0
+        ? parsed.assigneeIds
+        : undefined,
     });
 
     revalidatePath(`/sprints/${parsed.sprintId}`);
@@ -76,7 +78,9 @@ export async function updateTaskAction(input: unknown) {
     await taskApi.updateTask(parsed.taskId, {
       title: parsed.title,
       description: parsed.description ? parsed.description : undefined,
-      assigneeId: parsed.assigneeId ? parsed.assigneeId : undefined,
+      assigneeIds: parsed.assigneeIds && parsed.assigneeIds.length > 0
+        ? parsed.assigneeIds
+        : [],
     });
 
     revalidatePath(`/sprints/${parsed.sprintId}`);

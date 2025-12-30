@@ -572,11 +572,11 @@ async function main() {
     for (let i = 0; i < numTasks; i++) {
       const randomIndex = Math.floor(Math.random() * taskTitles.length)
       const randomAssignee = users[Math.floor(Math.random() * users.length)]
-      
+
       // Determine status based on sprint date
       let status: TaskStatus
       const now = new Date()
-      
+
       if (sprint.endDate < now) {
         // Past sprints should have mostly DONE tasks
         const rand = Math.random()
@@ -603,7 +603,9 @@ async function main() {
           title: `${taskTitles[randomIndex]} - ${i + 1}`,
           description: taskDescriptions[randomIndex],
           status,
-          assigneeId: randomAssignee.id,
+          assignments: {
+            create: [{ userId: randomAssignee.id }]
+          },
           createdAt: new Date(sprint.startDate.getTime() + Math.random() * (sprint.endDate.getTime() - sprint.startDate.getTime()))
         }
       })
@@ -675,7 +677,7 @@ async function main() {
     const randomAuthor = users[Math.floor(Math.random() * users.length)]
     const template = commentTemplates[Math.floor(Math.random() * commentTemplates.length)]
     const subject = subjects[Math.floor(Math.random() * subjects.length)]
-    
+
     await prisma.comment.create({
       data: {
         taskId: randomTask.id,
@@ -693,7 +695,7 @@ async function main() {
     const randomAuthor = users[Math.floor(Math.random() * users.length)]
     const template = commentTemplates[Math.floor(Math.random() * commentTemplates.length)]
     const subject = subjects[Math.floor(Math.random() * subjects.length)]
-    
+
     await prisma.comment.create({
       data: {
         deliverableId: randomDeliverable.id,
@@ -713,18 +715,18 @@ async function main() {
   console.log('\n📋 Creating meeting logs...')
 
   let meetingCount = 0
-  
+
   for (let i = 0; i < sprints.length; i++) {
     const sprint = sprints[i]
     // 2-3 meetings per sprint
     const numMeetings = Math.floor(Math.random() * 2) + 2
-    
+
     for (let j = 0; j < numMeetings; j++) {
       const meetingDate = new Date(
-        sprint.startDate.getTime() + 
+        sprint.startDate.getTime() +
         (j * (sprint.endDate.getTime() - sprint.startDate.getTime()) / numMeetings)
       )
-      
+
       await prisma.meetingLog.create({
         data: {
           sprintId: sprint.id,
@@ -786,10 +788,10 @@ async function main() {
         action: 'DELIVERABLE_STATUS_CHANGED',
         entityType: 'Deliverable',
         entityId: deliverable.id,
-        details: JSON.stringify({ 
-          title: deliverable.title, 
+        details: JSON.stringify({
+          title: deliverable.title,
           status: deliverable.status,
-          previousStatus: DeliverableStatus.NOT_STARTED 
+          previousStatus: DeliverableStatus.NOT_STARTED
         }),
         createdAt: deliverable.createdAt
       }
@@ -825,7 +827,7 @@ async function main() {
   for (const user of users) {
     // Each user gets 3-5 notifications
     const numNotifications = Math.floor(Math.random() * 3) + 3
-    
+
     for (let i = 0; i < numNotifications; i++) {
       const notificationTypes = [
         'Task assigned to you',
@@ -838,7 +840,7 @@ async function main() {
       ]
 
       const isRead = Math.random() > 0.3
-      
+
       await prisma.notification.create({
         data: {
           userId: user.id,
