@@ -116,6 +116,11 @@ export const API_ENDPOINTS = {
     DELETE: (id: string) => `/notifications/${id}`,
   },
 
+  // Search Endpoints
+  SEARCH: {
+    GLOBAL: "/search",
+  },
+
   // Analytics Endpoints
   ANALYTICS: {
     OVERVIEW: "/analytics/dashboard/overview",

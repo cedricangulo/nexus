@@ -36,7 +36,7 @@ apiClient.interceptors.request.use(
       } else {
         // Safe cast for plain object manipulation
         const headers = config.headers as Record<string, unknown>;
-        delete headers["Content-Type"];
+        headers["Content-Type"] = undefined;
       }
     }
 
@@ -68,6 +68,4 @@ apiClient.interceptors.response.use(
   }
 );
 
-export const createApiClient = async (): Promise<AxiosInstance> => {
-  return apiClient;
-};
+export const createApiClient = async (): Promise<AxiosInstance> => apiClient;

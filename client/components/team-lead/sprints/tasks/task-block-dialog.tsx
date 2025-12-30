@@ -141,7 +141,9 @@ export function TaskBlockDialog({
       <Drawer onOpenChange={onOpenChange} open={open}>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>{isBlocked ? "Block Task" : "Update Task"}</DrawerTitle>
+            <DrawerTitle>
+              {isBlocked ? "Block Task" : "Update Task"}
+            </DrawerTitle>
             <DrawerDescription>
               {isBlocked
                 ? "Explain why this task is blocked. This helps the team understand dependencies."
@@ -149,13 +151,21 @@ export function TaskBlockDialog({
             </DrawerDescription>
           </DrawerHeader>
 
-          <div className="px-4">
-            {formContent}
-          </div>
+          <div className="px-4">{formContent}</div>
 
           <DrawerFooter>
-            <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} type="button">
-              {isPending ? (isBlocked ? "Blocking..." : "Saving...") : (isBlocked ? "Block Task" : "Save")}
+            <Button
+              disabled={isPending}
+              onClick={form.handleSubmit(onSubmit)}
+              type="button"
+            >
+              {isPending
+                ? isBlocked
+                  ? "Blocking..."
+                  : "Saving..."
+                : isBlocked
+                  ? "Block Task"
+                  : "Save"}
             </Button>
             <DrawerClose asChild>
               <Button disabled={isPending} variant="outline">
@@ -191,8 +201,18 @@ export function TaskBlockDialog({
           >
             Cancel
           </Button>
-          <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} type="button">
-            {isPending ? (isBlocked ? "Blocking..." : "Saving...") : (isBlocked ? "Block Task" : "Save")}
+          <Button
+            disabled={isPending}
+            onClick={form.handleSubmit(onSubmit)}
+            type="button"
+          >
+            {isPending
+              ? isBlocked
+                ? "Blocking..."
+                : "Saving..."
+              : isBlocked
+                ? "Block Task"
+                : "Save"}
           </Button>
         </DialogFooter>
       </DialogContent>

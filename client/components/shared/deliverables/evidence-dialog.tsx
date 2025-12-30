@@ -19,8 +19,8 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { formatDate } from "@/lib/helpers/format-date";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { formatDate } from "@/lib/helpers/format-date";
 import type { Evidence } from "@/lib/types";
 
 export type EvidenceDialogProps = {
@@ -38,34 +38,33 @@ export function EvidenceDialog({
 }: EvidenceDialogProps) {
   const isMobile = useIsMobile();
 
-  const content = evidence.length === 0 ? (
-    <div className="py-6 text-center text-muted-foreground text-sm">
-      No evidence uploaded yet.
-    </div>
-  ) : (
-    <div className="space-y-2">
-      {evidence.map((item) => (
-        <div
-          className="flex flex-wrap items-center justify-between gap-2 rounded-md border px-3 py-2"
-          key={item.id}
-        >
-          <div className="min-w-0">
-            <p className="truncate font-medium text-sm">
-              {item.fileName}
-            </p>
-            <p className="text-muted-foreground text-xs">
-              Uploaded {formatDate(item.createdAt)}
-            </p>
+  const content =
+    evidence.length === 0 ? (
+      <div className="py-6 text-center text-muted-foreground text-sm">
+        No evidence uploaded yet.
+      </div>
+    ) : (
+      <div className="space-y-2">
+        {evidence.map((item) => (
+          <div
+            className="flex flex-wrap items-center justify-between gap-2 rounded-md border px-3 py-2"
+            key={item.id}
+          >
+            <div className="min-w-0">
+              <p className="truncate font-medium text-sm">{item.fileName}</p>
+              <p className="text-muted-foreground text-xs">
+                Uploaded {formatDate(item.createdAt)}
+              </p>
+            </div>
+            <Button asChild variant="outline">
+              <Link href={item.fileUrl} rel="noreferrer" target="_blank">
+                View
+              </Link>
+            </Button>
           </div>
-          <Button asChild variant="outline">
-            <Link href={item.fileUrl} rel="noreferrer" target="_blank">
-              View
-            </Link>
-          </Button>
-        </div>
-      ))}
-    </div>
-  );
+        ))}
+      </div>
+    );
 
   if (isMobile) {
     return (
@@ -78,9 +77,7 @@ export function EvidenceDialog({
             </DrawerDescription>
           </DrawerHeader>
 
-          <div className="px-4">
-            {content}
-          </div>
+          <div className="px-4">{content}</div>
 
           <DrawerFooter>
             <DrawerClose asChild>

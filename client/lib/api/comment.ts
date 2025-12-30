@@ -39,7 +39,10 @@ export const commentApi = {
     id: string,
     data: UpdateCommentInput
   ): Promise<Comment> => {
-    const response = await apiClient.put(API_ENDPOINTS.COMMENTS.UPDATE(id), data);
+    const response = await apiClient.put(
+      API_ENDPOINTS.COMMENTS.UPDATE(id),
+      data
+    );
     return response.data;
   },
 

@@ -1,9 +1,9 @@
 "use client";
 
 import { GripVertical } from "lucide-react";
+import { TaskDescription } from "@/components/shared/sprints/task-description";
 import { Badge } from "@/components/ui/badge";
 import type { Task, User } from "@/lib/types";
-import { TaskDescription } from "@/components/shared/sprints/task-description";
 
 export type TaskCardProps = {
   task: Task;

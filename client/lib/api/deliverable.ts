@@ -38,7 +38,10 @@ export const deliverableApi = {
   createDeliverable: async (
     data: CreateDeliverableInput
   ): Promise<Deliverable> => {
-    const response = await apiClient.post(API_ENDPOINTS.DELIVERABLES.CREATE, data);
+    const response = await apiClient.post(
+      API_ENDPOINTS.DELIVERABLES.CREATE,
+      data
+    );
     return response.data;
   },
 
@@ -58,7 +61,9 @@ export const deliverableApi = {
   },
 
   restoreDeliverable: async (id: string): Promise<Deliverable> => {
-    const response = await apiClient.post(API_ENDPOINTS.DELIVERABLES.RESTORE(id));
+    const response = await apiClient.post(
+      API_ENDPOINTS.DELIVERABLES.RESTORE(id)
+    );
     return response.data;
   },
 };

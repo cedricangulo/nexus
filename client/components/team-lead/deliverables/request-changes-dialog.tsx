@@ -60,9 +60,7 @@ export function RequestChangesDialog({
             </DrawerDescription>
           </DrawerHeader>
 
-          <div className="px-4">
-            {textareaContent}
-          </div>
+          <div className="px-4">{textareaContent}</div>
 
           <DrawerFooter>
             <Button

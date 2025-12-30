@@ -207,11 +207,7 @@ export function TaskDetailDialog({
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea
-                  {...field}
-                  placeholder="Optional details"
-                  rows={3}
-                />
+                <Textarea {...field} placeholder="Optional details" rows={3} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -311,9 +307,7 @@ export function TaskDetailDialog({
             </DrawerDescription>
           </DrawerHeader>
 
-          <div className="px-4">
-            {formContent}
-          </div>
+          <div className="px-4">{formContent}</div>
 
           <DrawerFooter>
             <Button

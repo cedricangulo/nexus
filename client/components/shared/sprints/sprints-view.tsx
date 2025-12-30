@@ -1,12 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-
-import { PhaseList } from "@/components/shared/sprints/phase-list";
 import {
   FilterChips,
   type FilterKey,
 } from "@/components/shared/sprints/filter-chips";
+import { PhaseList } from "@/components/shared/sprints/phase-list";
 import { CreateSprintButton } from "@/components/team-lead/sprints/_components/sprint-actions";
 import { getSprintStatus } from "@/lib/helpers/sprint";
 import type { Sprint, SprintProgress } from "@/lib/types";

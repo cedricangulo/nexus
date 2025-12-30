@@ -40,7 +40,10 @@ export const sprintApi = {
     id: string,
     data: UpdateSprintInput
   ): Promise<Sprint> => {
-    const response = await apiClient.put(API_ENDPOINTS.SPRINTS.UPDATE(id), data);
+    const response = await apiClient.put(
+      API_ENDPOINTS.SPRINTS.UPDATE(id),
+      data
+    );
     return response.data;
   },
 

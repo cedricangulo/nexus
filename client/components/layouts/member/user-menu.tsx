@@ -1,6 +1,7 @@
 "use client";
 
 import { LogOutIcon } from "lucide-react";
+import { logoutAction } from "@/actions/logout";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,8 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { User } from "@/lib/types";
-import { formatTitleCase } from "@/lib/helpers";
-import { logoutAction } from "@/actions/logout";
 
 /**
  * User Menu Component
@@ -20,7 +19,9 @@ import { logoutAction } from "@/actions/logout";
  * Designed for mobile view in the AppHeader.
  */
 export function UserMenu({ user }: { user: User | null }) {
-  if (!user) return null;
+  if (!user) {
+    return null;
+  }
 
   const initials = user.name
     ?.split(" ")
@@ -33,7 +34,7 @@ export function UserMenu({ user }: { user: User | null }) {
       {/* Mobile only */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button size="icon" variant="secondary" className="rounded-full">
+          <Button className="rounded-full" size="icon" variant="secondary">
             <Avatar className="h-8 w-8">
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
@@ -53,9 +54,9 @@ export function UserMenu({ user }: { user: User | null }) {
           <DropdownMenuSeparator />
 
           <DropdownMenuItem
-            variant="destructive"
-            className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer"
+            className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
             onClick={() => logoutAction()}
+            variant="destructive"
           >
             <LogOutIcon size={16} />
             Log out

@@ -57,7 +57,7 @@ export function PhaseList({
           const percent = progress?.percentage ?? 0;
 
           return (
-            // TODO: Bad UX for having two onClick handlers (Link and SprintActionsMenu) 
+            // TODO: Bad UX for having two onClick handlers (Link and SprintActionsMenu)
             <Suspense
               fallback={<Skeleton className="h-80 w-full" />}
               key={sprint.id}
@@ -122,8 +122,8 @@ export function PhaseList({
 
       {selectedSprint ? (
         <SprintFormDialog
-          open={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
+          open={isEditDialogOpen}
           sprint={selectedSprint}
         />
       ) : null}

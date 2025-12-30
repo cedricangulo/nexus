@@ -255,9 +255,7 @@ export function MemberTaskDetailDialog({
             </DrawerDescription>
           </DrawerHeader>
 
-          <div className="px-4">
-            {formContent}
-          </div>
+          <div className="px-4">{formContent}</div>
 
           <DrawerFooter>
             <Button

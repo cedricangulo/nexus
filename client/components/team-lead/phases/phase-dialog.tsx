@@ -177,12 +177,14 @@ export function PhaseDialog({ open, onOpenChange, phase }: PhaseDialogProps) {
             </DrawerDescription>
           </DrawerHeader>
 
-          <div className="px-4">
-            {formContent}
-          </div>
+          <div className="px-4">{formContent}</div>
 
           <DrawerFooter>
-            <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} type="button">
+            <Button
+              disabled={isPending}
+              onClick={form.handleSubmit(onSubmit)}
+              type="button"
+            >
               {isPending ? "Saving..." : "Save Changes"}
             </Button>
             <DrawerClose asChild>
@@ -215,7 +217,11 @@ export function PhaseDialog({ open, onOpenChange, phase }: PhaseDialogProps) {
           >
             Cancel
           </Button>
-          <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} type="button">
+          <Button
+            disabled={isPending}
+            onClick={form.handleSubmit(onSubmit)}
+            type="button"
+          >
             {isPending ? "Saving..." : "Save Changes"}
           </Button>
         </DialogFooter>

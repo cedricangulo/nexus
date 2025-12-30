@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
+import { showPendingActionToast } from "@/components/shared/pending-action-toast";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,7 +30,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { showPendingActionToast } from "@/components/shared/pending-action-toast";
 import type { ActionConfig, GenericRowActionsProps } from "./types";
 
 const defaultActionIcons: Record<string, LucideIcon> = {
