@@ -91,7 +91,7 @@ export function AppHeader({
       </div>
 
       <div className="flex flex-1 items-center justify-end gap-3 px-4 md:gap-6">
-        <div className="w-full max-w-xs items-center gap-2 md:flex">
+        <div className="w-fit max-w-xs items-center gap-2 sm:w-full md:flex">
           <SearchTrigger onOpenSearch={() => setSearchOpen(true)} />
         </div>
         {notificationComponent}

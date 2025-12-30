@@ -4,7 +4,11 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { Command } from "cmdk";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import {
+  DialogDescription,
+  DialogOverlay,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useSearch } from "@/hooks/use-search";
 import { SearchResults } from "./search-results";
 
@@ -77,9 +81,9 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
       open={open}
     >
       {/* Backdrop overlay with blur effect */}
-      <div
+      <DialogOverlay
         aria-hidden="true"
-        className="fixed inset-0 bg-background/80 backdrop-blur-sm"
+        className="fixed inset-0 z-0"
         onClick={() => onOpenChange(false)}
       />
 

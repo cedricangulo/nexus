@@ -17,10 +17,10 @@ export function SearchTrigger({ onOpenSearch }: SearchTriggerProps) {
 
   return (
     <Button
-      className="h-9 w-9 justify-center gap-2 bg-muted/50 px-0 font-normal text-muted-foreground hover:bg-muted sm:w-full sm:max-w-xs sm:justify-start sm:px-3"
+      className="h-9 w-9 justify-center sm:w-full sm:max-w-xs sm:justify-start"
       onClick={onOpenSearch}
       type="button"
-      variant="ghost"
+      variant="secondary"
     >
       <Search className="size-4 shrink-0" />
       <span className="hidden flex-1 text-left sm:inline">Search</span>

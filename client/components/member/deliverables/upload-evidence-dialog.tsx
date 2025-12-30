@@ -55,14 +55,17 @@ export function UploadEvidenceDialog({
 
   const maxSize = 10 * 1024 * 1024; // 10MB
 
-  const handleOpenChange = useCallback((newOpen: boolean) => {
-    if (!(newOpen || isPending)) {
-      setFiles([]);
-      onOpenChange(false);
-    } else if (newOpen) {
-      onOpenChange(true);
-    }
-  }, [isPending, onOpenChange]);
+  const handleOpenChange = useCallback(
+    (newOpen: boolean) => {
+      if (!(newOpen || isPending)) {
+        setFiles([]);
+        onOpenChange(false);
+      } else if (newOpen) {
+        onOpenChange(true);
+      }
+    },
+    [isPending, onOpenChange]
+  );
 
   const handleUpload = useCallback(async () => {
     const file = files[0];

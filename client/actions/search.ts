@@ -10,7 +10,7 @@ export async function globalSearchAction(query: string) {
   try {
     await requireUser();
 
-    if (!query.trim() || query.length < 2) {
+    if (!query.trim() || query.length < 3) {
       return { success: true, data: null } as const;
     }
 
