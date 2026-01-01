@@ -13,6 +13,7 @@ import {
   MentionPortal,
 } from "@/components/ui/mention";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Spinner } from "@/components/ui/spinner";
 import { formatTitleCase } from "@/lib/helpers";
 import {
   getGroupPosition,
@@ -277,10 +278,17 @@ export function CommentSection({
           <Button
             disabled={isPending || !comment.trim()}
             onClick={handleSubmit}
-            variant="outline"
+            variant="secondary"
           >
-            <SendIcon className="size-4" />
-            {isPending ? "Posting..." : "Post Comment"}
+            {isPending ? (
+              <>
+                <Spinner /> Post Comment
+              </>
+            ) : (
+              <>
+                <SendIcon /> Post Comment
+              </>
+            )}
           </Button>
         </div>
       </div>

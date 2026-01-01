@@ -27,17 +27,17 @@ function ProjectHealthNormal({
   const trackerData = [
     ...Array.from({ length: completion.completedDeliverables }, (_, i) => ({
       key: `completed-${i}`,
-      color: "bg-status-completed",
+      color: "bg-chart-1",
       tooltip: "Completed",
     })),
     ...Array.from({ length: completion.inProgressDeliverables }, (_, i) => ({
       key: `progress-${i}`,
-      color: "bg-status-in-progress",
+      color: "bg-chart-2",
       tooltip: "In Progress",
     })),
     ...Array.from({ length: completion.reviewDeliverables }, (_, i) => ({
       key: `review-${i}`,
-      color: "bg-status-review",
+      color: "bg-chart-3",
       tooltip: "In Review",
     })),
     ...Array.from(
@@ -52,7 +52,7 @@ function ProjectHealthNormal({
       },
       (_, i) => ({
         key: `pending-${i}`,
-        color: "bg-status-not-started",
+        color: "bg-accent",
         tooltip: "Not Started",
       })
     ),
@@ -70,7 +70,7 @@ function ProjectHealthNormal({
             <div
               className={cn(
                 "flex items-center gap-1 text-sm",
-                trend === "up" ? "text-chart-2" : "text-destructive"
+                trend === "up" ? "text-chart-1" : "text-destructive"
               )}
             >
               {trend === "up" ? (
@@ -87,7 +87,7 @@ function ProjectHealthNormal({
           <p
             className={cn(
               "font-semibold text-base",
-              trend === "up" ? "text-chart-2" : "text-muted-foreground"
+              trend === "up" ? "text-chart-1" : "text-muted-foreground"
             )}
           >
             {statusText}

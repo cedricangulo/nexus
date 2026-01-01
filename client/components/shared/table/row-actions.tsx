@@ -127,13 +127,13 @@ export function GenericRowActions<T>({
             return (
               <div key={action.id}>
                 <DropdownMenuItem
-                  className={`cursor-pointer gap-2 ${
-                    action.variant === "destructive" ? "text-red-600" : ""
+                  className={`cursor-pointer ${
+                    action.variant === "destructive" ? "text-destructive" : ""
                   }`}
                   disabled={isLoading}
                   onClick={() => handleMenuAction(action)}
                 >
-                  <Icon aria-hidden="true" className="opacity-60" size={16} />
+                  <Icon aria-hidden="true" size={16} />
                   <span>{action.label}</span>
                 </DropdownMenuItem>
                 {action.showDividerAfter && index < actions.length - 1 && (
@@ -165,8 +165,21 @@ export function GenericRowActions<T>({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction disabled={isLoading} onClick={handleConfirm}>
-              {isLoading ? "Working..." : "Confirm"}
+            <AlertDialogAction
+              disabled={isLoading}
+              onClick={handleConfirm}
+              variant={
+                pendingAction?.variant === "destructive" ? "destructive" : null
+              }
+            >
+              {isLoading ? (
+                "Working..."
+              ) : (
+                <>
+                  {pendingAction?.label === "Delete" ? <Trash /> : <Check />}{" "}
+                  {pendingAction?.label}
+                </>
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

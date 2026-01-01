@@ -14,12 +14,12 @@ export function isDeliverableOverdue(deliverable: Deliverable): boolean {
 export function getDeliverableAccentClass(status: DeliverableStatus): string {
   switch (status) {
     case "IN_PROGRESS":
-      return "bg-status-in-progress";
+      return "bg-info";
     case "REVIEW":
-      return "bg-status-review";
+      return "bg-warning";
     case "COMPLETED":
-      return "bg-status-completed";
+      return "bg-success";
     default:
-      return "bg-status-not-started";
+      return "bg-info";
   }
 }

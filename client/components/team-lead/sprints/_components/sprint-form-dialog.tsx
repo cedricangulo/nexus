@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
+import { Plus, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useTransition } from "react";
 import type { DateValue, RangeValue } from "react-aria-components";
@@ -36,6 +37,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Sprint } from "@/lib/types";
@@ -195,13 +197,25 @@ export function SprintFormDialog({
               onClick={form.handleSubmit(onSubmit)}
               type="button"
             >
-              {isPending
-                ? isEditing
-                  ? "Saving..."
-                  : "Creating..."
-                : isEditing
-                  ? "Save Changes"
-                  : "Create Sprint"}
+              {isPending ? (
+                isEditing ? (
+                  <>
+                    <Spinner /> Saving
+                  </>
+                ) : (
+                  <>
+                    <Spinner /> Creating
+                  </>
+                )
+              ) : isEditing ? (
+                <>
+                  <Save /> Save Changes
+                </>
+              ) : (
+                <>
+                  <Plus /> Create Sprint
+                </>
+              )}
             </Button>
             <DrawerClose asChild>
               <Button disabled={isPending} variant="outline">
@@ -244,13 +258,25 @@ export function SprintFormDialog({
             onClick={form.handleSubmit(onSubmit)}
             type="button"
           >
-            {isPending
-              ? isEditing
-                ? "Saving..."
-                : "Creating..."
-              : isEditing
-                ? "Save Changes"
-                : "Create Sprint"}
+            {isPending ? (
+              isEditing ? (
+                <>
+                  <Spinner /> Saving
+                </>
+              ) : (
+                <>
+                  <Spinner /> Creating
+                </>
+              )
+            ) : isEditing ? (
+              <>
+                <Save /> Save Changes
+              </>
+            ) : (
+              <>
+                <Plus /> Create Sprint
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

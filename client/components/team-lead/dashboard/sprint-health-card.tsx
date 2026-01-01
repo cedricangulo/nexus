@@ -31,13 +31,13 @@ function SprintHealthNormal({
   const hasBlockedTasks = sprintHealth.blockedTasks > 0;
 
   const trackerData = sprintTasks.map((task) => {
-    let color = "bg-status-not-started";
+    let color = "bg-accent";
     if (task.status === "DONE") {
-      color = "bg-status-completed";
+      color = "bg-chart-1";
     } else if (task.status === "IN_PROGRESS") {
-      color = "bg-status-in-progress";
+      color = "bg-chart-3";
     } else if (task.status === "BLOCKED") {
-      color = "bg-status-blocked";
+      color = "bg-chart-4";
     }
 
     return {
@@ -123,10 +123,10 @@ function SprintHealthNormal({
           <CategoryBar
             className="h-2"
             colors={[
-              "status-completed",
+              "status-success",
               "status-in-progress",
-              "status-blocked",
-              "status-not-started",
+              "status-error",
+              "status-info",
             ]}
             showLabels={false}
             values={[

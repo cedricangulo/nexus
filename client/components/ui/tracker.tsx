@@ -29,7 +29,7 @@ const Tracker = React.forwardRef<HTMLDivElement, TrackerProps>(
               <TooltipTrigger asChild>
                 <div
                   className={cn(
-                    "h-full w-full flex-1 transition-all hover:opacity-80 cursor-pointer",
+                    "h-full w-full rounded-xs flex-1 transition-all hover:opacity-80 cursor-pointer",
                     block.color || "bg-accent"
                   )}
                 />
@@ -42,7 +42,7 @@ const Tracker = React.forwardRef<HTMLDivElement, TrackerProps>(
             <div
               key={block.key}
               className={cn(
-                "h-full w-full flex-1 transition-all hover:opacity-80",
+                "h-full w-full rounded-xs flex-1 transition-all hover:opacity-80",
                 block.color || "bg-accent"
               )}
             />

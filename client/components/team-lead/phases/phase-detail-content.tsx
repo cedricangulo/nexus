@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, Plus, Upload } from "lucide-react";
+import { FileText, Plus, Trash, Upload } from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -111,7 +111,7 @@ export function PhaseDetailContent({
               <Button
                 onClick={handleCreateDeliverable}
                 size="sm"
-                variant="outline"
+                variant="secondary"
               >
                 <Plus className="size-4" />
                 Add
@@ -134,7 +134,7 @@ export function PhaseDetailContent({
             <Button
               onClick={() => setMeetingUploadOpen(true)}
               size="sm"
-              variant="outline"
+              variant="secondary"
             >
               <Upload size={16} />
               Upload
@@ -202,7 +202,7 @@ export function PhaseDetailContent({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel autoFocus>Cancel</AlertDialogCancel>
             <AlertDialogAction
               disabled={deleteTaskId === null || isDeleting !== null}
               onClick={async () => {
@@ -214,7 +214,9 @@ export function PhaseDetailContent({
                 setDeleteTaskId(null);
                 await confirmDeleteTask(deleteTaskId, taskTitle);
               }}
+              variant="destructive"
             >
+              <Trash />
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

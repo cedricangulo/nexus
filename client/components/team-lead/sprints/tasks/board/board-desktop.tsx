@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import {
   Kanban,
   KanbanColumn,
@@ -11,8 +10,8 @@ import {
   KanbanOverlay,
   KanbanBoard as UiKanbanBoard,
 } from "@/components/ui/kanban";
+import { StatusBadge } from "@/components/ui/status";
 import type { Task, TaskStatus, User } from "@/lib/types";
-
 import { TaskCard } from "../task-card";
 
 export type DesktopColumnDef = {
@@ -59,10 +58,8 @@ export function TaskBoardDesktop({
               value={col.status}
             >
               <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-sm">{col.label}</h3>
-                <Badge className="text-xs" variant="secondary">
-                  {columnTasks.length}
-                </Badge>
+                <span className="font-sora text-sm">{columnTasks.length}</span>
+                <StatusBadge status={col.status} />
               </div>
 
               <KanbanColumnContent

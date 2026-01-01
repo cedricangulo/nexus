@@ -1,6 +1,13 @@
 "use client";
 
-import { MoreVertical, Pencil, PlusIcon, Trash2 } from "lucide-react";
+import {
+  ExternalLink,
+  MoreVertical,
+  Pencil,
+  PlusIcon,
+  Trash2,
+} from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -33,7 +40,7 @@ export function CreateSprintButton() {
   return (
     <>
       <Button onClick={() => setOpen(true)}>
-        <PlusIcon className="mr-2 size-4" />
+        <PlusIcon />
         Create Sprint
       </Button>
       <SprintFormDialog onOpenChange={setOpen} open={open} />
@@ -109,6 +116,12 @@ export function SprintActionsMenu({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem asChild>
+            <Link href={`/sprints/${sprint.id}`}>
+              <ExternalLink className="size-4" />
+              View Details
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem
             onClick={(e) => {
               e.preventDefault();
@@ -116,7 +129,7 @@ export function SprintActionsMenu({
               onEditClick();
             }}
           >
-            <Pencil className="mr-2 size-4" />
+            <Pencil className="size-4" />
             Edit Sprint
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -129,7 +142,7 @@ export function SprintActionsMenu({
               setShowDeleteDialog(true);
             }}
           >
-            <Trash2 className="mr-2 size-4" />
+            <Trash2 className="size-4" />
             Delete Sprint
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -151,7 +164,9 @@ export function SprintActionsMenu({
             <AlertDialogAction
               disabled={isDeleting !== null}
               onClick={() => handleDelete(sprint.id)}
+              variant="destructive"
             >
+              <Trash2 />
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -6,11 +6,11 @@
 import { cn } from "@/lib/utils";
 
 const COLOR_VARIANTS = {
-  "status-completed": "bg-status-completed",
-  "status-in-progress": "bg-status-in-progress",
-  "status-review": "bg-status-review",
-  "status-blocked": "bg-status-blocked",
-  "status-not-started": "bg-status-not-started",
+  "status-success": "bg-chart-1",
+  "status-in-progress": "bg-chart-3",
+  "status-warning": "bg-chart-2",
+  "status-error": "bg-chart-4",
+  "status-info": "bg-accent",
 } as const;
 
 export type ColorVariant = keyof typeof COLOR_VARIANTS;

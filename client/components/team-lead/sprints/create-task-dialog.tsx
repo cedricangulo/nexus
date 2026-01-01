@@ -44,6 +44,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { User } from "@/lib/types";
@@ -212,7 +213,7 @@ export function CreateTaskDialog({ sprintId, users }: CreateTaskDialogProps) {
     return (
       <>
         <Button onClick={() => setOpen(true)}>
-          <PlusIcon size={16} />
+          <PlusIcon />
           Add Task
         </Button>
 
@@ -233,7 +234,15 @@ export function CreateTaskDialog({ sprintId, users }: CreateTaskDialogProps) {
                 onClick={form.handleSubmit(onSubmit)}
                 type="button"
               >
-                {isPending ? "Creating..." : "Add Task"}
+                {isPending ? (
+                  <>
+                    <Spinner /> Adding
+                  </>
+                ) : (
+                  <>
+                    <PlusIcon /> Add Task
+                  </>
+                )}
               </Button>
               <DrawerClose asChild>
                 <Button disabled={isPending} variant="outline">
@@ -278,7 +287,15 @@ export function CreateTaskDialog({ sprintId, users }: CreateTaskDialogProps) {
             onClick={form.handleSubmit(onSubmit)}
             type="button"
           >
-            {isPending ? "Creating..." : "Add Task"}
+            {isPending ? (
+              <>
+                <Spinner /> Adding
+              </>
+            ) : (
+              <>
+                <PlusIcon /> Add Task
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

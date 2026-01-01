@@ -34,8 +34,8 @@ export default function OnTimeCard({ logs, sprints, phases }: OnTimeCardProps) {
   return (
     <Frame>
       <FrameHeader className="flex-row items-center gap-2">
-        <div className="rounded-md bg-linear-120 from-phase-waterfall to-phase-waterfall/80 p-2 shadow-sm">
-          <Clock className="size-4 text-white" />
+        <div className="rounded-md bg-scrum p-2">
+          <Clock className="size-4 text-scrum-foreground" />
         </div>
         <div className="space-y-0">
           <FrameTitle className="text-sm">On-Time</FrameTitle>

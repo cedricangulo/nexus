@@ -1,5 +1,6 @@
 "use client";
 
+import { Save } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -15,6 +16,7 @@ import {
   FrameTitle,
 } from "@/components/ui/frame";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import type { Project } from "@/lib/types";
 
 /**
@@ -127,7 +129,15 @@ export default function RepositorySettings({
       </FramePanel>
       <FrameFooter className="flex-row justify-end">
         <Button disabled={isSaving} onClick={handleSave} variant="secondary">
-          {isSaving ? "Saving..." : "Save Changes"}
+          {isSaving ? (
+            <>
+              <Spinner /> Saving
+            </>
+          ) : (
+            <>
+              <Save /> Save Changes
+            </>
+          )}
         </Button>
       </FrameFooter>
     </Frame>

@@ -110,10 +110,10 @@ function PhaseProgressNormal({
                 <CategoryBar
                   className="h-2"
                   colors={[
-                    "status-completed",
+                    "status-success",
                     "status-in-progress",
-                    "status-review",
-                    "status-not-started",
+                    "status-warning",
+                    "status-info",
                   ]}
                   showLabels={false}
                   values={[

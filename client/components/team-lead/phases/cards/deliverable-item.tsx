@@ -1,6 +1,12 @@
 "use client";
 
-import { ExternalLink, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import {
+  ExternalLink,
+  MoreVertical,
+  Pencil,
+  Trash,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -119,7 +125,9 @@ export function DeliverableItem({
                 setConfirmDeleteId(null);
                 handleDelete(id);
               }}
+              variant="destructive"
             >
+              <Trash />
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

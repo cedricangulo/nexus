@@ -25,6 +25,7 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -46,16 +47,32 @@
   --radius-4xl: calc(var(--radius) + 16px);
 
   /* Status color utilities */
-  --color-status-completed: var(--status-completed);
-  --color-status-in-progress: var(--status-in-progress);
-  --color-status-review: var(--status-review);
-  --color-status-blocked: var(--status-blocked);
-  --color-status-not-started: var(--status-not-started);
+  --color-status-success: var(--success);
+  --color-status-in-progress: var(--info);
+  --color-status-warning: var(--warning);
+  --color-status-error: var(--error);
+  --color-status-info: var(--info);
 
   /* Phase type color utilities */
-  --color-phase-waterfall: var(--phase-waterfall);
-  --color-phase-scrum: var(--phase-scrum);
-  --color-phase-fall: var(--phase-fall);
+  --color-phase-waterfall: var(--waterfall);
+  --color-phase-scrum: var(--scrum);
+  --color-phase-fall: var(--fall);
+
+  /* Badge semantic colors (coss.ui) */
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-waterfall: var(--waterfall);
+  --color-waterfall-foreground: var(--waterfall-foreground);
+  --color-scrum: var(--scrum);
+  --color-scrum-foreground: var(--scrum-foreground);
+  --color-fall: var(--fall);
+  --color-fall-foreground: var(--fall-foreground);
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
 }
 
 :root {
@@ -65,22 +82,23 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.488 0.243 264.376);
-  --primary-foreground: oklch(0.97 0.014 254.604);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
+  --primary: oklch(58.418% 0.22671 259.23);
+  --primary-foreground: oklch(98.511% 0.00011 271.152);
+  --secondary: oklch(29.716% 0.00003 271.152);
+  --secondary-foreground: oklch(92.797% 0.00011 271.152);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.58 0.22 27);
+  --destructive-foreground: oklch(59.27% 0.2274 13.69);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
+  --chart-1: var(--color-emerald-600);
+  --chart-2: var(--color-amber-600);
+  --chart-3: var(--color-blue-600);
+  --chart-4: var(--color-red-600);
   --chart-5: oklch(0.424 0.199 265.638);
   --radius: 0.75rem;
   --sidebar: oklch(0.985 0 0);
@@ -92,17 +110,20 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  /* Status Colors */
-  --status-completed: oklch(0.65 0.19 155);
-  --status-in-progress: oklch(0.55 0.19 250);
-  --status-review: oklch(78.976% 0.17028 70.424);
-  --status-blocked: oklch(58.019% 0.22003 27.086);
-  --status-not-started: oklch(84.212% 0.0001 271.152);
-
-  /* Phase Type Colors */
-  --phase-waterfall: oklch(0.6 0.12 195);
-  --phase-scrum: oklch(0.62 0.22 300);
-  --phase-fall: oklch(0.64 0.18 45);
+  --info: var(--color-blue-100);
+  --info-foreground: var(--color-blue-800);
+  --success: var(--color-emerald-100);
+  --success-foreground: var(--color-emerald-600);
+  --warning: var(--color-amber-100);
+  --warning-foreground: var(--color-amber-800);
+  --waterfall: var(--color-cyan-100);
+  --waterfall-foreground: var(--color-cyan-800);
+  --scrum: var(--color-indigo-100);
+  --scrum-foreground: var(--color-indigo-800);
+  --fall: var(--color-orange-100);
+  --fall-foreground: var(--color-orange-800);
+  --error: var(--color-red-100);
+  --error-foreground: var(--color-red-800);
 }
 
 .dark {
@@ -112,22 +133,23 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.42 0.18 266);
-  --primary-foreground: oklch(0.97 0.014 254.604);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
+  --primary: oklch(44.079% 0.16848 258.714);
+  --primary-foreground: oklch(98.511% 0.00011 271.152);
+  --secondary: oklch(31.317% 0.00004 271.152);
+  --secondary-foreground: oklch(92.797% 0.00011 271.152);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.371 0 0);
   --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: oklch(0.63 0.22 27);
+  --destructive-foreground: oklch(70.4% 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
+  --chart-1: var(--color-emerald-500);
+  --chart-2: var(--color-amber-500);
+  --chart-3: var(--color-blue-500);
+  --chart-4: var(--color-red-500);
   --chart-5: oklch(0.424 0.199 265.638);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
@@ -138,17 +160,21 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 
-  /* Status Colors */
-  --status-completed: oklch(0.7 0.19 155);
-  --status-in-progress: oklch(0.6 0.19 250);
-  --status-review: oklch(0.63 0.18 295);
-  --status-blocked: oklch(0.63 0.22 27);
-  --status-not-started: oklch(0.6 0.01 260);
-
-  /* Phase Type Colors */
-  --phase-waterfall: oklch(0.7 0.12 195);
-  --phase-scrum: oklch(0.72 0.22 300);
-  --phase-fall: oklch(0.74 0.18 45);
+  /* Badge semantic colors (coss.ui) */
+  --info: var(--color-blue-950);
+  --info-foreground: var(--color-blue-400);
+  --success: var(--color-emerald-950);
+  --success-foreground: var(--color-emerald-400);
+  --warning: var(--color-amber-950);
+  --warning-foreground: var(--color-amber-400);
+  --waterfall: var(--color-cyan-950);
+  --waterfall-foreground: var(--color-cyan-400);
+  --scrum: var(--color-indigo-950);
+  --scrum-foreground: var(--color-indigo-300);
+  --fall: var(--color-orange-950);
+  --fall-foreground: var(--color-orange-400);
+  --error: var(--color-red-950);
+  --error-foreground: var(--color-red-400);
 }
 
 @layer base {

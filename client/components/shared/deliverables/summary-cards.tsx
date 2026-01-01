@@ -16,17 +16,17 @@ const getStatusColor = (status: string): string => {
   switch (status) {
     case "COMPLETED":
     case "DONE":
-      return "bg-status-completed";
+      return "bg-chart-1";
     case "IN_PROGRESS":
-      return "bg-status-in-progress";
+      return "bg-chart-2";
     case "REVIEW":
-      return "bg-status-review";
+      return "bg-chart-3";
     case "BLOCKED":
-      return "bg-status-blocked";
+      return "bg-chart-4";
     case "TODO":
-      return "bg-status-not-started";
+      return "bg-accent";
     default:
-      return "bg-status-not-started";
+      return "bg-accent";
   }
 };
 
@@ -60,8 +60,8 @@ export function DeliverablesSummaryCards({
     <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <Frame>
         <FrameHeader className="flex-row items-center gap-2">
-          <div className="rounded-md bg-linear-120 from-status-in-progress to-status-in-progress/80 p-2 shadow-sm">
-            <Blocks className="size-4 text-white" />
+          <div className="rounded-md bg-info p-2">
+            <Blocks className="size-4 text-info-foreground" />
           </div>
           <FrameTitle>Total Deliverables</FrameTitle>
         </FrameHeader>
@@ -72,8 +72,8 @@ export function DeliverablesSummaryCards({
 
       <Frame>
         <FrameHeader className="flex-row items-center gap-2">
-          <div className="rounded-md bg-linear-120 from-status-blocked to-status-blocked/80 p-2 shadow-sm">
-            <TriangleAlert className="size-4 text-white" />
+          <div className="rounded-md bg-error/70 p-2">
+            <TriangleAlert className="size-4 text-error-foreground" />
           </div>
           <div className="space-y-0">
             <FrameTitle className="text-sm">Overdue</FrameTitle>
@@ -89,8 +89,8 @@ export function DeliverablesSummaryCards({
 
       <Frame className="sm:col-span-2 lg:col-span-1">
         <FrameHeader className="flex-row items-center gap-2">
-          <div className="rounded-md bg-linear-120 from-status-completed to-status-completed/80 p-2 shadow-sm">
-            <Barcode className="size-4 text-white" />
+          <div className="rounded-md bg-success p-2">
+            <Barcode className="size-4 text-success-foreground" />
           </div>
           <div className="space-y-0">
             <FrameTitle className="text-sm">Deliverables Timeline</FrameTitle>

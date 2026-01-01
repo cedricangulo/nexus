@@ -15,11 +15,7 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button
-        className="m-0 p-0 text-foreground"
-        size="icon"
-        variant="secondary"
-      >
+      <Button className="m-0 p-0 text-foreground" size="icon" variant="outline">
         <LoaderIcon className="size-4 animate-spin text-foreground" />
       </Button>
     );
@@ -32,7 +28,7 @@ export function ThemeToggle() {
       className="m-0 p-0 text-foreground"
       onClick={() => setTheme(isLight ? "dark" : "light")}
       size="icon"
-      variant="secondary"
+      variant="outline"
     >
       <svg
         aria-label="Toggle theme"

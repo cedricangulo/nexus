@@ -1,12 +1,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
-
 import { updatePhaseAction } from "@/actions/phases";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +35,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { PhaseDetail } from "@/lib/types";
@@ -181,7 +182,15 @@ export function PhaseEditDialog({
               onClick={form.handleSubmit(onSubmit)}
               type="button"
             >
-              {isPending ? "Saving..." : "Save Changes"}
+              {isPending ? (
+                <>
+                  <Spinner /> Saving
+                </>
+              ) : (
+                <>
+                  <Save /> Save Changes
+                </>
+              )}
             </Button>
             <DrawerClose asChild>
               <Button disabled={isPending} variant="outline">
@@ -206,7 +215,7 @@ export function PhaseEditDialog({
 
         {formContent}
 
-        <DialogFooter className="sm:grid sm:grid-cols-2">
+        <DialogFooter>
           <Button
             disabled={isPending}
             onClick={() => onOpenChange(false)}
@@ -219,7 +228,15 @@ export function PhaseEditDialog({
             onClick={form.handleSubmit(onSubmit)}
             type="button"
           >
-            {isPending ? "Saving..." : "Save Changes"}
+            {isPending ? (
+              <>
+                <Spinner /> Saving
+              </>
+            ) : (
+              <>
+                <Save /> Save Changes
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

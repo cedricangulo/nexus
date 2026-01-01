@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusIcon } from "lucide-react";
+import { Plus, PlusIcon, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -47,6 +47,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { type Task, TaskStatus, type User } from "@/lib/types";
@@ -64,11 +65,26 @@ type TaskDialogProps = {
 };
 
 // Helper to get button label based on state
-function getButtonLabel(isPending: boolean, isEditMode: boolean): string {
+function getButtonLabel(
+  isPending: boolean,
+  isEditMode: boolean
+): React.ReactNode {
   if (isPending) {
-    return "Saving...";
+    return (
+      <>
+        <Spinner /> {isEditMode ? "Saving" : "Creating"}
+      </>
+    );
   }
-  return isEditMode ? "Save Changes" : "Create Task";
+  return isEditMode ? (
+    <>
+      <Save /> Save Changes
+    </>
+  ) : (
+    <>
+      <Plus /> Create Task
+    </>
+  );
 }
 
 export function TaskDialog({
@@ -333,7 +349,7 @@ export function TaskDialog({
 
         {formContent}
 
-        <DialogFooter className="sm:grid sm:grid-cols-2">
+        <DialogFooter>
           <DialogClose asChild>
             <Button disabled={isPending} type="button" variant="outline">
               Cancel
@@ -364,8 +380,8 @@ export function CreateTaskButton({
     <TaskDialog
       phaseId={phaseId}
       trigger={
-        <Button size="sm" variant="outline">
-          <PlusIcon className="size-4" />
+        <Button size="sm" variant="secondary">
+          <PlusIcon />
           Add
         </Button>
       }

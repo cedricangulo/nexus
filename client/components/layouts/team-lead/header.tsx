@@ -85,7 +85,7 @@ export function AppHeader({
       <div className="flex items-center gap-2 px-3">
         <SidebarTrigger
           aria-label="Toggle sidebar navigation"
-          className="rounded-md transition-colors hover:bg-accent"
+          className="hidden sm:flex rounded-md transition-colors hover:bg-accent"
         />
         <Separator aria-hidden="true" className="h-4" orientation="vertical" />
         {title ? (
@@ -101,6 +101,10 @@ export function AppHeader({
         </div>
         {notificationComponent}
         <ThemeToggle />
+        <SidebarTrigger
+          aria-label="Toggle sidebar navigation"
+          className="sm:hidden flex rounded-md transition-colors hover:bg-accent"
+        />
       </div>
 
       <GlobalSearch onOpenChange={setSearchOpen} open={searchOpen} />

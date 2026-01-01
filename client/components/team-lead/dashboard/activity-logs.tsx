@@ -46,7 +46,7 @@ function ActivityLogsDisplay({
       <Frame>
         <FrameHeader className="flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="rounded-md bg-linear-120 from-status-in-progress to-status-in-progress/80 p-2 shadow-sm">
+            <div className="rounded-md bg-linear-120 from-info to-info/80 p-2 shadow-sm">
               <Logs className="size-4 text-white" />
             </div>
             <FrameTitle className="text-sm">Activity Logs</FrameTitle>

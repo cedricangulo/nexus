@@ -1,12 +1,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
-
 import { createDeliverableAction } from "@/actions/phases";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +35,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { deliverableSchema } from "@/lib/validation";
@@ -166,7 +167,15 @@ export function DeliverableCreateDialog({
               onClick={form.handleSubmit(onSubmit)}
               type="button"
             >
-              {isPending ? "Creating..." : "Create Deliverable"}
+              {isPending ? (
+                <>
+                  <Spinner /> Creating
+                </>
+              ) : (
+                <>
+                  <Plus /> Create Deliverable
+                </>
+              )}
             </Button>
             <DrawerClose asChild>
               <Button disabled={isPending} variant="outline">
@@ -191,7 +200,7 @@ export function DeliverableCreateDialog({
 
         {formContent}
 
-        <DialogFooter className="sm:grid sm:grid-cols-2">
+        <DialogFooter>
           <Button
             disabled={isPending}
             onClick={() => onOpenChange(false)}
@@ -204,7 +213,15 @@ export function DeliverableCreateDialog({
             onClick={form.handleSubmit(onSubmit)}
             type="button"
           >
-            {isPending ? "Creating..." : "Create Deliverable"}
+            {isPending ? (
+              <>
+                <Spinner /> Creating
+              </>
+            ) : (
+              <>
+                <Plus /> Create Deliverable
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

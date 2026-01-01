@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Send } from "lucide-react";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -37,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { ServerActionResponse } from "@/lib/types/auth";
 import type { User } from "@/lib/types/models";
@@ -204,7 +206,15 @@ export function InviteMemberModal({
               onClick={form.handleSubmit(onSubmit)}
               type="button"
             >
-              {isPending ? "Inviting..." : "Send Invitation"}
+              {isPending ? (
+                <>
+                  <Spinner /> Sending
+                </>
+              ) : (
+                <>
+                  <Send /> Send Invitation
+                </>
+              )}
             </Button>
             <DrawerClose asChild>
               <Button disabled={isPending} variant="outline">
@@ -244,7 +254,15 @@ export function InviteMemberModal({
             onClick={form.handleSubmit(onSubmit)}
             type="button"
           >
-            {isPending ? "Inviting..." : "Send Invitation"}
+            {isPending ? (
+              <>
+                <Spinner /> Sending
+              </>
+            ) : (
+              <>
+                <Send /> Send Invitation
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

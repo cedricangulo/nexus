@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "rimraf .next && next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
     "test": "vitest",
@@ -75,6 +75,7 @@
     "msw": "^2.12.4",
     "nanoid": "^5.1.6",
     "picocolors": "^1.1.1",
+    "rimraf": "^6.1.2",
     "shadcn": "^3.6.2",
     "source-map-js": "^1.2.1",
     "tailwindcss": "^4",

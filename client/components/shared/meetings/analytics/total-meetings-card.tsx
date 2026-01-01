@@ -28,8 +28,8 @@ export default function TotalMeetingsCard({ logs }: TotalMeetingsCardProps) {
   return (
     <Frame>
       <FrameHeader className="flex-row items-center gap-2">
-        <div className="rounded-md bg-linear-120 from-status-in-progress to-status-in-progress/80 p-2 shadow-sm">
-          <FileText className="size-4 text-white" />
+        <div className="rounded-md bg-info p-2">
+          <FileText className="size-4 text-info-foreground" />
         </div>
         <div className="space-y-0">
           <FrameTitle className="text-sm">Total</FrameTitle>

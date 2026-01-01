@@ -1,26 +1,32 @@
 # Status Color System
 
-Centralized status colors using Tailwind CSS custom properties for consistent theming across the application.
+Centralized status colors using Tailwind CSS custom properties and coss.ui semantic naming for consistent theming across the application.
 
 ## Color Variables
 
-### Status Colors
+### Status Colors (Badge Semantic - coss.ui)
 
-| Status           | CSS Variable           | Light Mode                | Dark Mode              | Represents                 |
-| ---------------- | ---------------------- | ------------------------- | ---------------------- | -------------------------- |
-| Completed/Done   | `--status-completed`   | `oklch(0.65 0.19 155)`    | `oklch(0.70 0.19 155)` | Success, finished tasks    |
-| In Progress      | `--status-in-progress` | `oklch(0.55 0.19 250)`    | `oklch(0.60 0.19 250)` | Active work                |
-| Review           | `--status-review`      | `oklch(78.976% 0.17 70)`  | `oklch(0.63 0.18 295)` | Needs attention/inspection |
-| Blocked          | `--status-blocked`     | `oklch(58.019% 0.22 27)`  | `oklch(0.63 0.22 27)`  | Urgent problems            |
-| Todo/Not Started | `--status-not-started` | `oklch(84.212% 0.00 271)` | `oklch(0.60 0.01 260)` | Pending, not yet begun     |
+| Status         | CSS Variable | Light Mode                 | Dark Mode                  | Represents                 |
+| -------------- | ------------ | -------------------------- | -------------------------- | -------------------------- |
+| Completed/Done | `--success`  | `var(--color-emerald-100)` | `var(--color-emerald-950)` | Success, finished tasks    |
+| In Progress    | `--info`     | `var(--color-blue-100)`    | `var(--color-blue-950)`    | Active work                |
+| Review         | `--warning`  | `var(--color-amber-100)`   | `var(--color-amber-950)`   | Needs attention/inspection |
+| Blocked        | `--error`    | `var(--color-red-100)`     | `var(--color-red-950)`     | Urgent problems            |
+| Default        | `--info`     | `var(--color-blue-100)`    | `var(--color-blue-950)`    | Pending, not yet begun     |
+
+**Foreground colors** are automatically paired:
+- `--success-foreground`, `--info-foreground`, `--warning-foreground`, `--error-foreground`
 
 ### Phase Type Colors
 
-| Phase Type | CSS Variable        | Light Mode             | Dark Mode              | Represents             |
-| ---------- | ------------------- | ---------------------- | ---------------------- | ---------------------- |
-| Waterfall  | `--phase-waterfall` | `oklch(0.68 0.15 60)`  | `oklch(0.73 0.15 60)`  | Sequential methodology |
-| Scrum      | `--phase-scrum`     | `oklch(0.58 0.15 200)` | `oklch(0.63 0.15 200)` | Agile methodology      |
-| Fall       | `--phase-fall`      | `oklch(0.65 0.18 35)`  | `oklch(0.70 0.18 35)`  | Academic semester      |
+| Phase Type | CSS Variable  | Light Mode                | Dark Mode                 | Represents             |
+| ---------- | ------------- | ------------------------- | ------------------------- | ---------------------- |
+| Waterfall  | `--waterfall` | `var(--color-cyan-100)`   | `var(--color-cyan-950)`   | Sequential methodology |
+| Scrum      | `--scrum`     | `var(--color-indigo-100)` | `var(--color-indigo-950)` | Agile methodology      |
+| Fall       | `--fall`      | `var(--color-orange-100)` | `var(--color-orange-950)` | Academic semester      |
+
+**Foreground colors** are automatically paired:
+- `--waterfall-foreground`, `--scrum-foreground`, `--fall-foreground`
 
 ## Usage
 
@@ -29,24 +35,24 @@ Centralized status colors using Tailwind CSS custom properties for consistent th
 The CSS variables are exposed as Tailwind utility classes via the `@theme` directive:
 
 ```tsx
-// Background colors
-<div className="bg-status-completed" />
-<div className="bg-status-in-progress" />
-<div className="bg-status-review" />
-<div className="bg-status-blocked" />
+// Background colors with semantic naming
+<div className="bg-success" />
+<div className="bg-info" />
+<div className="bg-warning" />
+<div className="bg-error" />
 
 // Text colors
-<span className="text-status-completed" />
+<span className="text-success-foreground" />
 
 // Border colors
-<div className="border-status-in-progress" />
+<div className="border-info" />
 
 // With opacity
-<div className="bg-status-blocked/10" />
-<div className="text-status-completed/80" />
+<div className="bg-error/10" />
+<div className="text-success/80" />
 
 // Gradients
-<div className="bg-linear-120 from-status-completed to-status-completed/80" />
+<div className="bg-linear-120 from-success to-success/80" />
 ```
 
 ### StatusBadge Component
@@ -69,7 +75,7 @@ CategoryBar supports semantic status color names:
 import { CategoryBar } from "@/components/ui/category-bar";
 
 <CategoryBar
-  colors={["status-completed", "status-in-progress", "status-review", "status-not-started"]}
+  colors={["success", "info", "warning", "info"]}
   values={[completed, inProgress, review, notStarted]}
 />
 ```
@@ -88,6 +94,29 @@ getStatusColor(status: string): string
 // client/components/team-lead/settings/activity-logs/client.tsx
 getActionColor(action: string): string
 ```
+
+## Deprecated Variables
+
+The following CSS variables are deprecated and should no longer be used. They have been replaced with the new coss.ui semantic naming system:
+
+| Deprecated Variable    | Replacement   | Notes                          |
+| ---------------------- | ------------- | ------------------------------ |
+| `--status-success`     | `--success`   | Use for completed/done states  |
+| `--status-in-progress` | `--info`      | Use for active work            |
+| `--status-warning`     | `--warning`   | Use for items needing review   |
+| `--status-error`       | `--error`     | Use for blocked/urgent states  |
+| `--status-info`        | `--info`      | Use for default/pending states |
+| `--phase-waterfall`    | `--waterfall` | Use for waterfall methodology  |
+| `--phase-scrum`        | `--scrum`     | Use for scrum methodology      |
+| `--phase-fall`         | `--fall`      | Use for fall/academic semester |
+
+**Migration Guide**: Replace all occurrences of deprecated variables with their replacements:
+- `bg-status-success` → `bg-success`
+- `bg-status-in-progress` → `bg-info`
+- `bg-status-warning` → `bg-warning`
+- `bg-status-error` → `bg-error`
+
+The deprecated variables are kept in `globals.css` for backward compatibility but will be removed in a future version.
 
 ## Updated Components
 
@@ -121,7 +150,7 @@ getActionColor(action: string): string
 
 1. **Centralized Management**: Change colors in one place (`globals.css`)
 2. **Dark Mode Support**: Automatic light/dark variants
-3. **Type Safety**: Uses semantic naming (status-completed vs bg-green-500)
+3. **Type Safety**: Uses semantic naming (status-success vs bg-green-500)
 4. **Consistency**: Same colors across all status representations
 5. **Maintainability**: Easy to update color scheme
 6. **Accessibility**: OKLCH color space for perceptual uniformity

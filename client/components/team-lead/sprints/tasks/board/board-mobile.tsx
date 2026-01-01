@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Task, TaskStatus, User } from "@/lib/types";
 import { TaskCard } from "../task-card";
@@ -34,19 +34,17 @@ export function TaskBoardMobile({
       defaultValue={activeTab}
       onValueChange={(value) => setActiveTab(value as TaskStatus)}
     >
-      <TabsList className="grid w-full grid-cols-4 gap-1">
+      <TabsList className="flex w-full gap-1 overflow-x-scroll pl-10">
         {columns.map((col) => {
           const count = (columnsValue[col.status] ?? []).length;
           return (
             <TabsTrigger
-              className="text-xs"
+              className="flex items-center text-xs"
               key={col.status}
               value={col.status}
             >
-              <span className="truncate">{col.label}</span>
-              <Badge className="ml-1 text-xs" variant="secondary">
-                {count}
-              </Badge>
+              <span>{count}</span>
+              <StatusBadge status={col.status} />
             </TabsTrigger>
           );
         })}
