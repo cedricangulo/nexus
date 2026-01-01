@@ -3,11 +3,14 @@
 import type { AxiosError } from "axios";
 import { revalidatePath } from "next/cache";
 
+import { phaseApi } from "@/lib/api/phase";
 import { taskApi } from "@/lib/api/task";
 import { requireTeamLead, requireUser } from "@/lib/helpers/rbac";
 import type { Task } from "@/lib/types";
 import {
+  createPhaseTaskSchema,
   createSprintTaskSchema,
+  updatePhaseTaskSchema,
   updateTaskSchema,
   updateTaskStatusSchema,
 } from "@/lib/validation";
@@ -23,9 +26,10 @@ export async function createSprintTaskAction(input: unknown) {
       sprintId: parsed.sprintId,
       title: parsed.title,
       description: parsed.description ? parsed.description : undefined,
-      assigneeIds: parsed.assigneeIds && parsed.assigneeIds.length > 0
-        ? parsed.assigneeIds
-        : undefined,
+      assigneeIds:
+        parsed.assigneeIds && parsed.assigneeIds.length > 0
+          ? parsed.assigneeIds
+          : undefined,
     });
 
     revalidatePath(`/sprints/${parsed.sprintId}`);
@@ -78,15 +82,52 @@ export async function updateTaskAction(input: unknown) {
     await taskApi.updateTask(parsed.taskId, {
       title: parsed.title,
       description: parsed.description ? parsed.description : undefined,
-      assigneeIds: parsed.assigneeIds && parsed.assigneeIds.length > 0
-        ? parsed.assigneeIds
-        : [],
+      assigneeIds:
+        parsed.assigneeIds && parsed.assigneeIds.length > 0
+          ? parsed.assigneeIds
+          : [],
     });
 
     revalidatePath(`/sprints/${parsed.sprintId}`);
     return { success: true } as const;
   } catch (error) {
     console.error("[updateTaskAction] Error:", error);
+
+    const axiosError = error as AxiosError<{
+      error?: string;
+      message?: string;
+    }>;
+    const apiMessage =
+      axiosError.response?.data?.error || axiosError.response?.data?.message;
+
+    return {
+      success: false,
+      error: apiMessage || "Failed to update task",
+    } as const;
+  }
+}
+
+export async function updatePhaseTaskAction(input: unknown, phaseId: string) {
+  try {
+    // Security: Team Lead only
+    await requireTeamLead();
+
+    const parsed = updatePhaseTaskSchema.parse(input);
+
+    await taskApi.updateTask(parsed.taskId, {
+      title: parsed.title,
+      description: parsed.description ? parsed.description : undefined,
+      status: parsed.status,
+      assigneeIds:
+        parsed.assigneeIds && parsed.assigneeIds.length > 0
+          ? parsed.assigneeIds
+          : [],
+    });
+
+    revalidatePath(`/phases/${phaseId}`);
+    return { success: true } as const;
+  } catch (error) {
+    console.error("[updatePhaseTaskAction] Error:", error);
 
     const axiosError = error as AxiosError<{
       error?: string;
@@ -113,5 +154,68 @@ export async function getTaskDetailAction(
   } catch (error) {
     console.error("[getTaskDetailAction] Error:", error);
     return null;
+  }
+}
+
+export async function createPhaseTaskAction(input: unknown) {
+  try {
+    // Security: Team Lead only - creates waterfall tasks and assigns them
+    await requireTeamLead();
+
+    const parsed = createPhaseTaskSchema.parse(input);
+
+    await phaseApi.createPhaseTask({
+      phaseId: parsed.phaseId,
+      title: parsed.title,
+      description: parsed.description ? parsed.description : undefined,
+      status: parsed.status,
+      assigneeIds:
+        parsed.assigneeIds && parsed.assigneeIds.length > 0
+          ? parsed.assigneeIds
+          : undefined,
+    });
+
+    revalidatePath(`/phases/${parsed.phaseId}`);
+    return { success: true } as const;
+  } catch (error) {
+    console.error("[createPhaseTaskAction] Error:", error);
+
+    const axiosError = error as AxiosError<{
+      error?: string;
+      message?: string;
+    }>;
+    const apiMessage =
+      axiosError.response?.data?.error || axiosError.response?.data?.message;
+
+    return {
+      success: false,
+      error: apiMessage || "Failed to create task",
+    } as const;
+  }
+}
+
+export async function deletePhaseTaskAction(taskId: string, phaseId: string) {
+  try {
+    // Security: Team Lead only
+    await requireTeamLead();
+
+    await taskApi.deleteTask(taskId);
+
+    revalidatePath(`/phases/${phaseId}`);
+    return { success: true } as const;
+  } catch (error) {
+    console.error("[deletePhaseTaskAction] Error:", error);
+
+    const axiosError = error as AxiosError<{
+      error?: string;
+      message?: string;
+    }>;
+    const apiMessage =
+      axiosError.response?.data?.error || axiosError.response?.data?.message;
+
+    return {
+      success: false,
+      error: apiMessage || "Failed to delete task",
+    } as const;
   }
 }

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const createSprintSchema = z.object({
-  projectId: z.string().uuid().optional().describe('ID of the project the sprint belongs to'),
+  projectId: z.uuid().optional().describe('ID of the project the sprint belongs to'),
   number: z.number().int().positive().optional().describe('Sprint number (auto-incremented if not provided)'),
   goal: z.string().optional().describe('Goal or objective of the sprint'),
   startDate: z.string().datetime().describe('Sprint start date in ISO 8601 format'),
@@ -11,8 +11,8 @@ export const createSprintSchema = z.object({
 export const updateSprintSchema = createSprintSchema.partial().describe('Schema for updating an existing sprint (partial update)');
 
 export const sprintResponseSchema = z.object({
-  id: z.string().uuid().describe('Unique identifier for the sprint'),
-  projectId: z.string().uuid().describe('ID of the associated project'),
+  id: z.uuid().describe('Unique identifier for the sprint'),
+  projectId: z.uuid().describe('ID of the associated project'),
   number: z.number().int().describe('Sequential number of the sprint'),
   goal: z.string().nullable().describe('Goal of the sprint'),
   startDate: z.date().describe('Sprint start date'),

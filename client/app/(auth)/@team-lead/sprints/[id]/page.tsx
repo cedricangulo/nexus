@@ -12,7 +12,7 @@ import { FramePanel } from "@/components/ui/frame";
 import { StatusBadge } from "@/components/ui/status";
 import { sprintApi } from "@/lib/api/sprint";
 import { taskApi } from "@/lib/api/task";
-import { userApi } from "@/lib/api/user";
+import { getAllUsersForDisplay } from "@/lib/data/team";
 import {
   getSprintStatus,
   mapSprintStatusToTaskStatus,
@@ -25,7 +25,7 @@ async function SprintBoardContent({ sprintId }: { sprintId: string }) {
     [sprint, tasks, users] = await Promise.all([
       sprintApi.getSprintById(sprintId),
       taskApi.listTasks({ sprintId }),
-      userApi.listUsers(),
+      getAllUsersForDisplay(),
     ]);
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {

@@ -1,14 +1,15 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
-import { X } from "lucide-react";
 
 import { updateTaskAction, updateTaskStatusAction } from "@/actions/tasks";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -44,7 +45,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Task, User } from "@/lib/types";
 import { taskDetailSchema } from "@/lib/validation";
@@ -280,20 +280,20 @@ export function TaskDetailDialog({
               <FormItem>
                 <FormLabel>Assignees</FormLabel>
                 {selectedAssigneeIds.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-2">
+                  <div className="mb-2 flex flex-wrap gap-1">
                     {selectedAssigneeIds.map((id) => {
                       const user = teamMembers.find((u) => u.id === id);
                       return (
                         <Badge
+                          className="flex items-center gap-1"
                           key={id}
                           variant="secondary"
-                          className="flex items-center gap-1"
                         >
                           {user?.name || "Unknown"}
                           <button
-                            type="button"
+                            className="ml-1 rounded-full hover:bg-muted"
                             onClick={() => handleRemoveAssignee(id)}
-                            className="ml-1 hover:bg-muted rounded-full"
+                            type="button"
                           >
                             <X className="h-3 w-3" />
                           </button>

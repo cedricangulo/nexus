@@ -7,7 +7,7 @@ export const updateUserSchema = z.object({
 }).describe('Schema for updating user profile');
 
 export const userResponseSchema = z.object({
-  id: z.string().uuid().describe('Unique identifier for the user'),
+  id: z.uuid().describe('Unique identifier for the user'),
   email: z.string().email().describe('User\'s email address'),
   name: z.string().describe('User\'s full name'),
   role: z.nativeEnum(Role).describe('User\'s role in the project'),

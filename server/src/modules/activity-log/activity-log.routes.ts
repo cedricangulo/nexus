@@ -27,7 +27,7 @@ export async function activityLogRoutes(app: FastifyInstance) {
         schema: {
           params: z.object({
             entityType: z.string(),
-            entityId: z.string().uuid(),
+            entityId: z.uuid(),
           }),
         },
       },

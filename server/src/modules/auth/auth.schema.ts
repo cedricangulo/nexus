@@ -8,7 +8,7 @@ export const loginSchema = z.object({
 export const loginResponseSchema = z.object({
   token: z.string().describe('JWT authentication token'),
   user: z.object({
-    id: z.string().uuid().describe('Unique identifier of the user'),
+    id: z.uuid().describe('Unique identifier of the user'),
     email: z.string().email().describe('User\'s email address'),
     name: z.string().describe('User\'s full name'),
     role: z.enum(['MEMBER', 'TEAM_LEAD', 'ADVISER']).describe('Role of the user'),
@@ -22,7 +22,7 @@ export const inviteUserSchema = z.object({
 }).describe('Schema for inviting a new user');
 
 export const inviteUserResponseSchema = z.object({
-  id: z.string().uuid().describe('User ID'),
+  id: z.uuid().describe('User ID'),
   email: z.string().email().describe('User email address'),
   name: z.string().describe('User full name'),
   role: z.enum(['MEMBER', 'TEAM_LEAD', 'ADVISER']).describe('User role'),

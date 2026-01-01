@@ -20,7 +20,7 @@ export async function deviceTokenRoutes(app: FastifyInstance) {
                     201: z.object({
                         success: z.literal(true),
                         data: z.object({
-                            id: z.string().uuid(),
+                            id: z.uuid(),
                         }),
                     }),
                 },

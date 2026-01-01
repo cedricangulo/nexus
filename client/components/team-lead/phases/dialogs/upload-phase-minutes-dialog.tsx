@@ -15,32 +15,22 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { NaturalDateInput } from "@/components/ui/natural-date-input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { getCurrentDate } from "@/lib/helpers/date";
-import type { Phase, Sprint } from "@/lib/types";
 import { uploadSchema } from "@/lib/validation";
 
 type UploadInput = z.infer<typeof uploadSchema>;
 
-type UploadMinutesDialogProps = {
-  sprints: Sprint[];
-  phases: Phase[];
+type UploadPhaseMinutesDialogProps = {
+  phaseId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
 
-export function UploadMinutesDialog({
-  sprints,
-  phases,
+export function UploadPhaseMinutesDialog({
+  phaseId,
   open,
   onOpenChange,
-}: UploadMinutesDialogProps) {
+}: UploadPhaseMinutesDialogProps) {
   const [_isPending, startTransition] = useTransition();
   const maxSize = 10 * 1024 * 1024; // 10MB
 
@@ -49,23 +39,26 @@ export function UploadMinutesDialog({
     defaultValues: {
       title: "",
       date: getCurrentDate(),
-      scope: "sprint",
-      entityId: "",
+      scope: "phase",
+      entityId: phaseId,
       file: undefined,
     },
   });
 
-  const scope = form.watch("scope");
-  const selectedEntities = scope === "sprint" ? sprints : phases;
-
   const handleOpenChange = useCallback(
     (newOpen: boolean) => {
       if (!newOpen) {
-        form.reset();
+        form.reset({
+          title: "",
+          date: getCurrentDate(),
+          scope: "phase",
+          entityId: phaseId,
+          file: undefined,
+        });
       }
       onOpenChange(newOpen);
     },
-    [form, onOpenChange]
+    [form, phaseId, onOpenChange]
   );
 
   const handleUpload = useCallback(
@@ -76,12 +69,7 @@ export function UploadMinutesDialog({
       }
 
       // Validate metadata before uploading
-      const isValid = await form.trigger([
-        "title",
-        "date",
-        "scope",
-        "entityId",
-      ]);
+      const isValid = await form.trigger(["title", "date"]);
       if (!isValid) {
         toast.error("Please fill in all required fields");
         throw new Error("Please fill in all required fields");
@@ -89,8 +77,8 @@ export function UploadMinutesDialog({
 
       const formValues = form.getValues();
       const formData = new FormData();
-      formData.append("scope", formValues.scope);
-      formData.append("entityId", formValues.entityId);
+      formData.append("scope", "phase");
+      formData.append("entityId", phaseId);
       formData.append("title", formValues.title);
       formData.append("date", formValues.date);
       formData.append("file", file);
@@ -107,14 +95,20 @@ export function UploadMinutesDialog({
 
         if (result.success) {
           toast.success("Meeting minutes uploaded successfully");
-          form.reset();
+          form.reset({
+            title: "",
+            date: getCurrentDate(),
+            scope: "phase",
+            entityId: phaseId,
+            file: undefined,
+          });
         } else {
           toast.error(result.error || "Failed to upload meeting minutes");
           throw new Error(result.error);
         }
       });
     },
-    [form]
+    [form, phaseId]
   );
 
   return (
@@ -139,7 +133,7 @@ export function UploadMinutesDialog({
                   aria-invalid={fieldState.invalid}
                   disabled={isUploading}
                   id={field.name}
-                  placeholder="e.g., Sprint Planning Meeting"
+                  placeholder="e.g., Phase Kickoff Meeting"
                 />
                 {fieldState.invalid ? (
                   <FieldError errors={[fieldState.error]} />
@@ -167,74 +161,10 @@ export function UploadMinutesDialog({
               </Field>
             )}
           />
-
-          <Controller
-            control={form.control}
-            name="scope"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="scope">Scope</FieldLabel>
-                <Select
-                  disabled={isUploading}
-                  onValueChange={field.onChange}
-                  value={field.value}
-                >
-                  <SelectTrigger aria-invalid={fieldState.invalid} id="scope">
-                    <SelectValue placeholder="Select scope" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="sprint">Sprint</SelectItem>
-                    <SelectItem value="phase">Phase</SelectItem>
-                  </SelectContent>
-                </Select>
-                {fieldState.invalid ? (
-                  <FieldError errors={[fieldState.error]} />
-                ) : null}
-              </Field>
-            )}
-          />
-
-          <Controller
-            control={form.control}
-            name="entityId"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="entityId">
-                  {scope === "sprint" ? "Sprint" : "Phase"}
-                </FieldLabel>
-                <Select
-                  disabled={isUploading}
-                  onValueChange={field.onChange}
-                  value={field.value}
-                >
-                  <SelectTrigger
-                    aria-invalid={fieldState.invalid}
-                    id="entityId"
-                  >
-                    <SelectValue
-                      placeholder={`Select ${scope === "sprint" ? "sprint" : "phase"}`}
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {selectedEntities.map((entity) => (
-                      <SelectItem key={entity.id} value={entity.id}>
-                        {scope === "sprint"
-                          ? `Sprint ${(entity as Sprint).number}`
-                          : (entity as Phase).name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {fieldState.invalid ? (
-                  <FieldError errors={[fieldState.error]} />
-                ) : null}
-              </Field>
-            )}
-          />
         </FieldGroup>
       )}
       requiresConfirmation={true}
-      title="Upload Meeting Minutes"
+      title="Upload Phase Meeting Minutes"
     />
   );
 }

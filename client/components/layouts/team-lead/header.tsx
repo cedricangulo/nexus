@@ -37,6 +37,11 @@ function getPageTitle(pathname: string): string | undefined {
     return "Deliverable Details";
   }
 
+  // Check for phase detail page pattern
+  if (pathname.startsWith("/phases/") && pathname !== "/phases") {
+    return "Phase Details";
+  }
+
   return;
 }
 

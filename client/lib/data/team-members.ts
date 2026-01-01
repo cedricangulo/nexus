@@ -9,11 +9,16 @@
  * - Team Member: ❌ Cannot use @mentions (per original requirements)
  * - Adviser: ✅ Can use @mentions
  *
+ * Related functions:
+ * - `getAllUsersForDisplay()` in team.ts: For display purposes (all roles)
+ * - `getTeamUsers()` in team.ts: For management purposes (team lead only)
+ * - `getTeamMembersForMentions()`: For mentions functionality (team lead + adviser)
+ *
  * @module lib/data/team-members
  */
 "use server";
 
-import { userApi } from "@/lib/api/user";
+import { getAllUsersForDisplay } from "@/lib/data/team";
 import { getCurrentUser } from "@/lib/data/user";
 import type { User } from "@/lib/types";
 import { UserRole } from "@/lib/types";
@@ -51,7 +56,7 @@ export async function getTeamMembersForMentions(): Promise<
       return [];
     }
 
-    const users: User[] = await userApi.listUsers();
+    const users: User[] = await getAllUsersForDisplay();
 
     return users.map((user) => ({
       id: user.id,

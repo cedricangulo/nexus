@@ -48,7 +48,7 @@ export async function notificationRoutes(app: FastifyInstance) {
         preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
         schema: {
           params: z.object({
-            id: z.string().uuid(),
+            id: z.uuid(),
           }),
         },
       },
@@ -69,7 +69,7 @@ export async function notificationRoutes(app: FastifyInstance) {
         preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
         schema: {
           params: z.object({
-            id: z.string().uuid(),
+            id: z.uuid(),
           }),
         },
       },

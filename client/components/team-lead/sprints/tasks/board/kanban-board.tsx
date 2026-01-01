@@ -86,27 +86,27 @@ export function KanbanBoard({ tasks, users, sprintId }: KanbanBoardProps) {
     label: string;
     color: string;
   }> = [
-      {
-        status: "TODO",
-        label: "To Do",
-        color: "bg-neutral-50 dark:bg-neutral-900",
-      },
-      {
-        status: "IN_PROGRESS",
-        label: "In Progress",
-        color: "bg-blue-50 dark:bg-blue-950/30",
-      },
-      {
-        status: "BLOCKED",
-        label: "Blocked",
-        color: "bg-red-50 dark:bg-red-950/30",
-      },
-      {
-        status: "DONE",
-        label: "Done",
-        color: "bg-green-50 dark:bg-green-950/30",
-      },
-    ];
+    {
+      status: "TODO",
+      label: "To Do",
+      color: "bg-neutral-50 dark:bg-neutral-900",
+    },
+    {
+      status: "IN_PROGRESS",
+      label: "In Progress",
+      color: "bg-blue-50 dark:bg-blue-950/30",
+    },
+    {
+      status: "BLOCKED",
+      label: "Blocked",
+      color: "bg-red-50 dark:bg-red-950/30",
+    },
+    {
+      status: "DONE",
+      label: "Done",
+      color: "bg-green-50 dark:bg-green-950/30",
+    },
+  ];
 
   const handleStatusChange = (task: Task, toStatus: TaskStatus) => {
     const fromStatus = task.status;

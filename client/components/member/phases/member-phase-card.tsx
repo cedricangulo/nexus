@@ -1,8 +1,12 @@
 "use client";
 
+import { LayoutDashboard } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
   Frame,
   FrameDescription,
+  FrameFooter,
   FrameHeader,
   FramePanel,
   FrameTitle,
@@ -78,6 +82,15 @@ export function MemberPhaseCard({ phase }: MemberPhaseCardProps) {
         {/* Deliverables List */}
         <DeliverableItem deliverables={phase.deliverables} />
       </FramePanel>
+      <FrameFooter className="mt-auto">
+        {/* View Dashboard Button */}
+        <Button asChild className="w-full" variant="outline">
+          <Link href={`/phases/${phase.id}`}>
+            <LayoutDashboard className="size-4" />
+            View Dashboard
+          </Link>
+        </Button>
+      </FrameFooter>
     </Frame>
   );
 }

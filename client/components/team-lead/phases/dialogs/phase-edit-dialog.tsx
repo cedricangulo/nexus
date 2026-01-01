@@ -40,18 +40,24 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import type { PhaseDetail } from "@/lib/types";
 import { phaseSchema } from "@/lib/validation";
 
-type PhaseDialogProps = {
+type PhaseEditDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  phase: PhaseDetail | null;
+  phase: PhaseDetail;
 };
 
-export function PhaseDialog({ open, onOpenChange, phase }: PhaseDialogProps) {
+type FormValues = z.infer<typeof phaseSchema>;
+
+export function PhaseEditDialog({
+  open,
+  onOpenChange,
+  phase,
+}: PhaseEditDialogProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const isMobile = useIsMobile();
 
-  const form = useForm({
+  const form = useForm<FormValues>({
     resolver: zodResolver(phaseSchema),
     defaultValues: {
       name: "",
@@ -61,31 +67,18 @@ export function PhaseDialog({ open, onOpenChange, phase }: PhaseDialogProps) {
     },
   });
 
-  // Populate form when dialog opens with phase data
   useEffect(() => {
-    if (open && phase) {
+    if (open) {
       form.reset({
         name: phase.name,
         startDate: phase.startDate ? phase.startDate.split("T")[0] : "",
         endDate: phase.endDate ? phase.endDate.split("T")[0] : "",
         description: phase.description || "",
       });
-    } else if (open && !phase) {
-      form.reset({
-        name: "",
-        startDate: "",
-        endDate: "",
-        description: "",
-      });
     }
   }, [open, phase, form]);
 
-  const onSubmit = (values: z.infer<typeof phaseSchema>) => {
-    if (!phase) {
-      return;
-    }
-
-    // Close dialog immediately before async action
+  const onSubmit = (values: FormValues) => {
     onOpenChange(false);
 
     startTransition(async () => {
@@ -96,7 +89,6 @@ export function PhaseDialog({ open, onOpenChange, phase }: PhaseDialogProps) {
 
       if (result.success) {
         toast.success("Phase updated successfully");
-        // Refresh the page to fetch updated data from server
         router.refresh();
       } else {
         onOpenChange(true);
@@ -115,7 +107,7 @@ export function PhaseDialog({ open, onOpenChange, phase }: PhaseDialogProps) {
             <FormItem>
               <FormLabel>Phase Name</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} disabled={isPending} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -129,7 +121,7 @@ export function PhaseDialog({ open, onOpenChange, phase }: PhaseDialogProps) {
               <FormItem>
                 <FormLabel>Start Date</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <Input type="date" {...field} disabled={isPending} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -142,7 +134,7 @@ export function PhaseDialog({ open, onOpenChange, phase }: PhaseDialogProps) {
               <FormItem>
                 <FormLabel>End Date</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <Input type="date" {...field} disabled={isPending} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -154,9 +146,13 @@ export function PhaseDialog({ open, onOpenChange, phase }: PhaseDialogProps) {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>Description (optional)</FormLabel>
               <FormControl>
-                <Textarea {...field} />
+                <Textarea
+                  {...field}
+                  disabled={isPending}
+                  value={field.value || ""}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -207,12 +203,13 @@ export function PhaseDialog({ open, onOpenChange, phase }: PhaseDialogProps) {
             Update the details for this project phase.
           </DialogDescription>
         </DialogHeader>
+
         {formContent}
-        <DialogFooter>
+
+        <DialogFooter className="sm:grid sm:grid-cols-2">
           <Button
             disabled={isPending}
             onClick={() => onOpenChange(false)}
-            type="button"
             variant="outline"
           >
             Cancel

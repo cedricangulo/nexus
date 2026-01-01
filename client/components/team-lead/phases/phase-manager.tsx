@@ -4,9 +4,10 @@ import { useState } from "react";
 
 import type { Deliverable, PhaseDetail } from "@/lib/types";
 
-import { DeliverableDialog } from "./deliverable-dialog";
+import { DeliverableCreateDialog } from "./dialogs/deliverable-create-dialog";
+import { DeliverableEditDialog } from "./dialogs/deliverable-edit-dialog";
+import { PhaseEditDialog } from "./dialogs/phase-edit-dialog";
 import { PhaseCard } from "./phase-card";
-import { PhaseDialog } from "./phase-dialog";
 
 type PhaseManagerProps = {
   phases: PhaseDetail[];
@@ -33,8 +34,6 @@ export function PhaseManager({ phases }: PhaseManagerProps) {
         {sortedPhases.map((phase) => (
           <PhaseCard
             key={phase.id}
-            onAddDeliverable={setAddingDeliverablePhaseId}
-            onEditDeliverable={setEditingDeliverable}
             onEditPhase={setEditingPhase}
             phase={phase}
           />
@@ -42,25 +41,41 @@ export function PhaseManager({ phases }: PhaseManagerProps) {
       </div>
 
       {/* Dialogs */}
-      <PhaseDialog
-        onOpenChange={(open) => !open && setEditingPhase(null)}
-        open={!!editingPhase}
-        phase={editingPhase}
-      />
+      {editingPhase ? (
+        <PhaseEditDialog
+          onOpenChange={(open) => {
+            if (!open) {
+              setEditingPhase(null);
+            }
+          }}
+          open={true}
+          phase={editingPhase}
+        />
+      ) : null}
 
-      <DeliverableDialog
-        deliverable={editingDeliverable}
-        onOpenChange={(open) => {
-          if (!open) {
-            setAddingDeliverablePhaseId(null);
-            setEditingDeliverable(null);
-          }
-        }}
-        open={!!addingDeliverablePhaseId || !!editingDeliverable}
-        phaseId={
-          addingDeliverablePhaseId || (editingDeliverable?.phaseId ?? null)
-        }
-      />
+      {addingDeliverablePhaseId ? (
+        <DeliverableCreateDialog
+          onOpenChange={(open) => {
+            if (!open) {
+              setAddingDeliverablePhaseId(null);
+            }
+          }}
+          open={true}
+          phaseId={addingDeliverablePhaseId}
+        />
+      ) : null}
+
+      {editingDeliverable ? (
+        <DeliverableEditDialog
+          deliverable={editingDeliverable}
+          onOpenChange={(open) => {
+            if (!open) {
+              setEditingDeliverable(null);
+            }
+          }}
+          open={true}
+        />
+      ) : null}
     </div>
   );
 }

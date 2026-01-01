@@ -29,14 +29,6 @@ export const meetingLogApi = {
           "Content-Type": "multipart/form-data",
         },
         timeout: 300_000, // 5 minutes for large file uploads to Cloudinary
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            console.log(`Upload progress: ${percentCompleted}%`);
-          }
-        },
       }
     );
     return response.data;

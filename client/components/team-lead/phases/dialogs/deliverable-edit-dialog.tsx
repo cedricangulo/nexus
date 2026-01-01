@@ -7,10 +7,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 
-import {
-  createDeliverableAction,
-  updateDeliverableAction,
-} from "@/actions/phases";
+import { updateDeliverableAction } from "@/actions/phases";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -51,25 +48,24 @@ import { formatTitleCase } from "@/lib/helpers";
 import { type Deliverable, DeliverableStatus } from "@/lib/types";
 import { deliverableSchema } from "@/lib/validation";
 
-type DeliverableDialogProps = {
+type DeliverableEditDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  phaseId: string | null;
-  deliverable: Deliverable | null;
+  deliverable: Deliverable;
 };
 
-export function DeliverableDialog({
+type FormValues = z.infer<typeof deliverableSchema>;
+
+export function DeliverableEditDialog({
   open,
   onOpenChange,
-  phaseId,
   deliverable,
-}: DeliverableDialogProps) {
+}: DeliverableEditDialogProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const isMobile = useIsMobile();
-  const isEditing = !!deliverable;
 
-  const form = useForm({
+  const form = useForm<FormValues>({
     resolver: zodResolver(deliverableSchema),
     defaultValues: {
       title: "",
@@ -79,76 +75,33 @@ export function DeliverableDialog({
     },
   });
 
-  // Populate form when dialog opens with deliverable data
   useEffect(() => {
-    if (open && deliverable) {
+    if (open) {
       form.reset({
         title: deliverable.title,
         dueDate: deliverable.dueDate ? deliverable.dueDate.split("T")[0] : "",
         description: deliverable.description || "",
         status: deliverable.status,
       });
-    } else if (open && !deliverable) {
-      form.reset({
-        title: "",
-        dueDate: "",
-        description: "",
-        status: DeliverableStatus.NOT_STARTED,
-      });
     }
   }, [open, deliverable, form]);
 
-  type DeliverableActionResult = Awaited<
-    ReturnType<typeof createDeliverableAction>
-  >;
-
-  const saveDeliverable = (
-    values: z.infer<typeof deliverableSchema>
-  ): Promise<DeliverableActionResult> => {
-    if (isEditing) {
-      if (!deliverable) {
-        return Promise.resolve({
-          success: false,
-          error: "Missing deliverable",
-        });
-      }
-
-      return updateDeliverableAction({
-        id: deliverable.id,
-        ...values,
-      });
-    }
-
-    if (!phaseId) {
-      return Promise.resolve({ success: false, error: "Missing phase" });
-    }
-
-    return createDeliverableAction({
-      phaseId,
-      title: values.title,
-      dueDate: values.dueDate,
-      description: values.description,
-    });
-  };
-
-  const onSubmit = (values: z.infer<typeof deliverableSchema>) => {
-    // Close dialog immediately before async action
+  const onSubmit = (values: FormValues) => {
     onOpenChange(false);
 
     startTransition(async () => {
-      const result = await saveDeliverable(values);
+      const result = await updateDeliverableAction({
+        id: deliverable.id,
+        ...values,
+      });
+
       if (result.success) {
-        toast.success(
-          isEditing
-            ? "Deliverable updated successfully"
-            : "Deliverable created successfully"
-        );
-        // Refresh the page to fetch updated data from server
+        toast.success("Deliverable updated successfully");
         router.refresh();
-        return;
+      } else {
+        onOpenChange(true);
+        toast.error(result.error || "Failed to update deliverable");
       }
-      onOpenChange(true);
-      toast.error(result.error || "Failed to save deliverable");
     });
   };
 
@@ -162,7 +115,7 @@ export function DeliverableDialog({
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} disabled={isPending} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -175,49 +128,52 @@ export function DeliverableDialog({
             <FormItem>
               <FormLabel>Due Date</FormLabel>
               <FormControl>
-                <Input type="date" {...field} />
+                <Input type="date" {...field} disabled={isPending} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        {isEditing ? (
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Status</FormLabel>
-                <Select
-                  defaultValue={field.value}
-                  onValueChange={field.onChange}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {Object.values(DeliverableStatus).map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {formatTitleCase(status)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        ) : null}
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Status</FormLabel>
+              <Select
+                defaultValue={field.value}
+                disabled={isPending}
+                onValueChange={field.onChange}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {Object.values(DeliverableStatus).map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {formatTitleCase(status)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>Description (optional)</FormLabel>
               <FormControl>
-                <Textarea {...field} />
+                <Textarea
+                  {...field}
+                  disabled={isPending}
+                  value={field.value || ""}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -232,13 +188,9 @@ export function DeliverableDialog({
       <Drawer onOpenChange={onOpenChange} open={open}>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>
-              {isEditing ? "Edit Deliverable" : "Add Deliverable"}
-            </DrawerTitle>
+            <DrawerTitle>Edit Deliverable</DrawerTitle>
             <DrawerDescription>
-              {isEditing
-                ? "Update the details for this deliverable."
-                : "Create a new deliverable for this phase."}
+              Update the details for this deliverable.
             </DrawerDescription>
           </DrawerHeader>
 
@@ -250,15 +202,7 @@ export function DeliverableDialog({
               onClick={form.handleSubmit(onSubmit)}
               type="button"
             >
-              {(() => {
-                if (isPending) {
-                  return "Saving...";
-                }
-                if (isEditing) {
-                  return "Save Changes";
-                }
-                return "Create Deliverable";
-              })()}
+              {isPending ? "Saving..." : "Save Changes"}
             </Button>
             <DrawerClose asChild>
               <Button disabled={isPending} variant="outline">
@@ -275,21 +219,18 @@ export function DeliverableDialog({
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {isEditing ? "Edit Deliverable" : "Add Deliverable"}
-          </DialogTitle>
+          <DialogTitle>Edit Deliverable</DialogTitle>
           <DialogDescription>
-            {isEditing
-              ? "Update the details for this deliverable."
-              : "Create a new deliverable for this phase."}
+            Update the details for this deliverable.
           </DialogDescription>
         </DialogHeader>
+
         {formContent}
-        <DialogFooter>
+
+        <DialogFooter className="sm:grid sm:grid-cols-2">
           <Button
             disabled={isPending}
             onClick={() => onOpenChange(false)}
-            type="button"
             variant="outline"
           >
             Cancel
@@ -299,15 +240,7 @@ export function DeliverableDialog({
             onClick={form.handleSubmit(onSubmit)}
             type="button"
           >
-            {(() => {
-              if (isPending) {
-                return "Saving...";
-              }
-              if (isEditing) {
-                return "Save Changes";
-              }
-              return "Create Deliverable";
-            })()}
+            {isPending ? "Saving..." : "Save Changes"}
           </Button>
         </DialogFooter>
       </DialogContent>

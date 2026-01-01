@@ -2,7 +2,7 @@ import { z } from "zod";
 import { DeliverableStatus, DeliverableStage } from "../../generated/client.js";
 
 export const createDeliverableSchema = z.object({
-  phaseId: z.string().uuid(),
+  phaseId: z.uuid(),
   title: z.string().min(1),
   description: z.string().optional(),
   dueDate: z.string().datetime().nullable().optional(),
@@ -35,7 +35,7 @@ export const deliverableResponseSchema = z.object({
 });
 
 export const deliverableQuerySchema = z.object({
-  phaseId: z.string().uuid().optional(),
+  phaseId: z.uuid().optional(),
 });
 
 export type CreateDeliverableInput = z.infer<typeof createDeliverableSchema>;

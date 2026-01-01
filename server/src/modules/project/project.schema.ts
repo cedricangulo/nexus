@@ -11,7 +11,7 @@ export const createProjectSchema = z.object({
 export const updateProjectSchema = createProjectSchema.partial().describe('Schema for updating an existing project (partial update)');
 
 export const projectResponseSchema = z.object({
-  id: z.string().uuid().describe('Unique identifier for the project'),
+  id: z.uuid().describe('Unique identifier for the project'),
   name: z.string().describe('Name of the project'),
   description: z.string().nullable().describe('Brief description of the project'),
   repositoryUrl: z.string().nullable().describe('URL to the source code repository'),

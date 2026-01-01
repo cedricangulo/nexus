@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const createMeetingLogSchema = z.object({
-  sprintId: z.string().uuid().optional(),
-  phaseId: z.string().uuid().optional(),
+  sprintId: z.uuid().optional(),
+  phaseId: z.uuid().optional(),
   title: z.string().min(1),
   date: z.string().datetime(),
 }).refine(data => data.sprintId || data.phaseId, {

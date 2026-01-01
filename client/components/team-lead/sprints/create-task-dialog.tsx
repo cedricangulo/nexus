@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import type { z } from "zod";
 
 import { createSprintTaskAction } from "@/actions/tasks";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -44,7 +45,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { User } from "@/lib/types";
 import { createSprintTaskSchema } from "@/lib/validation";
@@ -148,20 +148,20 @@ export function CreateTaskDialog({ sprintId, users }: CreateTaskDialogProps) {
             <FormItem>
               <FormLabel>Assignees (Optional)</FormLabel>
               {selectedAssigneeIds.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-2">
+                <div className="mb-2 flex flex-wrap gap-1">
                   {selectedAssigneeIds.map((id) => {
                     const user = users.find((u) => u.id === id);
                     return (
                       <Badge
+                        className="flex items-center gap-1"
                         key={id}
                         variant="secondary"
-                        className="flex items-center gap-1"
                       >
                         {user?.name || "Unknown"}
                         <button
-                          type="button"
+                          className="ml-1 rounded-full hover:bg-muted"
                           onClick={() => handleRemoveAssignee(id)}
-                          className="ml-1 hover:bg-muted rounded-full"
+                          type="button"
                         >
                           <X className="h-3 w-3" />
                         </button>

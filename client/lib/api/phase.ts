@@ -19,6 +19,14 @@ export type UpdatePhaseInput = {
   endDate?: string;
 };
 
+export type CreatePhaseTaskInput = {
+  phaseId: string;
+  title: string;
+  description?: string;
+  status: "TODO" | "IN_PROGRESS" | "BLOCKED" | "DONE";
+  assigneeIds?: string[];
+};
+
 export const phaseApi = {
   listPhases: async (): Promise<Phase[]> => {
     const response = await apiClient.get(API_ENDPOINTS.PHASES.LIST);
@@ -30,9 +38,20 @@ export const phaseApi = {
     return response.data;
   },
 
+  /**
+   * Alias for getPhaseById - kept for backward compatibility.
+   * The backend now includes tasks, deliverables, and meetingLogs by default.
+   */
+  getPhaseWithDetails: async (id: string): Promise<PhaseDetail> =>
+    phaseApi.getPhaseById(id),
+
   createPhase: async (data: CreatePhaseInput): Promise<Phase> => {
     const response = await apiClient.post(API_ENDPOINTS.PHASES.CREATE, data);
     return response.data;
+  },
+
+  createPhaseTask: async (data: CreatePhaseTaskInput): Promise<void> => {
+    await apiClient.post(API_ENDPOINTS.TASKS.CREATE, data);
   },
 
   updatePhase: async (id: string, data: UpdatePhaseInput): Promise<Phase> => {

@@ -85,6 +85,8 @@ export type Phase = {
 
 export interface PhaseDetail extends Phase {
   deliverables: Deliverable[];
+  tasks?: Task[];
+  meetingLogs?: MeetingLog[];
 }
 
 // Deliverable

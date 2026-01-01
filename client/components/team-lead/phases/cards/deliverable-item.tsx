@@ -1,10 +1,10 @@
 "use client";
 
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { ExternalLink, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-
 import { deleteDeliverableAction } from "@/actions/phases";
 import { showPendingActionToast } from "@/components/shared/pending-action-toast";
 import {
@@ -22,6 +22,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { StatusBadge } from "@/components/ui/status";
@@ -32,17 +33,19 @@ import { cn } from "@/lib/utils";
 type DeliverableItemProps = {
   deliverables: Deliverable[];
   onEdit: (deliverable: Deliverable) => void;
+  isTeamLead?: boolean;
 };
 
 export function DeliverableItem({
   deliverables,
   onEdit,
+  isTeamLead = false,
 }: DeliverableItemProps) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     const deliverable = deliverables.find((d) => d.id === id);
     const itemToDelete = deliverable?.title || "this deliverable";
 
@@ -108,13 +111,13 @@ export function DeliverableItem({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               disabled={confirmDeleteId === null || isDeleting !== null}
-              onClick={async () => {
+              onClick={() => {
                 if (!confirmDeleteId) {
                   return;
                 }
                 const id = confirmDeleteId;
                 setConfirmDeleteId(null);
-                await handleDelete(id);
+                handleDelete(id);
               }}
             >
               Delete
@@ -126,14 +129,11 @@ export function DeliverableItem({
       <div className="space-y-2">
         {deliverables.map((item) => (
           <div
-            className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 p-3 transition-colors hover:bg-muted/50"
+            className="flex items-start justify-between gap-2 rounded-lg border border-border bg-muted/30 p-2 transition-colors hover:bg-muted/50"
             key={item.id}
           >
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-medium text-foreground text-sm">
-                {item.title}
-              </p>
-              <div className="mt-1 flex items-center gap-2">
+            <div className="min-w-0 flex-1 space-y-2">
+              <div className="flex items-center gap-2">
                 <StatusBadge status={item.status} />
                 {item.dueDate && item.status !== "COMPLETED" ? (
                   <span
@@ -146,30 +146,52 @@ export function DeliverableItem({
                   </span>
                 ) : null}
               </div>
+              <p className="truncate font-medium text-foreground text-sm">
+                {item.title}
+              </p>
             </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button className="shrink-0" size="icon" variant="ghost">
-                  <MoreHorizontal size={16} />
-                  <span className="sr-only">Open menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onEdit(item)}>
-                  <Pencil size={16} />
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="text-destructive focus:text-destructive"
-                  disabled={isDeleting === item.id}
-                  onClick={() => setConfirmDeleteId(item.id)}
-                >
-                  <Trash2 size={16} />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {isTeamLead ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="shrink-0" size="icon" variant="ghost">
+                    <MoreVertical size={16} />
+                    <span className="sr-only">Open menu</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href={`/deliverables/${item.id}`}
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink size={16} />
+                      View Details
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onEdit(item)}>
+                    <Pencil size={16} />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-destructive focus:text-destructive"
+                    disabled={isDeleting === item.id}
+                    onClick={() => setConfirmDeleteId(item.id)}
+                    variant="destructive"
+                  >
+                    <Trash2 size={16} />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button asChild className="shrink-0" size="sm" variant="ghost">
+                <Link href={`/deliverables/${item.id}`}>
+                  <ExternalLink size={16} />
+                </Link>
+              </Button>
+            )}
           </div>
         ))}
       </div>
