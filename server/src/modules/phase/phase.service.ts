@@ -25,7 +25,58 @@ export async function getPhaseById(id: string) {
           title: true,
           description: true,
           status: true,
+          stage: true,
           dueDate: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
+      tasks: {
+        where: {
+          sprintId: null, // Only waterfall tasks
+          deletedAt: null,
+        },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          status: true,
+          phaseId: true,
+          sprintId: true,
+          createdAt: true,
+          updatedAt: true,
+          assignments: {
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      meetingLogs: {
+        select: {
+          id: true,
+          title: true,
+          date: true,
+          fileUrl: true,
+          uploaderId: true,
+          createdAt: true,
+          updatedAt: true,
+          uploader: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: {
+          date: "desc",
         },
       },
     },
@@ -35,7 +86,19 @@ export async function getPhaseById(id: string) {
     throw new NotFoundError("Phase", id);
   }
 
-  return phase;
+  // Transform tasks to match frontend Task type
+  const transformedTasks = phase.tasks.map((task) => {
+    const { assignments, ...taskData } = task;
+    return {
+      ...taskData,
+      assignees: assignments.map((a) => a.user),
+    };
+  });
+
+  return {
+    ...phase,
+    tasks: transformedTasks,
+  };
 }
 
 export async function createPhase(input: CreatePhaseInput, userId: string) {

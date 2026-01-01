@@ -85,6 +85,8 @@ export type Phase = {
 
 export interface PhaseDetail extends Phase {
   deliverables: Deliverable[];
+  tasks?: Task[];
+  meetingLogs?: MeetingLog[];
 }
 
 // Deliverable
@@ -125,11 +127,10 @@ export type Task = {
   id: string;
   sprintId?: string | null;
   phaseId?: string | null;
-  assigneeId?: string | null;
+  assignees?: Array<{ id: string; name: string; email: string }>;
   title: string;
   description?: string | null;
   status: TaskStatus;
-  priority?: string | null;
   lastComment?: Comment | null;
   createdAt: string;
   updatedAt: string;
@@ -144,6 +145,7 @@ export type Comment = {
   author?: {
     id: string;
     name: string;
+    role?: string;
   };
   taskId?: string | null;
   deliverableId?: string | null;

@@ -1,4 +1,4 @@
-import { createApiClient } from "./client";
+import { apiClient } from "./client";
 import { API_ENDPOINTS } from "./endpoints";
 
 // Define types locally for now or import if they exist
@@ -43,32 +43,27 @@ export type TimelineData = {
 
 export const analyticsApi = {
   getDashboardOverview: async (): Promise<DashboardOverview> => {
-    const client = await createApiClient();
-    const response = await client.get(API_ENDPOINTS.ANALYTICS.OVERVIEW);
+    const response = await apiClient.get(API_ENDPOINTS.ANALYTICS.OVERVIEW);
     return response.data;
   },
 
   getPhaseAnalytics: async (): Promise<PhaseAnalytics[]> => {
-    const client = await createApiClient();
-    const response = await client.get(API_ENDPOINTS.ANALYTICS.PHASES);
+    const response = await apiClient.get(API_ENDPOINTS.ANALYTICS.PHASES);
     return response.data;
   },
 
   getSprintAnalytics: async (): Promise<SprintAnalytics[]> => {
-    const client = await createApiClient();
-    const response = await client.get(API_ENDPOINTS.ANALYTICS.SPRINTS);
+    const response = await apiClient.get(API_ENDPOINTS.ANALYTICS.SPRINTS);
     return response.data;
   },
 
   getTeamContributions: async (): Promise<TeamContribution[]> => {
-    const client = await createApiClient();
-    const response = await client.get(API_ENDPOINTS.ANALYTICS.CONTRIBUTIONS);
+    const response = await apiClient.get(API_ENDPOINTS.ANALYTICS.CONTRIBUTIONS);
     return response.data;
   },
 
   getTimelineData: async (): Promise<TimelineData> => {
-    const client = await createApiClient();
-    const response = await client.get(API_ENDPOINTS.ANALYTICS.TIMELINE);
+    const response = await apiClient.get(API_ENDPOINTS.ANALYTICS.TIMELINE);
     return response.data;
   },
 };

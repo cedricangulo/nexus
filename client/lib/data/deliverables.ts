@@ -1,9 +1,10 @@
 import "server-only";
 
+import { commentApi } from "@/lib/api/comment";
 import { deliverableApi } from "@/lib/api/deliverable";
 import { evidenceApi } from "@/lib/api/evidence";
 import { phaseApi } from "@/lib/api/phase";
-import type { Deliverable, Evidence, Phase } from "@/lib/types";
+import type { Comment, Deliverable, Evidence, Phase } from "@/lib/types";
 import { requireUser } from "../helpers/rbac";
 
 export async function getDeliverableById(
@@ -43,17 +44,34 @@ export async function getEvidenceByDeliverable(
   }
 }
 
+export async function getCommentsByDeliverable(
+  deliverableId: string
+): Promise<Comment[]> {
+  try {
+    await requireUser();
+    return await commentApi.listComments({ deliverableId });
+  } catch (error) {
+    console.error(
+      `Failed to fetch comments for deliverable ${deliverableId}:`,
+      error
+    );
+    return [];
+  }
+}
+
 export async function getDeliverableDetail(deliverableId: string) {
-  const [deliverable, phases, evidence] = await Promise.all([
+  const [deliverable, phases, evidence, comments] = await Promise.all([
     getDeliverableById(deliverableId),
     getPhases(),
     getEvidenceByDeliverable(deliverableId),
+    getCommentsByDeliverable(deliverableId),
   ]);
 
   return {
     deliverable,
     phases,
     evidence,
+    comments,
     phase: phases.find((p) => p.id === deliverable?.phaseId),
   };
 }

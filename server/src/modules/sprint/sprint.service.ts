@@ -23,7 +23,9 @@ export async function getSprintsByUser(userId: string) {
       deletedAt: null,
       tasks: {
         some: {
-          assigneeId: userId,
+          assignments: {
+            some: { userId },
+          },
           deletedAt: null,
         },
       },

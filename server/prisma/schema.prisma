@@ -80,7 +80,7 @@ model User {
   role          Role   @default(MEMBER)
 
   // Relations
-  assignedTasks    Task[]          @relation("AssignedTasks")
+  taskAssignments  TaskAssignment[]
   uploadedEvidence Evidence[]
   uploadedMeetings MeetingLog[]    @relation("MeetingUploader") // Who uploaded the minutes?
   comments         Comment[]
@@ -176,8 +176,7 @@ model Task {
   phaseId     String?
   phase       Phase?     @relation(fields: [phaseId], references: [id])
   
-  assigneeId  String?
-  assignee    User?      @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  assignments TaskAssignment[]
 
   title       String
   description String?    @db.Text
@@ -193,9 +192,22 @@ model Task {
 
   @@index([sprintId])
   @@index([phaseId])
-  @@index([assigneeId])
   @@index([status])
   @@index([deletedAt])
+}
+
+// 5b. Task Assignments (Many-to-Many between Task and User)
+model TaskAssignment {
+  id        String   @id @default(uuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([taskId, userId])
+  @@index([taskId])
+  @@index([userId])
 }
 
 // --------------------------------------

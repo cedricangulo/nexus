@@ -4,14 +4,15 @@
  */
 
 /**
- * Convert date string (YYYY-MM-DD) to ISO datetime format (YYYY-MM-DDTHH:MM:SSZ)
+ * Convert date or datetime string to ISO datetime format (YYYY-MM-DDTHH:MM:SSZ)
  * Server expects full ISO datetime with timezone
  *
- * @param dateString - Date in YYYY-MM-DD format or empty string
+ * @param dateString - Date in YYYY-MM-DD or datetime-local format (YYYY-MM-DDTHH:mm)
  * @returns ISO datetime string or undefined if input is empty/undefined
  *
  * @example
- * toISODateTime("2025-01-17") // "2025-01-17T00:00:00Z"
+ * toISODateTime("2025-01-17") // "2025-01-17T12:00:00Z"
+ * toISODateTime("2025-01-17T14:30") // "2025-01-17T14:30:00Z"
  * toISODateTime("") // undefined
  * toISODateTime(undefined) // undefined
  */
@@ -22,13 +23,26 @@ export function toISODateTime(
     return;
   }
 
-  // If already in ISO format, return as is
-  if (dateString.includes("T")) {
+  // If already in full ISO format with timezone, return as is
+  if (dateString.includes("Z") || dateString.match(/[+-]\d{2}:\d{2}$/)) {
     return dateString;
   }
 
-  // Convert YYYY-MM-DD to YYYY-MM-DDT00:00:00Z
-  return `${dateString}T00:00:00Z`;
+  // Handle datetime-local format (YYYY-MM-DDTHH:mm)
+  if (dateString.includes("T")) {
+    // Add seconds if not present
+    const parts = dateString.split("T");
+    const timePart = parts[1];
+    const timeWithSeconds =
+      timePart.includes(":") && timePart.split(":").length === 2
+        ? `${timePart}:00`
+        : timePart;
+    return `${parts[0]}T${timeWithSeconds}Z`;
+  }
+
+  // Convert YYYY-MM-DD to noon UTC (12:00:00Z) to avoid timezone display issues
+  // Using noon instead of midnight prevents dates from shifting to previous/next day
+  return `${dateString}T12:00:00Z`;
 }
 
 /**
@@ -42,6 +56,42 @@ export function toISODateTimeOrNull(
   dateString: string | undefined | null
 ): string | null {
   return toISODateTime(dateString) ?? null;
+}
+
+/**
+ * Get current datetime formatted for datetime-local input (YYYY-MM-DDTHH:mm)
+ * This format is required by HTML5 datetime-local inputs
+ *
+ * @returns Current datetime in YYYY-MM-DDTHH:mm format
+ *
+ * @example
+ * getCurrentDateTimeLocal() // "2025-12-31T14:30"
+ */
+export function getCurrentDateTimeLocal(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+/**
+ * Get current date in YYYY-MM-DD format
+ * Used for date-only inputs like meeting dates
+ *
+ * @returns Current date in YYYY-MM-DD format
+ *
+ * @example
+ * getCurrentDate() // "2025-12-31"
+ */
+export function getCurrentDate(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 /**

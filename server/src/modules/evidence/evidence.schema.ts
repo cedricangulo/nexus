@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const createEvidenceSchema = z.object({
-  deliverableId: z.string().uuid(),
+  deliverableId: z.uuid(),
 });
 
 export const evidenceResponseSchema = z.object({

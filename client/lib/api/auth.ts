@@ -1,11 +1,10 @@
 import type { LoginResponse, User } from "@/lib/types";
-import { createApiClient } from "./client";
+import { apiClient } from "./client";
 import { API_ENDPOINTS } from "./endpoints";
 
 export const authApi = {
   login: async (email: string, password: string): Promise<LoginResponse> => {
-    const client = await createApiClient();
-    const response = await client.post(API_ENDPOINTS.AUTH.LOGIN, {
+    const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, {
       email,
       password,
     });
@@ -13,13 +12,11 @@ export const authApi = {
   },
 
   logout: async (): Promise<void> => {
-    const client = await createApiClient();
-    await client.post(API_ENDPOINTS.AUTH.LOGOUT);
+    await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT);
   },
 
   getCurrentUser: async (): Promise<User> => {
-    const client = await createApiClient();
-    const response = await client.get(API_ENDPOINTS.AUTH.ME);
+    const response = await apiClient.get(API_ENDPOINTS.AUTH.ME);
     return response.data;
   },
 
@@ -27,8 +24,7 @@ export const authApi = {
     oldPassword: string,
     newPassword: string
   ): Promise<void> => {
-    const client = await createApiClient();
-    await client.post(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, {
+    await apiClient.post(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, {
       oldPassword,
       newPassword,
     });
@@ -39,8 +35,7 @@ export const authApi = {
     name: string,
     role: string
   ): Promise<User> => {
-    const client = await createApiClient();
-    const response = await client.post(API_ENDPOINTS.AUTH.INVITE, {
+    const response = await apiClient.post(API_ENDPOINTS.AUTH.INVITE, {
       email,
       name,
       role,

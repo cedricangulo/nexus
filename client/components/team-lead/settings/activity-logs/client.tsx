@@ -168,24 +168,24 @@ function DetailsCell({ details }: DetailsCellProps) {
 }
 
 const getActionColor = (action: string): string => {
-  // Positive actions (green)
+  // Positive actions (completed/success)
   if (action.includes("APPROVED") || action.includes("COMPLETED")) {
-    return "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400";
+    return "bg-status-success/10 text-status-success dark:text-status-success";
   }
-  // Negative actions (red)
+  // Negative actions (blocked/error)
   if (action.includes("REJECTED") || action.includes("DELETED")) {
-    return "bg-red-500/10 text-red-700 dark:text-red-400";
+    return "bg-status-error/10 text-status-error dark:text-status-error";
   }
-  // Blocked/warning actions (orange)
+  // Blocked/warning actions (blocked)
   if (action.includes("BLOCKED") || action.includes("PENDING")) {
-    return "bg-orange-500/10 text-orange-700 dark:text-orange-400";
+    return "bg-status-error/10 text-status-error dark:text-status-error";
   }
-  // Upload/create actions (blue)
+  // Upload/create actions (in-progress/active)
   if (action.includes("UPLOAD") || action.includes("CREATED")) {
-    return "bg-blue-500/10 text-blue-700 dark:text-blue-400";
+    return "bg-status-in-progress/10 text-status-in-progress dark:text-status-in-progress";
   }
-  // Default (gray)
-  return "bg-gray-500/10 text-gray-700 dark:text-gray-400";
+  // Default (not started/neutral)
+  return "bg-status-info/10 text-status-info dark:text-status-info";
 };
 
 type ActivityLogsClientProps = {

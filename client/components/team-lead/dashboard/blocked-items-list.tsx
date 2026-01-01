@@ -28,7 +28,7 @@ function BlockedItemsListDisplay({ items }: BlockedItemsListProps) {
       <Frame>
         <FrameHeader className="flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="rounded-md bg-linear-120 from-red-500 to-red-400 p-2 shadow-sm dark:from-red-800 dark:to-red-700">
+            <div className="rounded-md bg-linear-120 from-status-error to-status-error/80 p-2 shadow-sm">
               <AlertCircle className="size-4 text-white" />
             </div>
             <FrameTitle className="text-sm">Blocked Tasks</FrameTitle>
@@ -55,7 +55,7 @@ function BlockedItemsListDisplay({ items }: BlockedItemsListProps) {
     <Frame>
       <FrameHeader className="flex-row items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <div className="rounded-md bg-linear-120 from-red-500 to-red-400 p-2 shadow-sm dark:from-red-800 dark:to-red-700">
+          <div className="rounded-md bg-linear-120 from-status-error to-status-error/80 p-2 shadow-sm">
             <AlertCircle className="size-4 text-white" />
           </div>
           <div className="flex items-center gap-2">

@@ -21,9 +21,14 @@ export default async function TeamLeadMeetingsPage() {
   const { logs, sprints, phases } = await getMeetingsData();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-16">
       <SummaryCardsRow logs={logs} phases={phases} sprints={sprints} />
-      <MeetingsTable initialLogs={logs} phases={phases} sprints={sprints} />
+      <MeetingsTable
+        currentUserRole={session.user.role}
+        initialLogs={logs}
+        phases={phases}
+        sprints={sprints}
+      />
     </div>
   );
 }

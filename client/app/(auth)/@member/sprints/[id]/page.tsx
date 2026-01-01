@@ -1,32 +1,44 @@
+import axios from "axios";
 import { format } from "date-fns";
 import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { MemberKanbanBoard } from "@/components/member/sprints/member-kanban-board";
-import { mapSprintStatusToTaskStatus } from "@/components/team-lead/sprints/phase-section";
 import { Button } from "@/components/ui/button";
 import { FramePanel } from "@/components/ui/frame";
 import { StatusBadge } from "@/components/ui/status";
 import { authApi } from "@/lib/api/auth";
 import { sprintApi } from "@/lib/api/sprint";
 import { taskApi } from "@/lib/api/task";
-import { getSprintStatus } from "@/lib/helpers/sprint";
+import {
+  getSprintStatus,
+  mapSprintStatusToTaskStatus,
+} from "@/lib/helpers/sprint";
 
 async function SprintBoardContent({ sprintId }: { sprintId: string }) {
-  const [sprint, currentUser, allTasks] = await Promise.all([
-    sprintApi.getSprintById(sprintId),
-    authApi.getCurrentUser(),
-    taskApi.listTasks({ sprintId }),
-  ]);
+  let sprint, currentUser, allTasks;
+
+  try {
+    [sprint, currentUser, allTasks] = await Promise.all([
+      sprintApi.getSprintById(sprintId),
+      authApi.getCurrentUser(),
+      taskApi.listTasks({ sprintId }),
+    ]);
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      notFound();
+    }
+    throw error;
+  }
 
   if (!(sprint && currentUser)) {
     notFound();
   }
 
   // Filter tasks to only show those assigned to the current user
-  const userTasks = allTasks.filter(
-    (task) => task.assigneeId === currentUser.id
+  const userTasks = allTasks.filter((task) =>
+    task.assignees?.some((a) => a.id === currentUser.id)
   );
 
   const status = getSprintStatus(sprint);

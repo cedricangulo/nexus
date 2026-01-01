@@ -1,5 +1,6 @@
 import { AppHeader } from "@/components/layouts/team-lead/header";
 import { AppSidebar } from "@/components/layouts/team-lead/team-lead-sidebar";
+import Notification from "@/components/shared/notifications";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { getProject } from "@/lib/data/project";
 import { getCurrentUser } from "@/lib/data/user";
@@ -17,7 +18,7 @@ export default async function TeamLeadLayout({
     <SidebarProvider suppressHydrationWarning>
       <AppSidebar user={user} />
       <SidebarInset suppressHydrationWarning>
-        <AppHeader project={project} />
+        <AppHeader notificationComponent={<Notification />} project={project} />
         <main className="p-4 sm:p-8" suppressHydrationWarning>
           {children}
         </main>

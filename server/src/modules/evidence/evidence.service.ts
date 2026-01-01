@@ -1,6 +1,7 @@
 import { getPrismaClient, NotFoundError } from "../../utils/database.js";
 import { fileService, BufferedFile } from "../../services/file.service.js";
 import { createActivityLog } from "../activity-log/activity-log.service.js";
+import { createNotification } from "../notification/notification.service.js";
 
 const prisma = getPrismaClient();
 
@@ -36,6 +37,45 @@ export async function createEvidence(input: CreateEvidenceInput) {
     },
   });
 
+  // 4. Automatically update deliverable status to REVIEW when evidence is uploaded
+  // This allows members to submit evidence without needing Team Lead permissions
+  if (deliverable.status !== "REVIEW" && deliverable.status !== "COMPLETED") {
+    await prisma.deliverable.update({
+      where: { id: deliverableId },
+      data: { status: "REVIEW" },
+    });
+
+    // Log status change
+    await createActivityLog({
+      userId: uploaderId,
+      action: "DELIVERABLE_STATUS_CHANGED",
+      entityType: "Deliverable",
+      entityId: deliverable.id,
+      details: `Deliverable "${deliverable.title}" status changed to REVIEW (evidence uploaded)`,
+    });
+
+    // Notify all team leads about new evidence submission
+    const teamLeads = await prisma.user.findMany({
+      where: { 
+        role: "TEAM_LEAD",
+        deletedAt: null,
+      },
+      select: { id: true },
+    });
+
+    // Create notification for each team lead
+    const notificationPromises = teamLeads.map((teamLead) =>
+      createNotification({
+        userId: teamLead.id,
+        message: `New evidence submitted for "${deliverable.title}"`,
+        link: `/deliverables/${deliverable.id}`,
+      })
+    );
+
+    await Promise.all(notificationPromises);
+  }
+
+  // 5. Log evidence upload
   await createActivityLog({
     userId: uploaderId,
     action: "EVIDENCE_UPLOADED",

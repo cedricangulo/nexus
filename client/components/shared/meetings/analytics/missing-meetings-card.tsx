@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/frame";
 import { calculateMissingMeetings } from "@/lib/helpers/meeting-analytics";
 import type { MeetingLog, Phase, Sprint } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 type MissingMeetingsCardProps = {
   logs: MeetingLog[];
@@ -40,13 +41,14 @@ export default function MissingMeetingsCard({
     <Frame>
       <FrameHeader className="flex-row items-center gap-2">
         <div
-          className={`rounded-md p-2 shadow-sm ${
-            isAlert
-              ? "bg-linear-120 from-red-500 to-red-400 dark:from-red-800 dark:to-red-700"
-              : "bg-linear-120 from-gray-500 to-gray-400 dark:from-gray-800 dark:to-gray-700"
-          }`}
+          className={`rounded-md p-2 ${isAlert ? "bg-error/70" : "bg-info"}`}
         >
-          <AlertCircle className="size-4 text-white" />
+          <AlertCircle
+            className={cn(
+              "size-4",
+              isAlert ? "text-error-foreground" : "text-info-foreground"
+            )}
+          />
         </div>
         <div className="space-y-0">
           <FrameTitle className="text-sm">Missing</FrameTitle>

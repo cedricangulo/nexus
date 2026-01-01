@@ -33,11 +33,15 @@ export {
 } from "./project-config";
 export { type CreateSprintInput, createSprintSchema } from "./sprints";
 export {
+  type CreatePhaseTaskInput,
   type CreateSprintTaskInput,
+  createPhaseTaskSchema,
   createSprintTaskSchema,
   type TaskDetailInput,
   taskDetailSchema,
+  type UpdatePhaseTaskInput,
   type UpdateTaskStatusInput,
+  updatePhaseTaskSchema,
   updateTaskSchema,
   updateTaskStatusSchema,
 } from "./tasks";

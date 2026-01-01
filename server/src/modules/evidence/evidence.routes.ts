@@ -29,7 +29,7 @@ export async function evidenceRoutes(app: FastifyInstance) {
         preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
         schema: {
           params: z.object({
-            deliverableId: z.string().uuid(),
+            deliverableId: z.uuid(),
           }),
         },
       },
@@ -42,7 +42,7 @@ export async function evidenceRoutes(app: FastifyInstance) {
         preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
         schema: {
           params: z.object({
-            id: z.string().uuid(),
+            id: z.uuid(),
           }),
         },
       },
@@ -55,7 +55,7 @@ export async function evidenceRoutes(app: FastifyInstance) {
         preHandler: [requireRole([Role.TEAM_LEAD])],
         schema: {
           params: z.object({
-            id: z.string().uuid(),
+            id: z.uuid(),
           }),
         },
       },

@@ -128,15 +128,20 @@ export async function getTeamContributions() {
   const users = await prisma.user.findMany({
     where: { deletedAt: null },
     include: {
-      assignedTasks: {
-        where: { deletedAt: null }
+      taskAssignments: {
+        include: {
+          task: {
+            select: { status: true, deletedAt: true }
+          }
+        }
       }
     }
   });
 
   return users.map(user => {
-    const assigned = user.assignedTasks.length;
-    const completed = user.assignedTasks.filter(t => t.status === TaskStatus.DONE).length;
+    const activeTasks = user.taskAssignments.filter(a => !a.task.deletedAt);
+    const assigned = activeTasks.length;
+    const completed = activeTasks.filter(a => a.task.status === TaskStatus.DONE).length;
 
     return {
       userId: user.id,
@@ -210,8 +215,10 @@ export async function getGanttData() {
   const tasks = await prisma.task.findMany({
     where: { deletedAt: null },
     include: {
-      assignee: {
-        select: { name: true }
+      assignments: {
+        include: {
+          user: { select: { name: true } }
+        }
       },
       sprint: {
         select: { endDate: true }
@@ -294,7 +301,7 @@ export async function getGanttData() {
       completedAt: isDone ? task.updatedAt : null,
       status: task.status,
       progress: isDone ? 100 : (task.status === 'IN_PROGRESS' ? 50 : 0),
-      assignee: task.assignee?.name || null,
+      assignee: task.assignments[0]?.user?.name || null,
       parentId: task.sprintId || task.phaseId || null,
       isDelayed,
       delayDays,

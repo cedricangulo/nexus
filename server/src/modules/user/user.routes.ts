@@ -20,14 +20,17 @@ export async function userRoutes(app: FastifyInstance) {
     const protectedServer = protectedRoutes.withTypeProvider<ZodTypeProvider>();
     protectedRoutes.addHook("onRequest", app.authenticate);
 
-    // List all users (Team Lead / Adviser)
+    // List all users (All authenticated users for display purposes)
+    // Team Lead: For management + display
+    // Member: For display only (see assigned users in tasks/deliverables)
+    // Adviser: For display + mentions
     protectedServer.get("/", {
       schema: {
         response: {
           200: z.array(userResponseSchema),
         },
       },
-      preHandler: requireRole([Role.TEAM_LEAD, Role.ADVISER]),
+      preHandler: requireRole([Role.TEAM_LEAD, Role.MEMBER, Role.ADVISER]),
     }, getAllUsersHandler);
 
     // Get user by ID

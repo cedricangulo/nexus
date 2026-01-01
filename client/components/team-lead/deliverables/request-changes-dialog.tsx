@@ -9,7 +9,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { Textarea } from "@/components/ui/textarea";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export type RequestChangesDialogProps = {
   comment: string;
@@ -28,6 +38,48 @@ export function RequestChangesDialog({
   onOpenChange,
   onSubmit,
 }: RequestChangesDialogProps) {
+  const isMobile = useIsMobile();
+
+  const textareaContent = (
+    <Textarea
+      onChange={(e) => onCommentChange(e.target.value)}
+      placeholder="Feedback comment"
+      rows={3}
+      value={comment}
+    />
+  );
+
+  if (isMobile) {
+    return (
+      <Drawer onOpenChange={onOpenChange} open={open}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Request Changes</DrawerTitle>
+            <DrawerDescription>
+              Add feedback so the team knows what to fix.
+            </DrawerDescription>
+          </DrawerHeader>
+
+          <div className="px-4">{textareaContent}</div>
+
+          <DrawerFooter>
+            <Button
+              disabled={isPending || comment.trim() === ""}
+              onClick={onSubmit}
+            >
+              Submit
+            </Button>
+            <DrawerClose asChild>
+              <Button disabled={isPending} variant="outline">
+                Cancel
+              </Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
@@ -38,12 +90,7 @@ export function RequestChangesDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <Textarea
-          onChange={(e) => onCommentChange(e.target.value)}
-          placeholder="Feedback comment"
-          rows={3}
-          value={comment}
-        />
+        {textareaContent}
 
         <DialogFooter>
           <Button

@@ -7,7 +7,7 @@ export default function LoginPage() {
     <div className="relative flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="absolute top-0 left-0 h-full w-full">
         <PixelBlast
-          color="#1447e6"
+          color="#0471fe"
           edgeFade={0.25}
           enableRipples
           patternDensity={1.2}

@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
+import { showPendingActionToast } from "@/components/shared/pending-action-toast";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,6 +41,17 @@ const defaultActionIcons: Record<string, LucideIcon> = {
   reject: X,
 };
 
+function getActionDescription(label: string): string {
+  const descriptions: Record<string, string> = {
+    delete: "This item will be permanently removed.",
+    restore: "This item will be restored and become active again.",
+    approve: "You are about to approve this item.",
+    reject: "You are about to reject this item.",
+  };
+
+  return descriptions[label.toLowerCase()] || "This action cannot be undone.";
+}
+
 export function GenericRowActions<T>({
   row,
   actions,
@@ -63,9 +75,8 @@ export function GenericRowActions<T>({
     onAction(action.id, row);
   };
 
-  const handleDialogClose = () => {
+  const _handleDialogClose = () => {
     setIsAlertOpen(false);
-    setPendingAction(null);
   };
 
   const handleConfirm = () => {
@@ -73,8 +84,22 @@ export function GenericRowActions<T>({
       return;
     }
 
-    onAction(pendingAction.id, row);
-    handleDialogClose();
+    // Close alert dialog first
+    setIsAlertOpen(false);
+
+    // Show pending action toast with countdown
+    showPendingActionToast({
+      title: `${pendingAction.label} in progress`,
+      description: "This action will complete shortly. Click cancel to undo.",
+      duration: 5000,
+      onTimeout: async () => {
+        onAction(pendingAction.id, row);
+        setPendingAction(null);
+      },
+      onCancel: () => {
+        setPendingAction(null);
+      },
+    });
   };
 
   if (actions.length === 0) {
@@ -102,13 +127,13 @@ export function GenericRowActions<T>({
             return (
               <div key={action.id}>
                 <DropdownMenuItem
-                  className={`cursor-pointer gap-2 ${
-                    action.variant === "destructive" ? "text-red-600" : ""
+                  className={`cursor-pointer ${
+                    action.variant === "destructive" ? "text-destructive" : ""
                   }`}
                   disabled={isLoading}
                   onClick={() => handleMenuAction(action)}
                 >
-                  <Icon aria-hidden="true" className="opacity-60" size={16} />
+                  <Icon aria-hidden="true" size={16} />
                   <span>{action.label}</span>
                 </DropdownMenuItem>
                 {action.showDividerAfter && index < actions.length - 1 && (
@@ -123,7 +148,8 @@ export function GenericRowActions<T>({
       <AlertDialog
         onOpenChange={(open) => {
           if (!open) {
-            handleDialogClose();
+            setIsAlertOpen(false);
+            setPendingAction(null);
           }
         }}
         open={isAlertOpen}
@@ -131,20 +157,29 @@ export function GenericRowActions<T>({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {pendingAction
-                ? `Confirm ${pendingAction.label}`
-                : "Confirm action"}
+              {`Confirm ${pendingAction?.label}`}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone.
+              {pendingAction && getActionDescription(pendingAction.label)}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleDialogClose}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction disabled={isLoading} onClick={handleConfirm}>
-              {isLoading ? "Working..." : "Confirm"}
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isLoading}
+              onClick={handleConfirm}
+              variant={
+                pendingAction?.variant === "destructive" ? "destructive" : null
+              }
+            >
+              {isLoading ? (
+                "Working..."
+              ) : (
+                <>
+                  {pendingAction?.label === "Delete" ? <Trash /> : <Check />}{" "}
+                  {pendingAction?.label}
+                </>
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

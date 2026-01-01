@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { SprintsClient } from "@/components/team-lead/sprints/sprints-client";
+import { SprintsView } from "@/components/shared/sprints/sprints-view";
 import { getSprints, getSprintsProgress } from "@/lib/data/sprint";
 
 export default async function Page() {
@@ -12,9 +12,10 @@ export default async function Page() {
   const progressById = await getSprintsProgress(sprints.map((s) => s.id));
 
   return (
-    <SprintsClient
+    <SprintsView
       progressById={progressById}
       sprints={sprints}
+      userRole={session?.user?.role}
     />
   );
 }

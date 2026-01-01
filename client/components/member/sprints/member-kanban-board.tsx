@@ -18,12 +18,12 @@ import {
   KanbanBoard as UiKanbanBoard,
 } from "@/components/ui/kanban";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Task, TaskStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { MemberTaskCard } from "./member-task-card";
 import { MemberTaskDetailDialog } from "./member-task-detail-dialog";
-import { Textarea } from "@/components/ui/textarea";
 
 const COLUMN_DEFS = [
   {
@@ -106,7 +106,7 @@ export function MemberKanbanBoard({
     }
 
     // RBAC: Verify user owns the task
-    if (task.assigneeId !== currentUserId) {
+    if (!task.assignees?.some((a) => a.id === currentUserId)) {
       toast.error("You can only update your own tasks");
       return;
     }
@@ -133,7 +133,7 @@ export function MemberKanbanBoard({
     }
 
     // RBAC: Verify user owns the task
-    if (task.assigneeId !== currentUserId) {
+    if (!task.assignees?.some((a) => a.id === currentUserId)) {
       toast.error("You can only update your own tasks");
       return;
     }
@@ -314,7 +314,7 @@ export function MemberKanbanBoard({
               </div>
             </div>
           </div>
-        ): null}
+        ) : null}
       </>
     );
   }
@@ -416,7 +416,7 @@ export function MemberKanbanBoard({
             </div>
           </div>
         </div>
-      ): null}
+      ) : null}
     </>
   );
 }

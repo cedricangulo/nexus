@@ -1,6 +1,8 @@
 "use client";
 
-import { Edit, Plus } from "lucide-react";
+import { Edit } from "lucide-react";
+import Link from "next/link";
+import { DeliverableItem } from "@/components/member/phases/deliverable-item";
 import { Button } from "@/components/ui/button";
 import {
   Frame,
@@ -16,27 +18,15 @@ import {
   formatDate,
   isLessThanWeekRemaining,
 } from "@/lib/helpers/format-date";
-import {
-  type Deliverable,
-  DeliverableStatus,
-  type PhaseDetail,
-} from "@/lib/types";
+import { DeliverableStatus, type PhaseDetail } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { DeliverableItem } from "./deliverable-item";
 
 type PhaseCardProps = {
   phase: PhaseDetail;
   onEditPhase: (phase: PhaseDetail) => void;
-  onAddDeliverable: (phaseId: string) => void;
-  onEditDeliverable: (deliverable: Deliverable) => void;
 };
 
-export function PhaseCard({
-  phase,
-  onEditPhase,
-  onAddDeliverable,
-  onEditDeliverable,
-}: PhaseCardProps) {
+export function PhaseCard({ phase, onEditPhase }: PhaseCardProps) {
   const totalDeliverables = phase.deliverables.length;
   const completedDeliverables = phase.deliverables.filter(
     (d) => d.status === DeliverableStatus.COMPLETED
@@ -58,14 +48,7 @@ export function PhaseCard({
     phase.endDate && new Date() > new Date(phase.endDate) && progress === 100;
 
   return (
-    <Frame className="relative transition-all duration-300">
-      {/* Current Phase Badge */}
-      {/* {isActive ? (
-        <Badge className="absolute top-0 -translate-x-1/2 -translate-y-1/2 rounded-full left-1/2">
-          Current Phase
-        </Badge>
-      ) : null} */}
-
+    <Frame className="h-fit">
       {/* Card Header */}
       <FrameHeader className="space-y-2 p-4">
         <div className="flex justify-between gap-2">
@@ -116,24 +99,15 @@ export function PhaseCard({
         )}
       >
         {/* Deliverables List */}
-        {totalDeliverables === 0 ? (
-          <p className="text-muted-foreground text-xs">No deliverables</p>
-        ) : (
-          <DeliverableItem
-            deliverables={phase.deliverables}
-            onEdit={onEditDeliverable}
-          />
-        )}
+        <DeliverableItem deliverables={phase.deliverables} />
       </FramePanel>
-      <FrameFooter className="mt-auto">
-        {/* Add Deliverable Button */}
-        <Button
-          className="w-full"
-          onClick={() => onAddDeliverable(phase.id)}
-          variant={isActive ? "default" : "outline"}
-        >
-          <Plus className="size-4" />
-          Add Deliverable
+      <FrameFooter>
+        {/* View Dashboard Button */}
+        <Button asChild className="w-full" variant="outline">
+          <Link href={`/phases/${phase.id}`}>
+            {/* <LayoutDashboard className="size-4" /> */}
+            View Dashboard
+          </Link>
         </Button>
       </FrameFooter>
     </Frame>

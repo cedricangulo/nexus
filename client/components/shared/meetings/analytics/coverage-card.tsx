@@ -38,8 +38,8 @@ export default function CoverageCard({
   return (
     <Frame>
       <FrameHeader className="flex-row items-center gap-2">
-        <div className="rounded-md bg-linear-120 from-emerald-500 to-emerald-400 p-2 shadow-sm dark:from-emerald-800 dark:to-emerald-700">
-          <CheckCircle2 className="size-4 text-white" />
+        <div className="rounded-md bg-success p-2">
+          <CheckCircle2 className="size-4 text-success-foreground" />
         </div>
         <div className="space-y-0">
           <FrameTitle className="text-sm">Coverage</FrameTitle>

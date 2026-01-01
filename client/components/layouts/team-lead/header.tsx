@@ -1,9 +1,10 @@
 "use client";
 
-import { Search } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { GlobalSearch } from "@/components/search/global-search";
+import { SearchTrigger } from "@/components/search/search-trigger";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { Project } from "@/lib/types";
@@ -36,6 +37,11 @@ function getPageTitle(pathname: string): string | undefined {
     return "Deliverable Details";
   }
 
+  // Check for phase detail page pattern
+  if (pathname.startsWith("/phases/") && pathname !== "/phases") {
+    return "Phase Details";
+  }
+
   return;
 }
 
@@ -44,8 +50,28 @@ function getPageTitle(pathname: string): string | undefined {
  * Provides main navigation header with sidebar toggle, search, notifications, and user avatar
  * Title updates dynamically based on current route - shows project name on dashboard
  */
-export function AppHeader({ project }: { project: Project | null }) {
+export function AppHeader({
+  project,
+  notificationComponent,
+}: {
+  project: Project | null;
+  notificationComponent: React.ReactNode;
+}) {
   const pathname = usePathname();
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Keyboard shortcut for search (Cmd/Ctrl + K)
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setSearchOpen((open) => !open);
+      }
+    };
+
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   // For dashboard, show project name; for other routes, use mapping
   let title: string | undefined;
@@ -59,35 +85,29 @@ export function AppHeader({ project }: { project: Project | null }) {
       <div className="flex items-center gap-2 px-3">
         <SidebarTrigger
           aria-label="Toggle sidebar navigation"
-          className="rounded-md transition-colors hover:bg-accent"
+          className="hidden sm:flex rounded-md transition-colors hover:bg-accent"
         />
         <Separator aria-hidden="true" className="h-4" orientation="vertical" />
         {title ? (
-          <h1 className="text-muted-foreground font-medium text-sm md:text-lg">
+          <h1 className="font-medium text-muted-foreground text-sm md:text-lg">
             {title}
           </h1>
         ) : null}
       </div>
 
       <div className="flex flex-1 items-center justify-end gap-3 px-4 md:gap-6">
-        <div className="hidden w-full max-w-xs items-center gap-2 md:flex">
-          <div className="relative w-full">
-            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input aria-label="Search" className="pl-9" placeholder="Search" />
-          </div>
+        <div className="w-fit max-w-xs items-center gap-2 sm:w-full md:flex">
+          <SearchTrigger onOpenSearch={() => setSearchOpen(true)} />
         </div>
-
-        {/* <Button
-          aria-label="Notifications"
-          className="relative"
-          size="icon"
-          variant="ghost"
-        >
-          <Bell className="size-4" />
-          <span className="absolute rounded-full top-2 right-2 size-2 bg-destructive ring-2 ring-background" />
-        </Button> */}
+        {notificationComponent}
         <ThemeToggle />
+        <SidebarTrigger
+          aria-label="Toggle sidebar navigation"
+          className="sm:hidden flex rounded-md transition-colors hover:bg-accent"
+        />
       </div>
+
+      <GlobalSearch onOpenChange={setSearchOpen} open={searchOpen} />
     </header>
   );
 }

@@ -1,20 +1,18 @@
 import type { Task, TaskStatus } from "@/lib/types";
-import { createApiClient } from "./client";
+import { apiClient } from "./client";
 import { API_ENDPOINTS } from "./endpoints";
 
 export type CreateTaskInput = {
   sprintId: string;
-  assigneeId?: string;
+  assigneeIds?: string[];
   title: string;
   description?: string;
-  priority?: "High" | "Medium" | "Low";
 };
 
 export type UpdateTaskInput = {
-  assigneeId?: string | null;
+  assigneeIds?: string[];
   title?: string;
   description?: string;
-  priority?: "High" | "Medium" | "Low";
   status?: TaskStatus;
 };
 
@@ -31,28 +29,24 @@ export type TaskQuery = {
 
 export const taskApi = {
   listTasks: async (query?: TaskQuery): Promise<Task[]> => {
-    const client = await createApiClient();
-    const response = await client.get(API_ENDPOINTS.TASKS.LIST, {
+    const response = await apiClient.get(API_ENDPOINTS.TASKS.LIST, {
       params: query,
     });
     return response.data;
   },
 
   getTaskById: async (id: string): Promise<Task> => {
-    const client = await createApiClient();
-    const response = await client.get(API_ENDPOINTS.TASKS.GET(id));
+    const response = await apiClient.get(API_ENDPOINTS.TASKS.GET(id));
     return response.data;
   },
 
   createTask: async (data: CreateTaskInput): Promise<Task> => {
-    const client = await createApiClient();
-    const response = await client.post(API_ENDPOINTS.TASKS.CREATE, data);
+    const response = await apiClient.post(API_ENDPOINTS.TASKS.CREATE, data);
     return response.data;
   },
 
   updateTask: async (id: string, data: UpdateTaskInput): Promise<Task> => {
-    const client = await createApiClient();
-    const response = await client.put(API_ENDPOINTS.TASKS.UPDATE(id), data);
+    const response = await apiClient.put(API_ENDPOINTS.TASKS.UPDATE(id), data);
     return response.data;
   },
 
@@ -60,8 +54,7 @@ export const taskApi = {
     id: string,
     data: UpdateTaskStatusInput
   ): Promise<Task> => {
-    const client = await createApiClient();
-    const response = await client.patch(
+    const response = await apiClient.patch(
       API_ENDPOINTS.TASKS.UPDATE_STATUS(id),
       data
     );
@@ -69,13 +62,11 @@ export const taskApi = {
   },
 
   deleteTask: async (id: string): Promise<void> => {
-    const client = await createApiClient();
-    await client.delete(API_ENDPOINTS.TASKS.DELETE(id));
+    await apiClient.delete(API_ENDPOINTS.TASKS.DELETE(id));
   },
 
   restoreTask: async (id: string): Promise<Task> => {
-    const client = await createApiClient();
-    const response = await client.post(API_ENDPOINTS.TASKS.RESTORE(id));
+    const response = await apiClient.post(API_ENDPOINTS.TASKS.RESTORE(id));
     return response.data;
   },
 };

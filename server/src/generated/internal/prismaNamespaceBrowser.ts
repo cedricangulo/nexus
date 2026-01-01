@@ -57,6 +57,7 @@ export const ModelName = {
   Deliverable: 'Deliverable',
   Sprint: 'Sprint',
   Task: 'Task',
+  TaskAssignment: 'TaskAssignment',
   Evidence: 'Evidence',
   MeetingLog: 'MeetingLog',
   Comment: 'Comment',
@@ -159,7 +160,6 @@ export const TaskScalarFieldEnum = {
   id: 'id',
   sprintId: 'sprintId',
   phaseId: 'phaseId',
-  assigneeId: 'assigneeId',
   title: 'title',
   description: 'description',
   status: 'status',
@@ -169,6 +169,16 @@ export const TaskScalarFieldEnum = {
 } as const
 
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
+
+
+export const TaskAssignmentScalarFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type TaskAssignmentScalarFieldEnum = (typeof TaskAssignmentScalarFieldEnum)[keyof typeof TaskAssignmentScalarFieldEnum]
 
 
 export const EvidenceScalarFieldEnum = {

@@ -4,7 +4,7 @@ import { UploadIcon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { Phase, Sprint } from "@/lib/types";
-import { UploadMinutesSheet } from "./upload-minutes-sheet";
+import { UploadMinutesDialog } from "./upload-minutes-dialog";
 
 type UploadMinutesButtonProps = {
   sprints: Sprint[];
@@ -19,11 +19,11 @@ export function UploadMinutesButton({
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>
+      <Button className="w-full md:w-fit" onClick={() => setOpen(true)}>
         <UploadIcon className="opacity-60" size={16} />
         Upload
       </Button>
-      <UploadMinutesSheet
+      <UploadMinutesDialog
         onOpenChange={setOpen}
         open={open}
         phases={phases}

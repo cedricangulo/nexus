@@ -1,3 +1,4 @@
+import axios from "axios";
 import { format } from "date-fns";
 import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
@@ -5,22 +6,33 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { auth } from "@/auth";
 import { CreateTaskDialog } from "@/components/team-lead/sprints/create-task-dialog";
-import { mapSprintStatusToTaskStatus } from "@/components/team-lead/sprints/phase-section";
-import { KanbanBoard } from "@/components/team-lead/sprints/tasks/kanban-board";
+import { KanbanBoard } from "@/components/team-lead/sprints/tasks/board/kanban-board";
 import { Button } from "@/components/ui/button";
 import { FramePanel } from "@/components/ui/frame";
 import { StatusBadge } from "@/components/ui/status";
 import { sprintApi } from "@/lib/api/sprint";
 import { taskApi } from "@/lib/api/task";
-import { userApi } from "@/lib/api/user";
-import { getSprintStatus } from "@/lib/helpers/sprint";
+import { getAllUsersForDisplay } from "@/lib/data/team";
+import {
+  getSprintStatus,
+  mapSprintStatusToTaskStatus,
+} from "@/lib/helpers/sprint";
 
 async function SprintBoardContent({ sprintId }: { sprintId: string }) {
-  const [sprint, tasks, users] = await Promise.all([
-    sprintApi.getSprintById(sprintId),
-    taskApi.listTasks({ sprintId }),
-    userApi.listUsers(),
-  ]);
+  let sprint, tasks, users;
+
+  try {
+    [sprint, tasks, users] = await Promise.all([
+      sprintApi.getSprintById(sprintId),
+      taskApi.listTasks({ sprintId }),
+      getAllUsersForDisplay(),
+    ]);
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      notFound();
+    }
+    throw error;
+  }
 
   if (!sprint) {
     notFound();

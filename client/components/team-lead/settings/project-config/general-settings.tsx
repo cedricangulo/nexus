@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
+import { Save } from "lucide-react";
 import { useState } from "react";
 import type { DateValue, RangeValue } from "react-aria-components";
 import { Controller, useForm } from "react-hook-form";
@@ -19,6 +20,7 @@ import {
   FrameTitle,
 } from "@/components/ui/frame";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { toISODateTime } from "@/lib/helpers/date";
 import { formatRelativeTime } from "@/lib/helpers/format-date";
@@ -193,7 +195,15 @@ export default function GeneralSettings({ project }: GeneralSettingsProps) {
             Last Edited {lastEdited}
           </p>
           <Button disabled={isSaving} type="submit" variant="secondary">
-            {isSaving ? "Saving..." : "Save Changes"}
+            {isSaving ? (
+              <>
+                <Spinner /> Saving
+              </>
+            ) : (
+              <>
+                <Save /> Save Changes
+              </>
+            )}
           </Button>
         </FrameFooter>
       </form>

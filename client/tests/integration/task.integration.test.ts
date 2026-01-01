@@ -43,7 +43,6 @@ describe("Task Integration Tests", () => {
         title: `Integration Task ${Date.now()}`,
         description: "Task created during integration test",
         status: TaskStatus.TODO,
-        priority: "Medium" as const,
         sprintId: sprint.id,
         assigneeId: userId, // Assign to self
       };

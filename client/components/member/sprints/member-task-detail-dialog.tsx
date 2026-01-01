@@ -13,6 +13,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -23,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { Task, TaskStatus } from "@/lib/types";
 
 const STATUS_OPTIONS = [
@@ -52,6 +62,7 @@ export function MemberTaskDetailDialog({
 }: MemberTaskDetailDialogProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const isMobile = useIsMobile();
   const [formData, setFormData] = useState({
     title: task?.title || "",
     description: task?.description || "",
@@ -68,7 +79,8 @@ export function MemberTaskDetailDialog({
         status: task.status,
         blockReason:
           task.status === "BLOCKED"
-            ? (task as Task & { lastComment?: { content: string } }).lastComment?.content || ""
+            ? (task as Task & { lastComment?: { content: string } }).lastComment
+                ?.content || ""
             : "",
       });
     }
@@ -142,6 +154,131 @@ export function MemberTaskDetailDialog({
     });
   };
 
+  const formContent = (
+    <div className="space-y-4">
+      {/* Title */}
+      <div className="space-y-2">
+        <Label className="font-medium text-sm" htmlFor="title">
+          Title
+        </Label>
+        <Input
+          disabled={isPending}
+          id="title"
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, title: e.target.value }))
+          }
+          placeholder="Task title"
+          value={formData.title}
+        />
+      </div>
+
+      {/* Description */}
+      <div className="space-y-2">
+        <Label className="font-medium text-sm" htmlFor="description">
+          Description
+        </Label>
+        <Textarea
+          disabled={isPending}
+          id="description"
+          onChange={(e) =>
+            setFormData((prev) => ({
+              ...prev,
+              description: e.target.value,
+            }))
+          }
+          placeholder="Add a description..."
+          rows={3}
+          value={formData.description}
+        />
+      </div>
+
+      {/* Status */}
+      <div className="space-y-2">
+        <Label className="font-medium text-sm" htmlFor="status">
+          Status
+        </Label>
+        <Select
+          disabled={isPending}
+          onValueChange={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              status: value as TaskStatus,
+            }))
+          }
+          value={formData.status}
+        >
+          <SelectTrigger id="status">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {STATUS_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Block Reason (only shown when status is BLOCKED) */}
+      {formData.status === "BLOCKED" && (
+        <div className="space-y-2">
+          <Label className="font-medium text-sm" htmlFor="blockReason">
+            Reason for Block
+          </Label>
+          <Textarea
+            disabled={isPending}
+            id="blockReason"
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                blockReason: e.target.value,
+              }))
+            }
+            placeholder="Explain why this task is blocked..."
+            rows={3}
+            value={formData.blockReason}
+          />
+        </div>
+      )}
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <Drawer onOpenChange={onOpenChange} open={isOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Task Details</DrawerTitle>
+            <DrawerDescription>
+              View and edit your task information
+            </DrawerDescription>
+          </DrawerHeader>
+
+          <div className="px-4">{formContent}</div>
+
+          <DrawerFooter>
+            <Button
+              disabled={
+                isPending ||
+                !formData.title.trim() ||
+                (formData.status === "BLOCKED" && !formData.blockReason.trim())
+              }
+              onClick={handleSave}
+            >
+              {isPending ? "Saving..." : "Save"}
+            </Button>
+            <DrawerClose asChild>
+              <Button disabled={isPending} variant="outline">
+                Cancel
+              </Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
   return (
     <Dialog onOpenChange={onOpenChange} open={isOpen}>
       <DialogContent className="max-w-md">
@@ -152,115 +289,29 @@ export function MemberTaskDetailDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Title */}
-          <div className="space-y-2">
-            <Label className="font-medium text-sm" htmlFor="title">
-              Title
-            </Label>
-            <Input
-              disabled={isPending}
-              id="title"
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, title: e.target.value }))
-              }
-              placeholder="Task title"
-              value={formData.title}
-            />
-          </div>
+        {formContent}
 
-          {/* Description */}
-          <div className="space-y-2">
-            <Label className="font-medium text-sm" htmlFor="description">
-              Description
-            </Label>
-            <Textarea
-              disabled={isPending}
-              id="description"
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-              placeholder="Add a description..."
-              rows={3}
-              value={formData.description}
-            />
-          </div>
-
-          {/* Status */}
-          <div className="space-y-2">
-            <Label className="font-medium text-sm" htmlFor="status">
-              Status
-            </Label>
-            <Select
-              disabled={isPending}
-              onValueChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  status: value as TaskStatus,
-                }))
-              }
-              value={formData.status}
-            >
-              <SelectTrigger id="status">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {STATUS_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Block Reason (only shown when status is BLOCKED) */}
-          {formData.status === "BLOCKED" && (
-            <div className="space-y-2">
-              <Label className="font-medium text-sm" htmlFor="blockReason">
-                Reason for Block
-              </Label>
-              <Textarea
-                disabled={isPending}
-                id="blockReason"
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    blockReason: e.target.value,
-                  }))
-                }
-                placeholder="Explain why this task is blocked..."
-                rows={3}
-                value={formData.blockReason}
-              />
-            </div>
-          )}
-
-          {/* Actions */}
-          <div className="flex gap-2 pt-4">
-            <Button
-              className="flex-1"
-              disabled={isPending}
-              onClick={() => onOpenChange(false)}
-              variant="outline"
-            >
-              Cancel
-            </Button>
-            <Button
-              className="flex-1"
-              disabled={
-                isPending ||
-                !formData.title.trim() ||
-                (formData.status === "BLOCKED" && !formData.blockReason.trim())
-              }
-              onClick={handleSave}
-            >
-              {isPending ? "Saving..." : "Save"}
-            </Button>
-          </div>
+        {/* Actions */}
+        <div className="flex gap-2 pt-4">
+          <Button
+            className="flex-1"
+            disabled={isPending}
+            onClick={() => onOpenChange(false)}
+            variant="outline"
+          >
+            Cancel
+          </Button>
+          <Button
+            className="flex-1"
+            disabled={
+              isPending ||
+              !formData.title.trim() ||
+              (formData.status === "BLOCKED" && !formData.blockReason.trim())
+            }
+            onClick={handleSave}
+          >
+            {isPending ? "Saving..." : "Save"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

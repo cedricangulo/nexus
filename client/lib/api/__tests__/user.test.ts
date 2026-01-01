@@ -21,7 +21,7 @@ describe("User API", () => {
         expect(user).toHaveProperty("role");
         expect(user).toHaveProperty("createdAt");
         expect(user).toHaveProperty("updatedAt");
-      };
+      }
     });
   });
 

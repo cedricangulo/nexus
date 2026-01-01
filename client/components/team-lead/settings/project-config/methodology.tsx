@@ -3,6 +3,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Save } from "lucide-react";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -17,6 +18,7 @@ import {
   FramePanel,
   FrameTitle,
 } from "@/components/ui/frame";
+import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { PhaseDetail, PhaseType } from "@/lib/types";
 import {
@@ -272,7 +274,15 @@ export default function Methodology({ phases }: MethodologyProps) {
             onClick={handleSaveClick}
             variant="secondary"
           >
-            {isPending ? "Saving..." : "Save Changes"}
+            {isPending ? (
+              <>
+                <Spinner /> Saving
+              </>
+            ) : (
+              <>
+                <Save /> Save Changes
+              </>
+            )}
           </Button>
         </FrameFooter>
       </Frame>

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PhaseType, DeliverableStatus } from "../../generated/client.js";
+import { PhaseType, DeliverableStatus, TaskStatus } from "../../generated/client.js";
 
 export const createPhaseSchema = z.object({
   projectId: z.string().optional(), // Optional, will default to singleton project if missing
@@ -33,8 +33,42 @@ const embeddedDeliverableSchema = z.object({
   dueDate: z.date().nullable(),
 });
 
+// User schema for assignees
+const embeddedUserSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string(),
+});
+
+// Task schema for waterfall tasks
+const embeddedTaskSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string().nullable(),
+  status: z.enum(TaskStatus),
+  phaseId: z.string(),
+  sprintId: z.string().nullable(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  assignees: z.array(embeddedUserSchema),
+});
+
+// Meeting log schema
+const embeddedMeetingLogSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  date: z.date(),
+  fileUrl: z.string(),
+  uploaderId: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  uploader: embeddedUserSchema,
+});
+
 export const phaseDetailResponseSchema = phaseResponseSchema.extend({
   deliverables: z.array(embeddedDeliverableSchema),
+  tasks: z.array(embeddedTaskSchema).optional(),
+  meetingLogs: z.array(embeddedMeetingLogSchema).optional(),
 });
 
 export type CreatePhaseInput = z.infer<typeof createPhaseSchema>;

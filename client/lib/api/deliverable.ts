@@ -1,5 +1,5 @@
 import type { Deliverable, DeliverableStatus } from "@/lib/types";
-import { createApiClient } from "./client";
+import { apiClient } from "./client";
 import { API_ENDPOINTS } from "./endpoints";
 
 export type CreateDeliverableInput = {
@@ -24,24 +24,24 @@ export const deliverableApi = {
   listDeliverables: async (
     query?: DeliverableQuery
   ): Promise<Deliverable[]> => {
-    const client = await createApiClient();
-    const response = await client.get(API_ENDPOINTS.DELIVERABLES.LIST, {
+    const response = await apiClient.get(API_ENDPOINTS.DELIVERABLES.LIST, {
       params: query,
     });
     return response.data;
   },
 
   getDeliverableById: async (id: string): Promise<Deliverable> => {
-    const client = await createApiClient();
-    const response = await client.get(API_ENDPOINTS.DELIVERABLES.GET(id));
+    const response = await apiClient.get(API_ENDPOINTS.DELIVERABLES.GET(id));
     return response.data;
   },
 
   createDeliverable: async (
     data: CreateDeliverableInput
   ): Promise<Deliverable> => {
-    const client = await createApiClient();
-    const response = await client.post(API_ENDPOINTS.DELIVERABLES.CREATE, data);
+    const response = await apiClient.post(
+      API_ENDPOINTS.DELIVERABLES.CREATE,
+      data
+    );
     return response.data;
   },
 
@@ -49,8 +49,7 @@ export const deliverableApi = {
     id: string,
     data: UpdateDeliverableInput
   ): Promise<Deliverable> => {
-    const client = await createApiClient();
-    const response = await client.put(
+    const response = await apiClient.put(
       API_ENDPOINTS.DELIVERABLES.UPDATE(id),
       data
     );
@@ -58,13 +57,13 @@ export const deliverableApi = {
   },
 
   deleteDeliverable: async (id: string): Promise<void> => {
-    const client = await createApiClient();
-    await client.delete(API_ENDPOINTS.DELIVERABLES.DELETE(id));
+    await apiClient.delete(API_ENDPOINTS.DELIVERABLES.DELETE(id));
   },
 
   restoreDeliverable: async (id: string): Promise<Deliverable> => {
-    const client = await createApiClient();
-    const response = await client.post(API_ENDPOINTS.DELIVERABLES.RESTORE(id));
+    const response = await apiClient.post(
+      API_ENDPOINTS.DELIVERABLES.RESTORE(id)
+    );
     return response.data;
   },
 };

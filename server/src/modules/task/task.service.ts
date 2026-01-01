@@ -5,25 +5,49 @@ import { createActivityLog } from "../activity-log/activity-log.service.js";
 
 const prisma = getPrismaClient();
 
+// Helper to transform task with assignments to response format
+function transformTaskToResponse(task: any) {
+  const { assignments, comments, ...taskWithoutRelations } = task;
+  return {
+    ...taskWithoutRelations,
+    assignees: assignments?.map((a: any) => ({
+      id: a.user.id,
+      name: a.user.name,
+      email: a.user.email,
+    })) || [],
+    lastComment: comments?.[0] || null,
+  };
+}
+
 export async function getTasks(query: TaskQuery) {
   const { sprintId, phaseId, assigneeId, status } = query;
+
   const tasks = await prisma.task.findMany({
     where: {
       sprintId,
       phaseId,
-      assigneeId,
       status,
       deletedAt: null,
+      // Filter by assignee if provided
+      ...(assigneeId && {
+        assignments: {
+          some: { userId: assigneeId },
+        },
+      }),
     },
     orderBy: {
       createdAt: "desc",
     },
     include: {
-      assignee: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
+      assignments: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
         },
       },
       comments: {
@@ -43,25 +67,22 @@ export async function getTasks(query: TaskQuery) {
     },
   });
 
-  // Transform tasks to extract lastComment from most recent comment
-  return tasks.map((task) => {
-    const { comments, ...taskWithoutComments } = task;
-    return {
-      ...taskWithoutComments,
-      lastComment: comments[0] || null,
-    };
-  });
+  return tasks.map(transformTaskToResponse);
 }
 
 export async function getTaskById(id: string) {
   const task = await prisma.task.findUnique({
     where: { id },
     include: {
-      assignee: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
+      assignments: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
         },
       },
       comments: {
@@ -84,16 +105,7 @@ export async function getTaskById(id: string) {
     throw new NotFoundError("Task", id);
   }
 
-  // Transform task to extract lastComment from most recent comment
-  // Using destructuring to properly exclude comments array
-  const { comments, ...taskWithoutComments } = task;
-  
-  const transformedTask = {
-    ...taskWithoutComments,
-    lastComment: comments[0] || null,
-  };
-
-  return transformedTask;
+  return transformTaskToResponse(task);
 }
 
 export async function createTask(input: CreateTaskInput, creatorId: string) {
@@ -108,8 +120,30 @@ export async function createTask(input: CreateTaskInput, creatorId: string) {
     throw new Error("Task must be linked to a Sprint or a Phase");
   }
 
+  const { assigneeIds, ...taskData } = input;
+
   const task = await prisma.task.create({
-    data: input,
+    data: {
+      ...taskData,
+      assignments: assigneeIds && assigneeIds.length > 0
+        ? {
+          create: assigneeIds.map(userId => ({ userId })),
+        }
+        : undefined,
+    },
+    include: {
+      assignments: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   // Activity Log
@@ -121,30 +155,83 @@ export async function createTask(input: CreateTaskInput, creatorId: string) {
     details: `Task "${task.title}" created`,
   });
 
-  // Notification
-  if (input.assigneeId && input.assigneeId !== creatorId) {
-    await createNotification({
-      userId: input.assigneeId,
-      message: `You have been assigned to task: ${task.title}`,
-      link: `/tasks/${task.id}`,
-    });
+  // Notify all assignees except the creator
+  if (assigneeIds && assigneeIds.length > 0) {
+    for (const assigneeId of assigneeIds) {
+      if (assigneeId !== creatorId) {
+        await createNotification({
+          userId: assigneeId,
+          message: `You have been assigned to task: ${task.title}`,
+          link: `/tasks/${task.id}`,
+        });
+      }
+    }
   }
 
-  return task;
+  return transformTaskToResponse({ ...task, comments: [] });
 }
 
 export async function updateTask(id: string, input: UpdateTaskInput, userId: string) {
   const task = await prisma.task.findUnique({
     where: { id },
+    include: {
+      assignments: true,
+    },
   });
 
   if (!task || task.deletedAt) {
     throw new NotFoundError("Task", id);
   }
 
-  const updatedTask = await prisma.task.update({
-    where: { id },
-    data: input,
+  const { assigneeIds, ...updateData } = input;
+
+  // Start a transaction to update task and assignments
+  const updatedTask = await prisma.$transaction(async (tx) => {
+    // Update task fields
+    const updated = await tx.task.update({
+      where: { id },
+      data: updateData,
+    });
+
+    // Update assignments if provided
+    if (assigneeIds !== undefined) {
+      const currentAssigneeIds = task.assignments.map(a => a.userId);
+      const newAssigneeIds = assigneeIds;
+
+      // Find assignees to remove and add
+      const toRemove = currentAssigneeIds.filter(id => !newAssigneeIds.includes(id));
+      const toAdd = newAssigneeIds.filter(id => !currentAssigneeIds.includes(id));
+
+      // Remove old assignments
+      if (toRemove.length > 0) {
+        await tx.taskAssignment.deleteMany({
+          where: {
+            taskId: id,
+            userId: { in: toRemove },
+          },
+        });
+      }
+
+      // Add new assignments
+      if (toAdd.length > 0) {
+        await tx.taskAssignment.createMany({
+          data: toAdd.map(userId => ({ taskId: id, userId })),
+        });
+      }
+
+      // Notify new assignees
+      for (const assigneeId of toAdd) {
+        if (assigneeId !== userId) {
+          await createNotification({
+            userId: assigneeId,
+            message: `You have been assigned to task: ${updated.title}`,
+            link: `/tasks/${updated.id}`,
+          });
+        }
+      }
+    }
+
+    return updated;
   });
 
   // Activity Log
@@ -156,21 +243,16 @@ export async function updateTask(id: string, input: UpdateTaskInput, userId: str
     details: `Task "${task.title}" updated`,
   });
 
-  // Notification if assignee changed
-  if (input.assigneeId && input.assigneeId !== task.assigneeId && input.assigneeId !== userId) {
-    await createNotification({
-      userId: input.assigneeId,
-      message: `You have been assigned to task: ${updatedTask.title}`,
-      link: `/tasks/${updatedTask.id}`,
-    });
-  }
-
-  return updatedTask;
+  // Fetch the updated task with all relations
+  return getTaskById(id);
 }
 
 export async function updateTaskStatus(id: string, userId: string, input: UpdateTaskStatusInput) {
   const task = await prisma.task.findUnique({
     where: { id },
+    include: {
+      assignments: true,
+    },
   });
 
   if (!task || task.deletedAt) {
@@ -207,13 +289,16 @@ export async function updateTaskStatus(id: string, userId: string, input: Update
     details: `Task "${task.title}" status changed to ${input.status}`,
   });
 
-  // Notification to assignee if someone else changed status
-  if (task.assigneeId && task.assigneeId !== userId) {
-    await createNotification({
-      userId: task.assigneeId,
-      message: `Task "${task.title}" status updated to ${input.status}`,
-      link: `/tasks/${task.id}`,
-    });
+  // Notify all assignees if someone else changed status
+  const assigneeIds = task.assignments.map(a => a.userId);
+  for (const assigneeId of assigneeIds) {
+    if (assigneeId !== userId) {
+      await createNotification({
+        userId: assigneeId,
+        message: `Task "${task.title}" status updated to ${input.status}`,
+        link: `/tasks/${task.id}`,
+      });
+    }
   }
 
   // Blocker notification: notify all Team Leads when a task is blocked
@@ -244,7 +329,7 @@ export async function updateTaskStatus(id: string, userId: string, input: Update
     }
   }
 
-  return result;
+  return getTaskById(id);
 }
 
 export async function deleteTask(id: string, userId: string) {
@@ -282,10 +367,10 @@ export async function restoreTask(id: string, userId: string) {
   }
 
   if (!task.deletedAt) {
-    return task;
+    return getTaskById(id);
   }
 
-  const restoredTask = await prisma.task.update({
+  await prisma.task.update({
     where: { id },
     data: {
       deletedAt: null,
@@ -300,5 +385,5 @@ export async function restoreTask(id: string, userId: string) {
     details: `Task "${task.title}" restored`,
   });
 
-  return restoredTask;
+  return getTaskById(id);
 }
