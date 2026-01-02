@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -42,6 +43,7 @@ export function UploadMinutesDialog({
   onOpenChange,
 }: UploadMinutesDialogProps) {
   const [_isPending, startTransition] = useTransition();
+  const router = useRouter();
   const maxSize = 10 * 1024 * 1024; // 10MB
 
   const form = useForm<UploadInput>({
@@ -108,13 +110,14 @@ export function UploadMinutesDialog({
         if (result.success) {
           toast.success("Meeting minutes uploaded successfully");
           form.reset();
+          router.refresh();
         } else {
           toast.error(result.error || "Failed to upload meeting minutes");
           throw new Error(result.error);
         }
       });
     },
-    [form]
+    [form, router.refresh]
   );
 
   return (
@@ -168,69 +171,71 @@ export function UploadMinutesDialog({
             )}
           />
 
-          <Controller
-            control={form.control}
-            name="scope"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="scope">Scope</FieldLabel>
-                <Select
-                  disabled={isUploading}
-                  onValueChange={field.onChange}
-                  value={field.value}
-                >
-                  <SelectTrigger aria-invalid={fieldState.invalid} id="scope">
-                    <SelectValue placeholder="Select scope" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="sprint">Sprint</SelectItem>
-                    <SelectItem value="phase">Phase</SelectItem>
-                  </SelectContent>
-                </Select>
-                {fieldState.invalid ? (
-                  <FieldError errors={[fieldState.error]} />
-                ) : null}
-              </Field>
-            )}
-          />
-
-          <Controller
-            control={form.control}
-            name="entityId"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="entityId">
-                  {scope === "sprint" ? "Sprint" : "Phase"}
-                </FieldLabel>
-                <Select
-                  disabled={isUploading}
-                  onValueChange={field.onChange}
-                  value={field.value}
-                >
-                  <SelectTrigger
-                    aria-invalid={fieldState.invalid}
-                    id="entityId"
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Controller
+              control={form.control}
+              name="scope"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="scope">Scope</FieldLabel>
+                  <Select
+                    disabled={isUploading}
+                    onValueChange={field.onChange}
+                    value={field.value}
                   >
-                    <SelectValue
-                      placeholder={`Select ${scope === "sprint" ? "sprint" : "phase"}`}
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {selectedEntities.map((entity) => (
-                      <SelectItem key={entity.id} value={entity.id}>
-                        {scope === "sprint"
-                          ? `Sprint ${(entity as Sprint).number}`
-                          : (entity as Phase).name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {fieldState.invalid ? (
-                  <FieldError errors={[fieldState.error]} />
-                ) : null}
-              </Field>
-            )}
-          />
+                    <SelectTrigger aria-invalid={fieldState.invalid} id="scope">
+                      <SelectValue placeholder="Select scope" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sprint">Sprint</SelectItem>
+                      <SelectItem value="phase">Phase</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {fieldState.invalid ? (
+                    <FieldError errors={[fieldState.error]} />
+                  ) : null}
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={form.control}
+              name="entityId"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="entityId">
+                    {scope === "sprint" ? "Sprint" : "Phase"}
+                  </FieldLabel>
+                  <Select
+                    disabled={isUploading}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                  >
+                    <SelectTrigger
+                      aria-invalid={fieldState.invalid}
+                      id="entityId"
+                    >
+                      <SelectValue
+                        placeholder={`Select ${scope === "sprint" ? "sprint" : "phase"}`}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {selectedEntities.map((entity) => (
+                        <SelectItem key={entity.id} value={entity.id}>
+                          {scope === "sprint"
+                            ? `Sprint ${(entity as Sprint).number}`
+                            : (entity as Phase).name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {fieldState.invalid ? (
+                    <FieldError errors={[fieldState.error]} />
+                  ) : null}
+                </Field>
+              )}
+            />
+          </div>
         </FieldGroup>
       )}
       requiresConfirmation={true}

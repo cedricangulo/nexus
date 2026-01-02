@@ -1,41 +1,26 @@
 "use client";
 
 import {
-  type ColumnDef,
-  type ColumnFiltersState,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  type PaginationState,
-  type SortingState,
-  useReactTable,
-  type VisibilityState,
-} from "@tanstack/react-table";
-import { formatDistanceToNow } from "date-fns";
-import {
   ChevronFirstIcon,
   ChevronLastIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   CircleXIcon,
-  Columns3Icon,
+  Download,
   FilterIcon,
   ListFilterIcon,
+  X,
 } from "lucide-react";
 import { useId, useMemo, useRef, useState } from "react";
-import {
-  GenericTableBody,
-  GenericTableHeader,
-} from "@/components/shared/table";
-import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { exportActivityLogsAction } from "@/actions/activity-logs";
+import { ActivityLogCard } from "@/components/team-lead/settings/activity-logs/activity-log-card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuLabel,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -57,166 +42,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { StatusBadge } from "@/components/ui/status";
-import { Table } from "@/components/ui/table";
 import { formatTitleCase } from "@/lib/helpers/format-title-case";
-import type { ActivityLog, TaskStatus } from "@/lib/types";
-import { cn } from "@/lib/utils";
-
-type DetailsCellProps = {
-  details: string | null;
-};
-
-function DetailsCell({ details }: DetailsCellProps) {
-  if (!details) {
-    return <span className="text-muted-foreground text-sm">—</span>;
-  }
-
-  let parsedData: Record<string, unknown> | null = null;
-  let parseError = false;
-
-  try {
-    parsedData = JSON.parse(details);
-  } catch {
-    parseError = true;
-  }
-
-  // If not JSON or parsing failed, show truncated text
-  if (parseError || !parsedData) {
-    return (
-      <Popover>
-        <PopoverTrigger asChild>
-          <button
-            className="max-w-md truncate text-left text-muted-foreground text-sm underline decoration-dotted underline-offset-4 hover:text-foreground"
-            type="button"
-          >
-            {details.slice(0, 50)}
-            {details.length > 50 ? "..." : ""}
-          </button>
-        </PopoverTrigger>
-        <PopoverContent align="start" className="w-96">
-          <div className="space-y-2">
-            <p className="font-medium text-sm">Raw Details</p>
-            <pre className="max-h-96 overflow-auto rounded-md bg-muted p-3 text-xs">
-              {details}
-            </pre>
-          </div>
-        </PopoverContent>
-      </Popover>
-    );
-  }
-
-  // Show parsed JSON in a popover
-  const entries = Object.entries(parsedData);
-  const preview = entries
-    .slice(0, 2)
-    .map(([key, value]) => `${key}: ${String(value)}`)
-    .join(", ");
-
-  const STATUS_VALUES = [
-    "COMPLETED",
-    "DONE",
-    "IN_PROGRESS",
-    "REVIEW",
-    "BLOCKED",
-    "TODO",
-    "NOT_STARTED",
-    "WATERFALL",
-    "SCRUM",
-    "FALL",
-  ];
-
-  const isStatus = (value: unknown): boolean =>
-    typeof value === "string" && STATUS_VALUES.includes(value);
-
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <button
-          className="max-w-md truncate text-left text-muted-foreground text-sm underline decoration-dotted underline-offset-4 hover:text-foreground"
-          type="button"
-        >
-          {preview}
-          {entries.length > 2 ? "..." : ""}
-        </button>
-      </PopoverTrigger>
-      <PopoverContent align="start" className="w-96">
-        <div className="space-y-3">
-          <p className="font-medium text-sm">Activity Details</p>
-          <div className="space-y-2 rounded-md bg-muted p-3">
-            {entries.map(([key, value]) => (
-              <div className="space-y-1" key={key}>
-                <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
-                  {formatTitleCase(key)}
-                </p>
-                {isStatus(value) ? (
-                  <StatusBadge status={value as TaskStatus} />
-                ) : (
-                  <p className="wrap-break-word text-sm">
-                    {typeof value === "object" && value !== null
-                      ? JSON.stringify(value, null, 2)
-                      : String(value)}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
-const getActionColor = (action: string): string => {
-  // Positive actions (completed/success)
-  if (action.includes("APPROVED") || action.includes("COMPLETED")) {
-    return "bg-status-success/10 text-status-success dark:text-status-success";
-  }
-  // Negative actions (blocked/error)
-  if (action.includes("REJECTED") || action.includes("DELETED")) {
-    return "bg-status-error/10 text-status-error dark:text-status-error";
-  }
-  // Blocked/warning actions (blocked)
-  if (action.includes("BLOCKED") || action.includes("PENDING")) {
-    return "bg-status-error/10 text-status-error dark:text-status-error";
-  }
-  // Upload/create actions (in-progress/active)
-  if (action.includes("UPLOAD") || action.includes("CREATED")) {
-    return "bg-status-in-progress/10 text-status-in-progress dark:text-status-in-progress";
-  }
-  // Default (not started/neutral)
-  return "bg-status-info/10 text-status-info dark:text-status-info";
-};
+import type { ActivityLog } from "@/lib/types";
 
 type ActivityLogsClientProps = {
   activities: ActivityLog[];
+  userRole?: string;
 };
 
 function ActivityLogsFilters({
-  table,
+  searchValue,
+  onSearchChange,
+  selectedActions,
+  onActionChange,
   actionTypes,
   actionCounts,
+  onClearFilters,
 }: {
-  table: ReturnType<typeof useReactTable<ActivityLog>>;
+  searchValue: string;
+  onSearchChange: (value: string) => void;
+  selectedActions: string[];
+  onActionChange: (checked: boolean, value: string) => void;
   actionTypes: string[];
   actionCounts: Map<string, number>;
+  onClearFilters: () => void;
 }) {
   const filterId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const searchValue = (table.getColumn("action")?.getFilterValue() ??
-    "") as string;
-  const selectedActions = (table.getColumn("action")?.getFilterValue() ??
-    []) as string[];
-
-  const handleActionChange = (checked: boolean, value: string) => {
-    const newActions = checked
-      ? [...selectedActions, value]
-      : selectedActions.filter((s) => s !== value);
-    table
-      .getColumn("action")
-      ?.setFilterValue(newActions.length ? newActions : undefined);
-  };
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4">
@@ -225,15 +77,13 @@ function ActivityLogsFilters({
         <div className="relative">
           <Input
             aria-label="Filter activity logs"
-            className={cn("peer min-w-80 ps-9", searchValue && "pe-9")}
+            className="peer min-w-80 ps-9 pe-9"
             id={`${filterId}-search`}
-            onChange={(e) =>
-              table.getColumn("user")?.setFilterValue(e.target.value)
-            }
+            onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search by user or action..."
             ref={inputRef}
             type="text"
-            value={(table.getColumn("user")?.getFilterValue() ?? "") as string}
+            value={searchValue}
           />
           <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
             <ListFilterIcon aria-hidden="true" size={16} />
@@ -243,7 +93,7 @@ function ActivityLogsFilters({
               aria-label="Clear search filter"
               className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md text-muted-foreground/80 outline-none transition-[color,box-shadow] hover:text-foreground focus:z-10 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
               onClick={() => {
-                table.getColumn("user")?.setFilterValue("");
+                onSearchChange("");
                 inputRef.current?.focus();
               }}
               type="button"
@@ -282,7 +132,7 @@ function ActivityLogsFilters({
                       checked={selectedActions.includes(action)}
                       id={`${filterId}-action-${i}`}
                       onCheckedChange={(checked: boolean) =>
-                        handleActionChange(checked, action)
+                        onActionChange(checked, action)
                       }
                     />
                     <Label
@@ -303,179 +153,27 @@ function ActivityLogsFilters({
           </PopoverContent>
         </Popover>
 
-        {/* Column Visibility Toggle */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              <Columns3Icon
-                aria-hidden="true"
-                className="-ms-1 opacity-60"
-                size={16}
-              />
-              View
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => (
-                <DropdownMenuCheckboxItem
-                  checked={column.getIsVisible()}
-                  className="capitalize"
-                  key={column.id}
-                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                  onSelect={(event) => event.preventDefault()}
-                >
-                  {column.id}
-                </DropdownMenuCheckboxItem>
-              ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Clear Filters Button */}
+        {(searchValue || selectedActions.length > 0) && (
+          <Button onClick={onClearFilters} variant="ghost">
+            <X size={16} />
+            Clear Filters
+          </Button>
+        )}
       </div>
     </div>
   );
 }
 
-export function ActivityLogsClient({ activities }: ActivityLogsClientProps) {
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 20,
-  });
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: "createdAt", desc: true },
-  ]);
-
-  const columns = useMemo<ColumnDef<ActivityLog>[]>(
-    () => [
-      {
-        id: "action",
-        accessorKey: "action",
-        size: 200,
-        enableHiding: false,
-        filterFn: (row, _columnId, filterValue) => {
-          const selected = (filterValue ?? []) as string[];
-          if (!selected.length) {
-            return true;
-          }
-          return selected.includes(row.original.action);
-        },
-        header: "Action",
-        cell: ({ row }) => {
-          const action = row.original.action;
-          const colorClass = getActionColor(action);
-
-          return (
-            <Badge
-              className={cn("font-medium", colorClass)}
-              variant="secondary"
-            >
-              {formatTitleCase(action)}
-            </Badge>
-          );
-        },
-      },
-      {
-        id: "user",
-        accessorFn: (row) => row.user?.name ?? "System",
-        size: 200,
-        filterFn: (row, _columnId, filterValue) => {
-          const searchTerm = (filterValue ?? "")
-            .toString()
-            .toLowerCase()
-            .trim();
-          if (!searchTerm) {
-            return true;
-          }
-
-          const searchableContent = [
-            row.original.user?.name,
-            row.original.user?.email,
-            row.original.action,
-            row.original.entityType,
-          ]
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase();
-
-          return searchableContent.includes(searchTerm);
-        },
-        header: "User",
-        cell: ({ row }) => {
-          const user = row.original.user;
-          if (!user) {
-            return (
-              <span className="text-muted-foreground text-sm">System</span>
-            );
-          }
-          return (
-            <div className="space-y-0">
-              <p className="font-medium text-sm">{user.name}</p>
-              <span className="text-muted-foreground text-xs">
-                {user.email}
-              </span>
-            </div>
-          );
-        },
-      },
-      {
-        accessorKey: "entityType",
-        size: 150,
-        header: "Entity Type",
-        cell: ({ row }) => (
-          <div className="text-sm">
-            {formatTitleCase(row.getValue("entityType"))}
-          </div>
-        ),
-      },
-      {
-        accessorKey: "details",
-        size: 300,
-        header: "Details",
-        cell: ({ row }) => {
-          const details = row.getValue("details") as string | null;
-          return <DetailsCell details={details} />;
-        },
-      },
-      {
-        accessorKey: "createdAt",
-        size: 180,
-        header: "Timestamp",
-        cell: ({ row }) => {
-          const date = new Date(row.getValue("createdAt"));
-          return (
-            <div className="text-sm">
-              {formatDistanceToNow(date, { addSuffix: true })}
-            </div>
-          );
-        },
-      },
-    ],
-    []
-  );
-
-  const table = useReactTable({
-    data: activities,
-    columns,
-    enableSortingRemoval: false,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting,
-    state: {
-      columnFilters,
-      columnVisibility,
-      pagination,
-      sorting,
-    },
-  });
+export function ActivityLogsClient({
+  activities,
+  userRole = "teamLead",
+}: ActivityLogsClientProps) {
+  const [searchValue, setSearchValue] = useState("");
+  const [selectedActions, setSelectedActions] = useState<string[]>([]);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(20);
+  const [isExporting, setIsExporting] = useState(false);
 
   const actionTypes = useMemo(() => {
     const types = new Set(activities.map((a) => a.action));
@@ -490,127 +188,270 @@ export function ActivityLogsClient({ activities }: ActivityLogsClientProps) {
     return counts;
   }, [activities]);
 
+  const handleActionChange = (checked: boolean, value: string) => {
+    const newActions = checked
+      ? [...selectedActions, value]
+      : selectedActions.filter((s) => s !== value);
+    setSelectedActions(newActions);
+    setPageIndex(0); // Reset to first page on filter change
+  };
+
+  const handleClearFilters = () => {
+    setSearchValue("");
+    setSelectedActions([]);
+    setPageIndex(0);
+  };
+
+  // Filter activities based on search and selected actions
+  const filteredActivities = useMemo(() => {
+    return activities.filter((log) => {
+      // Action filter
+      if (selectedActions.length > 0 && !selectedActions.includes(log.action)) {
+        return false;
+      }
+
+      // Search filter
+      if (searchValue) {
+        const searchTerm = searchValue.toLowerCase().trim();
+        const searchableContent = [
+          log.user?.name,
+          log.user?.email,
+          log.action,
+          log.entityType,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        if (!searchableContent.includes(searchTerm)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [activities, searchValue, selectedActions]);
+
+  // Sort by createdAt descending (newest first)
+  const sortedActivities = useMemo(
+    () =>
+      [...filteredActivities].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      ),
+    [filteredActivities]
+  );
+
+  // Paginate
+  const paginatedActivities = useMemo(() => {
+    const start = pageIndex * pageSize;
+    const end = start + pageSize;
+    return sortedActivities.slice(start, end);
+  }, [sortedActivities, pageIndex, pageSize]);
+
+  const totalPages = Math.ceil(sortedActivities.length / pageSize);
+  const canPreviousPage = pageIndex > 0;
+  const canNextPage = pageIndex < totalPages - 1;
+
+  const handleExport = async (format: "csv" | "json") => {
+    try {
+      setIsExporting(true);
+      const result = await exportActivityLogsAction(format);
+
+      if (!(result.success && result.data)) {
+        toast.error(result.error || "Failed to export activity logs");
+        return;
+      }
+
+      // Create blob and download
+      const blob = new Blob([result.data], {
+        type:
+          format === "csv"
+            ? "text/csv;charset=utf-8;"
+            : "application/json;charset=utf-8;",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = result.filename;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 500);
+
+      toast.success(`Activity logs exported as ${result.filename}`);
+    } catch (error) {
+      console.error("Export error:", error);
+      toast.error("Failed to export activity logs");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
-      <ActivityLogsFilters
-        actionCounts={actionCounts}
-        actionTypes={actionTypes}
-        table={table}
-      />
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <ActivityLogsFilters
+          actionCounts={actionCounts}
+          actionTypes={actionTypes}
+          onActionChange={handleActionChange}
+          onClearFilters={handleClearFilters}
+          onSearchChange={setSearchValue}
+          searchValue={searchValue}
+          selectedActions={selectedActions}
+        />
 
-      <div className="overflow-hidden rounded-md border bg-background">
-        <Table>
-          <GenericTableHeader table={table} />
-          <GenericTableBody
-            emptyMessage="No activity logs found"
-            table={table}
-          />
-        </Table>
+        {/* Export Button (Team Lead only) */}
+        {userRole === "teamLead" && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="gap-2" disabled={isExporting}>
+                <Download size={16} />
+                {isExporting ? "Exporting..." : "Export"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleExport("csv")}>
+                Export as CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport("json")}>
+                Export as JSON
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
-      <div className="flex items-center justify-between gap-8">
-        <div className="flex items-center gap-3">
-          <Label className="max-sm:sr-only">Rows per page</Label>
-          <Select
-            onValueChange={(value) => {
-              table.setPageSize(Number(value));
-            }}
-            value={table.getState().pagination.pageSize.toString()}
-          >
-            <SelectTrigger className="w-fit whitespace-nowrap">
-              <SelectValue placeholder="Select number of results" />
-            </SelectTrigger>
-            <SelectContent className="[&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2 [&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8">
-              {[5, 10, 25, 50].map((pageSize) => (
-                <SelectItem key={pageSize} value={pageSize.toString()}>
-                  {pageSize}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex grow justify-end whitespace-nowrap text-muted-foreground text-sm">
-          <p
-            aria-live="polite"
-            className="whitespace-nowrap text-muted-foreground text-sm"
-          >
-            <span className="text-foreground">
-              {table.getState().pagination.pageIndex *
-                table.getState().pagination.pageSize +
-                1}
-              -
-              {Math.min(
-                Math.max(
-                  table.getState().pagination.pageIndex *
-                    table.getState().pagination.pageSize +
-                    table.getState().pagination.pageSize,
-                  0
-                ),
-                table.getRowCount()
-              )}
-            </span>{" "}
-            of{" "}
-            <span className="text-foreground">
-              {table.getRowCount().toString()}
-            </span>
-          </p>
-        </div>
-        {/* Pagination Controls */}
-        <div>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <Button
-                  aria-label="Go to first page"
-                  className="disabled:pointer-events-none disabled:opacity-50"
-                  disabled={!table.getCanPreviousPage()}
-                  onClick={() => table.firstPage()}
-                  size="icon"
-                  variant="outline"
-                >
-                  <ChevronFirstIcon aria-hidden="true" size={16} />
-                </Button>
-              </PaginationItem>
-              <PaginationItem>
-                <Button
-                  aria-label="Go to previous page"
-                  className="disabled:pointer-events-none disabled:opacity-50"
-                  disabled={!table.getCanPreviousPage()}
-                  onClick={() => table.previousPage()}
-                  size="icon"
-                  variant="outline"
-                >
-                  <ChevronLeftIcon aria-hidden="true" size={16} />
-                </Button>
-              </PaginationItem>
-              <PaginationItem>
-                <Button
-                  aria-label="Go to next page"
-                  className="disabled:pointer-events-none disabled:opacity-50"
-                  disabled={!table.getCanNextPage()}
-                  onClick={() => table.nextPage()}
-                  size="icon"
-                  variant="outline"
-                >
-                  <ChevronRightIcon aria-hidden="true" size={16} />
-                </Button>
-              </PaginationItem>
-              <PaginationItem>
-                <Button
-                  aria-label="Go to last page"
-                  className="disabled:pointer-events-none disabled:opacity-50"
-                  disabled={!table.getCanNextPage()}
-                  onClick={() => table.lastPage()}
-                  size="icon"
-                  variant="outline"
-                >
-                  <ChevronLastIcon aria-hidden="true" size={16} />
-                </Button>
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+      {/* Results count */}
+      <div className="text-muted-foreground text-sm">
+        {searchValue || selectedActions.length > 0 ? (
+          <>
+            Showing {filteredActivities.length} matching logs (
+            {filteredActivities.length} found across all {activities.length}{" "}
+            logs )
+          </>
+        ) : (
+          <>
+            Showing {Math.min(pageSize, sortedActivities.length)} logs on this
+            page (total {sortedActivities.length} logs)
+          </>
+        )}
       </div>
+
+      {/* Logs list */}
+      <div className="rounded-lg border border-border bg-card">
+        {paginatedActivities.length > 0 ? (
+          <div className="divide-y divide-border p-4">
+            {paginatedActivities.map((log) => (
+              <ActivityLogCard key={log.id} log={log} />
+            ))}
+          </div>
+        ) : (
+          <div className="p-8 text-center text-muted-foreground">
+            {searchValue || selectedActions.length > 0
+              ? "No logs match your search or filter."
+              : "No activity logs found."}
+          </div>
+        )}
+      </div>
+
+      {/* Pagination controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between gap-8">
+          <div className="flex items-center gap-3">
+            <Label className="max-sm:sr-only">Rows per page</Label>
+            <Select
+              onValueChange={(value) => {
+                setPageSize(Number(value));
+                setPageIndex(0);
+              }}
+              value={pageSize.toString()}
+            >
+              <SelectTrigger className="w-fit whitespace-nowrap">
+                <SelectValue placeholder="Select number of results" />
+              </SelectTrigger>
+              <SelectContent className="[&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2 [&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8">
+                {[5, 10, 20, 50].map((size) => (
+                  <SelectItem key={size} value={size.toString()}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex grow justify-end whitespace-nowrap text-muted-foreground text-sm">
+            <p
+              aria-live="polite"
+              className="whitespace-nowrap text-muted-foreground text-sm"
+            >
+              <span className="text-foreground">
+                {pageIndex * pageSize + 1}-
+                {Math.min((pageIndex + 1) * pageSize, sortedActivities.length)}
+              </span>{" "}
+              of{" "}
+              <span className="text-foreground">{sortedActivities.length}</span>
+            </p>
+          </div>
+          <div>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <Button
+                    aria-label="Go to first page"
+                    className="disabled:pointer-events-none disabled:opacity-50"
+                    disabled={!canPreviousPage}
+                    onClick={() => setPageIndex(0)}
+                    size="icon"
+                    variant="outline"
+                  >
+                    <ChevronFirstIcon aria-hidden="true" size={16} />
+                  </Button>
+                </PaginationItem>
+                <PaginationItem>
+                  <Button
+                    aria-label="Go to previous page"
+                    className="disabled:pointer-events-none disabled:opacity-50"
+                    disabled={!canPreviousPage}
+                    onClick={() => setPageIndex(pageIndex - 1)}
+                    size="icon"
+                    variant="outline"
+                  >
+                    <ChevronLeftIcon aria-hidden="true" size={16} />
+                  </Button>
+                </PaginationItem>
+                <PaginationItem>
+                  <Button
+                    aria-label="Go to next page"
+                    className="disabled:pointer-events-none disabled:opacity-50"
+                    disabled={!canNextPage}
+                    onClick={() => setPageIndex(pageIndex + 1)}
+                    size="icon"
+                    variant="outline"
+                  >
+                    <ChevronRightIcon aria-hidden="true" size={16} />
+                  </Button>
+                </PaginationItem>
+                <PaginationItem>
+                  <Button
+                    aria-label="Go to last page"
+                    className="disabled:pointer-events-none disabled:opacity-50"
+                    disabled={!canNextPage}
+                    onClick={() => setPageIndex(totalPages - 1)}
+                    size="icon"
+                    variant="outline"
+                  >
+                    <ChevronLastIcon aria-hidden="true" size={16} />
+                  </Button>
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

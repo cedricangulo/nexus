@@ -29,29 +29,39 @@ export type MeetingsPageData = {
  * @throws Error if data fetching fails
  */
 export async function getMeetingsData(): Promise<MeetingsPageData> {
-  await requireUser();
-  const [sprints, phases] = await Promise.all([
-    sprintApi.listSprints(),
-    phaseApi.listPhases(),
-  ]);
+  try {
+    await requireUser();
+    const [sprints, phases] = await Promise.all([
+      sprintApi.listSprints(),
+      phaseApi.listPhases(),
+    ]);
 
-  // Collect all meeting logs from sprints and phases in parallel
-  const allLogs = await Promise.all([
-    ...sprints.map((sprint) =>
-      meetingLogApi.getMeetingLogsBySprint(sprint.id).catch(() => [])
-    ),
-    ...phases.map((phase) =>
-      meetingLogApi.getMeetingLogsByPhase(phase.id).catch(() => [])
-    ),
-  ]);
+    // Collect all meeting logs from sprints and phases in parallel
+    const allLogs = await Promise.all([
+      ...sprints.map((sprint) =>
+        meetingLogApi.getMeetingLogsBySprint(sprint.id).catch(() => [])
+      ),
+      ...phases.map((phase) =>
+        meetingLogApi.getMeetingLogsByPhase(phase.id).catch(() => [])
+      ),
+    ]);
 
-  const logs = allLogs.flat();
-  const totalExpected = sprints.length;
+    const logs = allLogs.flat();
+    const totalExpected = sprints.length;
 
-  return {
-    logs,
-    sprints,
-    phases,
-    totalExpected,
-  };
+    return {
+      logs,
+      sprints,
+      phases,
+      totalExpected,
+    };
+  } catch (error) {
+    console.error("Failed to fetch meetings data:", error);
+    return {
+      logs: [],
+      sprints: [],
+      phases: [],
+      totalExpected: 0,
+    };
+  }
 }

@@ -1,6 +1,7 @@
+import { FolderX } from "lucide-react";
 import { MemberPhaseCard } from "@/components/member/phases/member-phase-card";
-import { phaseApi } from "@/lib/api/phase";
-import type { PhaseDetail } from "@/lib/types";
+import { EmptyState } from "@/components/shared/empty-state";
+import { getPhasesWithDetails } from "@/lib/data/phases";
 
 export const metadata = {
   title: "Project Phases",
@@ -8,13 +9,17 @@ export const metadata = {
 };
 
 export default async function PhasesPage() {
-  // Fetch all phases with their deliverables included
-  const phases = await phaseApi.listPhases();
+  const phasesWithDeliverables = await getPhasesWithDetails();
 
-  // Fetch detailed information for each phase (includes deliverables)
-  const phasesWithDeliverables: PhaseDetail[] = await Promise.all(
-    phases.map((phase) => phaseApi.getPhaseById(phase.id))
-  );
+  if (phasesWithDeliverables.length === 0) {
+    return (
+      <EmptyState
+        description="No phases have been created yet. Please wait for the team lead to set up the project."
+        icon={FolderX}
+        title="No Phases Available"
+      />
+    );
+  }
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

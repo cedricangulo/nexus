@@ -16,7 +16,14 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { FrameDescription, FramePanel, FrameTitle } from "../ui/frame";
+import {
+  Frame,
+  FrameDescription,
+  FrameFooter,
+  FrameHeader,
+  FramePanel,
+  FrameTitle,
+} from "../ui/frame";
 
 const loginSchema = z.object({
   email: z.email("Enter a valid email address."),
@@ -99,15 +106,15 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <FramePanel>
-        <div className="mb-4 space-y-0">
+      <Frame className="backdrop-blur-2xl">
+        <FrameHeader className="space-y-0">
           <FrameTitle className="text-xl">Welcome!</FrameTitle>
           <FrameDescription>
             Sign in to your account to get started
           </FrameDescription>
-        </div>
-        <div>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+        </FrameHeader>
+        <FramePanel>
+          <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               <Controller
                 control={form.control}
@@ -151,16 +158,20 @@ export function LoginForm({
                   </Field>
                 )}
               />
-
-              <Field>
-                <Button disabled={isPending} type="submit">
-                  {isPending ? "Logging in..." : "Login"}
-                </Button>
-              </Field>
             </FieldGroup>
           </form>
-        </div>
-      </FramePanel>
+        </FramePanel>
+        <FrameFooter>
+          <Button
+            className="w-full"
+            disabled={isPending}
+            form="login-form"
+            type="submit"
+          >
+            {isPending ? "Logging in..." : "Login"}
+          </Button>
+        </FrameFooter>
+      </Frame>
     </div>
   );
 }

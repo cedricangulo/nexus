@@ -1,12 +1,14 @@
 "use client";
 
-import { ChevronsUpDown, LogOut } from "lucide-react";
+import { ChevronsUpDown, LogOut, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useTransition } from "react";
 import { logoutAction } from "@/actions/logout";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -28,6 +30,7 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const { setTheme, theme } = useTheme();
   const [isPending, startTransition] = useTransition();
 
   const handleLogout = () => {
@@ -46,7 +49,6 @@ export function NavUser({
               size="lg"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
                 <AvatarFallback className="rounded-lg">
                   {getInitials(user.name)}
                 </AvatarFallback>
@@ -64,8 +66,28 @@ export function NavUser({
             side={isMobile ? "bottom" : "right"}
             sideOffset={4}
           >
+            {/* Theme Toggle with preventDefault to keep menu open */}
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onSelect={(e) => {
+                e.preventDefault();
+                setTheme(theme === "light" ? "dark" : "light");
+              }}
+            >
+              {/* Show current state icon */}
+              {theme === "light" ? (
+                <Sun className="size-4" />
+              ) : (
+                <Moon className="size-4" />
+              )}
+              {/* Show current state text */}
+              <span>{theme === "light" ? "Light Mode" : "Dark Mode"}</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator />
+
             <DropdownMenuItem disabled={isPending} onClick={handleLogout}>
-              <LogOut size={16} />
+              <LogOut className="size-4" />
               {isPending ? "Logging out..." : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>

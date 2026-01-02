@@ -1,6 +1,12 @@
 "use client";
 
-import { Home, Layers, MessageSquare, Package, Zap } from "lucide-react";
+import {
+  CalendarDays,
+  Home,
+  IterationCcw,
+  Layers,
+  Package,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -34,13 +40,13 @@ const navItems: NavItem[] = [
   {
     href: "/sprints",
     label: "Sprints",
-    icon: <Zap className="size-5" />,
+    icon: <IterationCcw className="size-5" />,
     ariaLabel: "View sprints",
   },
   {
     href: "/meetings",
     label: "Meetings",
-    icon: <MessageSquare className="size-5" />,
+    icon: <CalendarDays className="size-5" />,
     ariaLabel: "View meetings",
   },
 ];
@@ -69,7 +75,7 @@ export function MemberMobileNav() {
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed right-0 bottom-0 left-0 z-40 border-t bg-background md:hidden"
+      className="fixed right-0 bottom-0 left-0 z-40 border-t bg-sidebar md:hidden"
     >
       <div
         className="grid h-16 grid-cols-5 gap-1"
@@ -87,8 +93,8 @@ export function MemberMobileNav() {
               className={cn(
                 "relative flex flex-col items-center justify-center gap-1 transition-all duration-200 ease-in-out active:scale-95",
                 isActive
-                  ? "font-medium text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "font-medium text-sidebar-primary"
+                  : "text-muted-foreground/80 hover:text-sidebar-primary"
               )}
               href={item.href}
               key={item.href}
@@ -96,7 +102,7 @@ export function MemberMobileNav() {
               <div
                 className={cn(
                   "rounded-sm px-2 py-0.5 transition-all duration-200",
-                  isActive && "scale-110 bg-primary/10 drop-shadow-sm"
+                  isActive && "scale-110 bg-sidebar-accent drop-shadow-sm"
                 )}
               >
                 {item.icon}

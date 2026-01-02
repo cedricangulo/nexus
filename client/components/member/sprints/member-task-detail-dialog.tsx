@@ -1,9 +1,9 @@
 "use client";
 
+import { Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-
 import { updateTaskAction, updateTaskStatusAction } from "@/actions/tasks";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Task, TaskStatus } from "@/lib/types";
@@ -266,7 +267,15 @@ export function MemberTaskDetailDialog({
               }
               onClick={handleSave}
             >
-              {isPending ? "Saving..." : "Save"}
+              {isPending ? (
+                <>
+                  <Spinner /> Save Changes
+                </>
+              ) : (
+                <>
+                  <Save /> Save Changes
+                </>
+              )}
             </Button>
             <DrawerClose asChild>
               <Button disabled={isPending} variant="outline">
@@ -310,7 +319,15 @@ export function MemberTaskDetailDialog({
             }
             onClick={handleSave}
           >
-            {isPending ? "Saving..." : "Save"}
+            {isPending ? (
+              <>
+                <Spinner /> Save Changes
+              </>
+            ) : (
+              <>
+                <Save /> Save Changes
+              </>
+            )}
           </Button>
         </div>
       </DialogContent>

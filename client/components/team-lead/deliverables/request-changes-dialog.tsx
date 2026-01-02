@@ -1,5 +1,6 @@
 "use client";
 
+import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -67,7 +68,7 @@ export function RequestChangesDialog({
               disabled={isPending || comment.trim() === ""}
               onClick={onSubmit}
             >
-              Submit
+              <Send /> Submit
             </Button>
             <DrawerClose asChild>
               <Button disabled={isPending} variant="outline">
@@ -97,7 +98,7 @@ export function RequestChangesDialog({
             disabled={isPending || comment.trim() === ""}
             onClick={onSubmit}
           >
-            Submit
+            <Send /> Submit
           </Button>
         </DialogFooter>
       </DialogContent>

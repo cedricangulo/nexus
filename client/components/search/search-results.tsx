@@ -39,7 +39,7 @@ export function SearchResults({
   showEmpty,
 }: SearchResultsProps) {
   return (
-    <Command.List className="max-h-200 overflow-y-auto px-2">
+    <Command.List className="max-h-100 overflow-y-auto px-2 pb-2">
       {isLoading && (
         <div className="py-6 text-center text-muted-foreground text-sm">
           Searching...

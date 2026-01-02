@@ -18,9 +18,9 @@ const getStatusColor = (status: string): string => {
     case "DONE":
       return "bg-chart-1";
     case "IN_PROGRESS":
-      return "bg-chart-2";
-    case "REVIEW":
       return "bg-chart-3";
+    case "REVIEW":
+      return "bg-chart-2";
     case "BLOCKED":
       return "bg-chart-4";
     case "TODO":

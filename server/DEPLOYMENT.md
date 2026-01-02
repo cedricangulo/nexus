@@ -49,7 +49,7 @@ In the Web Service settings, scroll down to **Environment Variables** and add th
 | `DATABASE_URL` | `postgres://...` | Connection string from Step 1. |
 | `JWT_SECRET` | `your-secure-secret` | Generate a strong random string (e.g., `openssl rand -hex 32`). |
 | `JWT_EXPIRES_IN` | `7d` | Token expiration duration. |
-| `FRONTEND_URL` | `https://your-frontend-app.onrender.com` | URL of your deployed frontend (for CORS). |
+| `FRONTEND_URL` | `https://your-frontend-app.vercel.app` | URL of your deployed frontend (for CORS). |
 | `SMTP_HOST` | `smtp.example.com` | Your email provider host (e.g., `smtp.resend.com`). |
 | `SMTP_PORT` | `587` | Email provider port. |
 | `SMTP_USER` | `user` | Email provider username/apikey. |
@@ -58,6 +58,9 @@ In the Web Service settings, scroll down to **Environment Variables** and add th
 | `CLOUDINARY_CLOUD_NAME` | `...` | Cloudinary Cloud Name. |
 | `CLOUDINARY_API_KEY` | `...` | Cloudinary API Key. |
 | `CLOUDINARY_API_SECRET` | `...` | Cloudinary API Secret. |
+| `FIREBASE_PROJECT_ID` | `...` | Firebase Project ID (for push notifications). |
+| `FIREBASE_CLIENT_EMAIL` | `...` | Firebase service account email. |
+| `FIREBASE_PRIVATE_KEY` | `...` | Firebase service account private key (escape newlines as `\n`). |
 
 ---
 
@@ -84,6 +87,19 @@ If you need initial data (e.g., default Phases):
 pnpm db:seed
 ```
 
+**Production Seed (Recommended for First Deploy):**
+To create the initial Team Lead account and project with WSF phases:
+```bash
+pnpm db:seed:prod
+```
+*Customize via environment variables:*
+- `SEED_TEAM_LEAD_EMAIL` - Team Lead's email
+- `SEED_TEAM_LEAD_NAME` - Team Lead's display name
+- `SEED_TEAM_LEAD_PASSWORD` - Initial password (change after first login!)
+- `SEED_PROJECT_NAME` - Your project name
+- `SEED_PROJECT_DESCRIPTION` - Project description
+- `SEED_PROJECT_REPO_URL` - Repository URL (optional)
+
 ---
 
 ## Step 5: Verify Deployment
@@ -103,5 +119,66 @@ pnpm db:seed
 
 ---
 
-**Frontend Deployment:**
-For the frontend (`client/` folder), create a separate **Static Site** (if SSG) or **Web Service** (if SSR) on Render, setting the Root Directory to `client` and following Next.js deployment instructions.
+## Frontend Deployment (AWS Amplify - Recommended)
+
+AWS Amplify is the recommended platform for deploying the Next.js frontend if you want to stay within the AWS ecosystem or prefer its feature set.
+
+### Step 1: Connect Repository
+
+1.  Log in to the **AWS Management Console** and search for **AWS Amplify**.
+2.  Click **Create new app** -> **GitHub**.
+3.  Authorize AWS Amplify to access your GitHub account and select your repository.
+4.  **App Name:** `nexus-frontend`.
+5.  **Branch:** `main`.
+6.  **Root Directory:** Set this to `client`.
+
+### Step 2: Build Settings
+
+Amplify should automatically detect Next.js. Ensure the build settings look like this:
+
+```yaml
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - nvm use 22
+        - pnpm install
+    build:
+      commands:
+        - pnpm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - .next/cache/**/*
+      - node_modules/**/*
+```
+
+### Step 3: Configure Environment Variables
+
+In the Amplify console, go to **App settings** -> **Environment variables**:
+
+| Key | Value | Description |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_API_URL` | `https://nexus-api.onrender.com/api/v1` | Your Render backend URL. |
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | `...` | Firebase Web API Key. |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | `...` | Firebase Auth Domain. |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | `...` | Firebase Project ID. |
+| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | `...` | Firebase Storage Bucket. |
+| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | `...` | Firebase Messaging Sender ID. |
+| `NEXT_PUBLIC_FIREBASE_APP_ID` | `...` | Firebase App ID. |
+| `NEXT_PUBLIC_FIREBASE_VAPID_KEY` | `...` | Firebase VAPID Key. |
+
+### Step 4: Deploy
+
+1.  Click **Save and deploy**.
+2.  Amplify will provision, build, and deploy your app.
+3.  Once finished, you will get a URL like `https://main.dxxxxxxxxxxxxx.amplifyapp.com`.
+
+### Step 5: Update Backend CORS
+
+Update your backend's `FRONTEND_URL` environment variable on Render to match your new Amplify URL.
+

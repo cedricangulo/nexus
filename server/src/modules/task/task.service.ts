@@ -5,6 +5,17 @@ import { createActivityLog } from "../activity-log/activity-log.service.js";
 
 const prisma = getPrismaClient();
 
+// Helper to generate correct task link based on parent (sprint or phase)
+function getTaskLink(task: { sprintId?: string | null; phaseId?: string | null }): string {
+  if (task.sprintId) {
+    return `/sprints/${task.sprintId}`;
+  } else if (task.phaseId) {
+    return `/phases/${task.phaseId}`;
+  }
+  // Fallback - shouldn't happen as tasks must belong to either sprint or phase
+  return '/dashboard';
+}
+
 // Helper to transform task with assignments to response format
 function transformTaskToResponse(task: any) {
   const { assignments, comments, ...taskWithoutRelations } = task;
@@ -162,7 +173,7 @@ export async function createTask(input: CreateTaskInput, creatorId: string) {
         await createNotification({
           userId: assigneeId,
           message: `You have been assigned to task: ${task.title}`,
-          link: `/tasks/${task.id}`,
+          link: getTaskLink(task),
         });
       }
     }
@@ -225,7 +236,7 @@ export async function updateTask(id: string, input: UpdateTaskInput, userId: str
           await createNotification({
             userId: assigneeId,
             message: `You have been assigned to task: ${updated.title}`,
-            link: `/tasks/${updated.id}`,
+            link: getTaskLink(updated),
           });
         }
       }
@@ -296,7 +307,7 @@ export async function updateTaskStatus(id: string, userId: string, input: Update
       await createNotification({
         userId: assigneeId,
         message: `Task "${task.title}" status updated to ${input.status}`,
-        link: `/tasks/${task.id}`,
+        link: getTaskLink(task),
       });
     }
   }
@@ -323,7 +334,7 @@ export async function updateTaskStatus(id: string, userId: string, input: Update
         await createNotification({
           userId: lead.id,
           message: `🚫 Task "${task.title}" was blocked by ${blocker?.name || 'a team member'}${input.comment ? `: "${input.comment}"` : ''}`,
-          link: `/tasks/${task.id}`,
+          link: getTaskLink(task),
         });
       }
     }

@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { UserMenu } from "@/components/layouts/member/user-menu";
 import { GlobalSearch } from "@/components/search/global-search";
 import { SearchTrigger } from "@/components/search/search-trigger";
-import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { Project, User } from "@/lib/types";
@@ -32,6 +31,11 @@ function getPageTitle(pathname: string): string | undefined {
   // Check for deliverable detail page pattern
   if (pathname.startsWith("/deliverables/") && pathname !== "/deliverables") {
     return "Deliverable Details";
+  }
+
+  // Check for phase detail page pattern
+  if (pathname.startsWith("/phases/") && pathname !== "/phases") {
+    return "Phase Details";
   }
 
   return;
@@ -76,7 +80,7 @@ export function AppHeader({
   }
 
   return (
-    <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-3 border-b bg-sidebar/60 backdrop-blur-2xl">
+    <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-3 border-b bg-sidebar">
       <div className="flex items-center gap-2 px-3">
         <SidebarTrigger
           aria-label="Toggle sidebar navigation"
@@ -94,12 +98,15 @@ export function AppHeader({
         <div className="w-fit max-w-xs items-center gap-2 sm:w-full md:flex">
           <SearchTrigger onOpenSearch={() => setSearchOpen(true)} />
         </div>
-        <ThemeToggle />
         {notificationComponent}
         <UserMenu user={user} />
       </div>
 
-      <GlobalSearch onOpenChange={setSearchOpen} open={searchOpen} />
+      <GlobalSearch
+        onOpenChange={setSearchOpen}
+        open={searchOpen}
+        user={user}
+      />
     </header>
   );
 }

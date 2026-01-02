@@ -5,7 +5,6 @@ import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { updateTaskStatusAction } from "@/actions/tasks";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Kanban,
@@ -17,6 +16,7 @@ import {
   KanbanOverlay,
   KanbanBoard as UiKanbanBoard,
 } from "@/components/ui/kanban";
+import { StatusBadge } from "@/components/ui/status";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -209,10 +209,10 @@ export function MemberKanbanBoard({
                   value={col.status}
                 >
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-sm">{col.label}</h3>
-                    <Badge className="text-xs" variant="secondary">
+                    <span className="font-sora text-sm">
                       {columnTasks.length}
-                    </Badge>
+                    </span>
+                    <StatusBadge status={col.status} />
                   </div>
 
                   <KanbanColumnContent
@@ -326,19 +326,17 @@ export function MemberKanbanBoard({
         defaultValue={activeTab}
         onValueChange={(value) => setActiveTab(value as TaskStatus)}
       >
-        <TabsList className="grid w-full grid-cols-4 gap-1">
+        <TabsList className="flex w-full gap-1 overflow-x-scroll pl-10">
           {COLUMN_DEFS.map((col) => {
             const count = (columnValues[col.status] ?? []).length;
             return (
               <TabsTrigger
-                className="text-xs"
+                className="flex items-center text-xs"
                 key={col.status}
                 value={col.status}
               >
-                <span className="truncate">{col.label}</span>
-                <Badge className="ml-1 text-xs" variant="secondary">
-                  {count}
-                </Badge>
+                <span>{count}</span>
+                <StatusBadge status={col.status} />
               </TabsTrigger>
             );
           })}

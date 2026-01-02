@@ -53,13 +53,26 @@ export async function updateSprintAction(input: UpdateSprintActionInput) {
       endDate: input.endDate,
     });
 
-    await sprintApi.updateSprint(input.id, parsed);
+    const startDate = cleanDateInput(parsed.startDate);
+    const endDate = cleanDateInput(parsed.endDate);
+
+    if (!(startDate && endDate)) {
+      throw new Error("Start date and end date are required");
+    }
+
+    const transformed = {
+      goal: parsed.goal || "",
+      startDate: toISODateTime(startDate) as string,
+      endDate: toISODateTime(endDate) as string,
+    };
+
+    await sprintApi.updateSprint(input.id, transformed);
     revalidatePath("/sprints");
 
     return { success: true } as const;
   } catch (error) {
     console.error("[updateSprintAction] Error:", error);
-    return { success: false, error: "Failed to update sprint" } as const;
+    return { success: false, error: getErrorMessage(error) } as const;
   }
 }
 

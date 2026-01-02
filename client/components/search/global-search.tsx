@@ -2,6 +2,7 @@
 
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { Command } from "cmdk";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useSearch } from "@/hooks/use-search";
+import type { User } from "@/lib/types";
 import { SearchResults } from "./search-results";
 
 /**
@@ -20,6 +22,8 @@ type GlobalSearchProps = {
   open: boolean;
   /** Callback to change dialog state */
   onOpenChange: (open: boolean) => void;
+  /** Current user (used for role-aware search filtering) */
+  user?: User | null;
 };
 
 /**
@@ -39,6 +43,7 @@ type GlobalSearchProps = {
  * - Backdrop click and cancel button to close
  * - Auto-focuses input when opened
  * - Resets state when closed
+ * - Role-aware filtering (members see only assigned items)
  *
  * Performance:
  * - startTransition keeps input responsive during result updates
@@ -51,9 +56,9 @@ type GlobalSearchProps = {
  * - aria-labels on interactive elements
  * - Proper focus management
  */
-export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
+export function GlobalSearch({ open, onOpenChange, user }: GlobalSearchProps) {
   const router = useRouter();
-  const { search, setSearch, results, isLoading } = useSearch(open);
+  const { search, setSearch, results, isLoading } = useSearch(open, user);
 
   /**
    * Handle result selection
@@ -102,11 +107,11 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
           aria-label="Close search"
           className="absolute top-2 right-2 z-10"
           onClick={() => onOpenChange(false)}
-          size="sm"
+          size="icon"
           type="button"
-          variant="outline"
+          variant="ghost"
         >
-          Cancel
+          <X />
         </Button>
 
         {/* Search input */}

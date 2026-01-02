@@ -51,12 +51,20 @@ export function MeetingRowActions({
 
   const handleView = () => {
     setDropdownOpen(false);
-    onAction("view", meeting);
+    window.open(meeting.fileUrl, "_blank");
   };
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     setDropdownOpen(false);
-    onAction("copy", meeting);
+    const url = `${window.location.origin}/meetings/${meeting.id}`;
+
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard");
+    } catch (error) {
+      console.error("Failed to copy link:", error);
+      toast.error("Failed to copy link");
+    }
   };
 
   const handleDeleteConfirm = () => {
@@ -65,7 +73,8 @@ export function MeetingRowActions({
 
     showPendingActionToast({
       title: "Delete meeting",
-      description: `We'll delete "${meeting.title}" in 5 seconds. Click Cancel to stop this action.`,
+      duration: 10_000,
+      description: `We'll delete "${meeting.title}" in 10 seconds. Click Cancel to stop this action.`,
       onTimeout: async () => {
         try {
           await onAction("delete", meeting);
@@ -90,7 +99,7 @@ export function MeetingRowActions({
         <DropdownMenuTrigger asChild>
           <Button
             aria-label="Meeting actions"
-            className="h-8 w-8 p-0"
+            // className="h-8 w-8 p-0"
             disabled={isLoading || isDeleting}
             size="icon"
             variant="ghost"
@@ -148,7 +157,9 @@ export function MeetingRowActions({
             <AlertDialogAction
               disabled={isDeleting}
               onClick={handleDeleteConfirm}
+              variant="destructive"
             >
+              <TrashIcon />
               Continue
             </AlertDialogAction>
           </AlertDialogFooter>

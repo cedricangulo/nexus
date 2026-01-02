@@ -1,9 +1,18 @@
 "use client";
 
+import { FolderPlus } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
-
+import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import type { Deliverable, PhaseDetail } from "@/lib/types";
-
 import { DeliverableCreateDialog } from "./dialogs/deliverable-create-dialog";
 import { DeliverableEditDialog } from "./dialogs/deliverable-edit-dialog";
 import { PhaseEditDialog } from "./dialogs/phase-edit-dialog";
@@ -11,9 +20,10 @@ import { PhaseCard } from "./phase-card";
 
 type PhaseManagerProps = {
   phases: PhaseDetail[];
+  isTeamLead?: boolean;
 };
 
-export function PhaseManager({ phases }: PhaseManagerProps) {
+export function PhaseManager({ phases, isTeamLead }: PhaseManagerProps) {
   const [editingPhase, setEditingPhase] = useState<PhaseDetail | null>(null);
   const [addingDeliverablePhaseId, setAddingDeliverablePhaseId] = useState<
     string | null
@@ -26,6 +36,31 @@ export function PhaseManager({ phases }: PhaseManagerProps) {
   const sortedPhases = [...phases].sort(
     (a, b) => phaseOrder.indexOf(a.type) - phaseOrder.indexOf(b.type)
   );
+
+  // Empty state for team lead
+  if (isTeamLead && sortedPhases.length === 0) {
+    return (
+      <Empty className="border py-12">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <FolderPlus />
+          </EmptyMedia>
+          <EmptyTitle>No Phases Created</EmptyTitle>
+          <EmptyDescription>
+            Get started by creating your first project phase in the methodology
+            settings.
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <Button asChild variant="secondary">
+            <Link href="/settings/project-config#methodology">
+              <FolderPlus /> Create Phase
+            </Link>
+          </Button>
+        </EmptyContent>
+      </Empty>
+    );
+  }
 
   return (
     <div className="flex w-full flex-col gap-6">

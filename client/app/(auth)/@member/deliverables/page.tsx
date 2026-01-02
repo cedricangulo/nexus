@@ -15,9 +15,11 @@
  */
 
 import { MemberDeliverablesClient } from "@/components/member/deliverables/client";
-import { deliverableApi } from "@/lib/api/deliverable";
-import { evidenceApi } from "@/lib/api/evidence";
-import { phaseApi } from "@/lib/api/phase";
+import {
+  getDeliverables,
+  getEvidenceByDeliverable,
+  getPhases,
+} from "@/lib/data/deliverables";
 
 export const metadata = {
   title: "Deliverables",
@@ -26,20 +28,14 @@ export const metadata = {
 
 export default async function MemberDeliverablesPage() {
   const [deliverables, phases] = await Promise.all([
-    deliverableApi.listDeliverables(),
-    phaseApi.listPhases(),
+    getDeliverables(),
+    getPhases(),
   ]);
 
   const evidenceEntries = await Promise.all(
     deliverables.map(async (deliverable) => {
-      try {
-        const evidence = await evidenceApi.getEvidenceByDeliverable(
-          deliverable.id
-        );
-        return [deliverable.id, evidence] as const;
-      } catch {
-        return [deliverable.id, []] as const;
-      }
+      const evidence = await getEvidenceByDeliverable(deliverable.id);
+      return [deliverable.id, evidence] as const;
     })
   );
 

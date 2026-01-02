@@ -13,7 +13,12 @@ export async function getProject(): Promise<Project | null> {
     await requireUser();
     const response = await projectApi.getProject();
     return response;
-  } catch (error) {
+  } catch (error: unknown) {
+    // Project not found (404) is expected when team lead hasn't created it yet
+    const axiosError = error as any;
+    if (axiosError?.response?.status === 404) {
+      return null;
+    }
     console.error("Failed to fetch project:", error);
     return null;
   }

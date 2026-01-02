@@ -95,24 +95,6 @@ export default function GeneralSettings({ project }: GeneralSettingsProps) {
     }
   };
 
-  if (!project) {
-    return (
-      <Frame id="general-settings">
-        <FrameHeader>
-          <FrameTitle>General Settings</FrameTitle>
-          <FrameDescription>
-            Basic identification details for your capstone project.
-          </FrameDescription>
-        </FrameHeader>
-        <FramePanel className="space-y-8">
-          <p className="text-center text-muted-foreground">
-            No project found. Please contact your administrator.
-          </p>
-        </FramePanel>
-      </Frame>
-    );
-  }
-
   return (
     <Frame id="general-settings">
       <FrameHeader className="p-4">

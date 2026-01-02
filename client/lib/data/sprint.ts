@@ -22,13 +22,18 @@ export async function getSprints(): Promise<Sprint[]> {
 
   const role = session.user.role;
 
-  // Members see only their assigned sprints
-  if (role === "member") {
-    return await sprintApi.listMySprints();
-  }
+  try {
+    // Members see only their assigned sprints
+    if (role === "member") {
+      return await sprintApi.listMySprints();
+    }
 
-  // Team Lead and Adviser see all sprints
-  return await sprintApi.listSprints();
+    // Team Lead and Adviser see all sprints
+    return await sprintApi.listSprints();
+  } catch (error) {
+    console.error("Failed to fetch sprints:", error);
+    return [];
+  }
 }
 
 /**
