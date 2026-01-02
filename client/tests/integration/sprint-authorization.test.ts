@@ -1,6 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { notFound, unauthorized } from "next/navigation";
-import type { Sprint, Task, User } from "@/lib/types";
+import { describe, expect, it } from "vitest";
+import type { Task, User } from "@/lib/types";
 
 // Authorization logic tests don't need next/navigation mocks
 // since they test the logic directly, not the page component
@@ -65,16 +64,23 @@ describe("Sprint Detail Page Authorization", () => {
     status: "IN_PROGRESS",
     sprintId: "sprint-1",
     phaseId: null,
-    assignees: [{ id: "other-user", email: "", name: "", role: "MEMBER", createdAt: new Date(), updatedAt: new Date() }],
+    assignees: [
+      {
+        id: "other-user",
+        email: "",
+        name: "",
+        role: "MEMBER",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ],
     createdAt: new Date(),
     updatedAt: new Date(),
   };
 
   describe("Member Authorization", () => {
     it("should allow member with assigned tasks in sprint", async () => {
-      const result = await validateSprintAccess(mockMember, [
-        mockAssignedTask,
-      ]);
+      const result = await validateSprintAccess(mockMember, [mockAssignedTask]);
 
       expect(result.authorized).toBe(true);
       expect(result.reason).toBeUndefined();
@@ -221,7 +227,10 @@ describe("Sprint Detail Page Authorization", () => {
     });
 
     it("should handle undefined assignees", async () => {
-      const taskWithoutAssignees = { ...mockAssignedTask, assignees: undefined };
+      const taskWithoutAssignees = {
+        ...mockAssignedTask,
+        assignees: undefined,
+      };
       const result = await validateSprintAccess(mockMember, [
         taskWithoutAssignees,
       ]);

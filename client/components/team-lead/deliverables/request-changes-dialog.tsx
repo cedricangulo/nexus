@@ -1,5 +1,6 @@
 "use client";
 
+import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,7 +21,6 @@ import {
 } from "@/components/ui/drawer";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Send } from "lucide-react";
 
 export type RequestChangesDialogProps = {
   comment: string;

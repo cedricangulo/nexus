@@ -1,7 +1,6 @@
 import { auth } from "@/auth";
 import { PhaseManager } from "@/components/team-lead/phases/phase-manager";
-import { phaseApi } from "@/lib/api/phase";
-import type { PhaseDetail } from "@/lib/types";
+import { getPhasesWithDetails } from "@/lib/data/phases";
 
 export const metadata = {
   title: "Project Phases",
@@ -16,13 +15,7 @@ export default async function PhasesPage() {
     return null;
   }
 
-  // Fetch all phases with their deliverables included
-  const phases = await phaseApi.listPhases();
+  const phasesWithDeliverables = await getPhasesWithDetails();
 
-  // Fetch detailed information for each phase (includes deliverables)
-  const phasesWithDeliverables: PhaseDetail[] = await Promise.all(
-    phases.map((phase) => phaseApi.getPhaseById(phase.id))
-  );
-
-  return <PhaseManager phases={phasesWithDeliverables} />;
+  return <PhaseManager isTeamLead phases={phasesWithDeliverables} />;
 }

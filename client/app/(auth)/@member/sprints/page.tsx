@@ -15,10 +15,7 @@ export default async function Page() {
     return null;
   }
 
-  // Fetch sprints assigned to the user
   const sprints = await getSprints();
-
-  // Fetch progress for sprints
   const progressById = await getSprintsProgress(sprints.map((s) => s.id));
 
   return (

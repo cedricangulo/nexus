@@ -1,6 +1,12 @@
 "use client";
 
-import { CalendarDays, Home, IterationCcw, Layers, Package} from "lucide-react";
+import {
+  CalendarDays,
+  Home,
+  IterationCcw,
+  Layers,
+  Package,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";

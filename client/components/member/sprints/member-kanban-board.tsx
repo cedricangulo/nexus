@@ -5,7 +5,6 @@ import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { updateTaskStatusAction } from "@/actions/tasks";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Kanban,
@@ -17,6 +16,7 @@ import {
   KanbanOverlay,
   KanbanBoard as UiKanbanBoard,
 } from "@/components/ui/kanban";
+import { StatusBadge } from "@/components/ui/status";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -24,7 +24,6 @@ import type { Task, TaskStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { MemberTaskCard } from "./member-task-card";
 import { MemberTaskDetailDialog } from "./member-task-detail-dialog";
-import { StatusBadge } from "@/components/ui/status";
 
 const COLUMN_DEFS = [
   {
@@ -210,7 +209,9 @@ export function MemberKanbanBoard({
                   value={col.status}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="font-sora text-sm">{columnTasks.length}</span>
+                    <span className="font-sora text-sm">
+                      {columnTasks.length}
+                    </span>
                     <StatusBadge status={col.status} />
                   </div>
 

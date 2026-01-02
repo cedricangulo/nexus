@@ -57,7 +57,7 @@ export function MeetingRowActions({
   const handleCopy = async () => {
     setDropdownOpen(false);
     const url = `${window.location.origin}/meetings/${meeting.id}`;
-    
+
     try {
       await navigator.clipboard.writeText(url);
       toast.success("Link copied to clipboard");

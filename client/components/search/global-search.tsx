@@ -2,6 +2,7 @@
 
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { Command } from "cmdk";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +13,6 @@ import {
 import { useSearch } from "@/hooks/use-search";
 import type { User } from "@/lib/types";
 import { SearchResults } from "./search-results";
-import { X } from "lucide-react";
 
 /**
  * Props for GlobalSearch component

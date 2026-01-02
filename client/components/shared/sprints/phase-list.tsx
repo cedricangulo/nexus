@@ -90,7 +90,9 @@ export function PhaseList({
                     <div className="space-y-4">
                       <div className="space-y-1">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Progress</span>
+                          <span className="text-muted-foreground">
+                            Progress
+                          </span>
                           <span className="font-medium font-sora">
                             {progress
                               ? `${progress.completedTasks}/${progress.totalTasks}`
@@ -110,7 +112,7 @@ export function PhaseList({
                   </FramePanel>
                 ) : (
                   <Link href={`/sprints/${sprint.id}`}>
-                    <FramePanel className="space-y-6 bg-card hover:border-primary/50 transition-colors">
+                    <FramePanel className="space-y-6 bg-card transition-colors hover:border-primary/50">
                       <div className="space-y-2">
                         <div className="flex items-start justify-between gap-4">
                           <div>
@@ -130,7 +132,9 @@ export function PhaseList({
                       <div className="space-y-4">
                         <div className="space-y-1">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Progress</span>
+                            <span className="text-muted-foreground">
+                              Progress
+                            </span>
                             <span className="font-medium font-sora">
                               {progress
                                 ? `${progress.completedTasks}/${progress.totalTasks}`

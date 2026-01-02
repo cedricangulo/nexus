@@ -19,6 +19,16 @@ export async function getDeliverableById(
   }
 }
 
+export async function getDeliverables(): Promise<Deliverable[]> {
+  try {
+    await requireUser();
+    return await deliverableApi.listDeliverables();
+  } catch (error) {
+    console.error("Failed to fetch deliverables:", error);
+    return [];
+  }
+}
+
 export async function getPhases(): Promise<Phase[]> {
   try {
     await requireUser();
