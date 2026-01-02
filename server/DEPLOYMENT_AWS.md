@@ -142,7 +142,7 @@ This guide outlines how to deploy the Nexus backend to **AWS** using **EC2** (fo
     ```bash
     pnpm build
     pnpm db:migrate:deploy
-    pnpm db:seed
+    pnpm db:seed:prod  # Creates Team Lead & Project (customize via env vars)
     ```
 
 5.  **Start with PM2 (Keep alive):**

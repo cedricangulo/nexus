@@ -87,6 +87,19 @@ If you need initial data (e.g., default Phases):
 pnpm db:seed
 ```
 
+**Production Seed (Recommended for First Deploy):**
+To create the initial Team Lead account and project with WSF phases:
+```bash
+pnpm db:seed:prod
+```
+*Customize via environment variables:*
+- `SEED_TEAM_LEAD_EMAIL` - Team Lead's email
+- `SEED_TEAM_LEAD_NAME` - Team Lead's display name
+- `SEED_TEAM_LEAD_PASSWORD` - Initial password (change after first login!)
+- `SEED_PROJECT_NAME` - Your project name
+- `SEED_PROJECT_DESCRIPTION` - Project description
+- `SEED_PROJECT_REPO_URL` - Repository URL (optional)
+
 ---
 
 ## Step 5: Verify Deployment
