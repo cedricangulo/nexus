@@ -3,6 +3,7 @@
 import { startTransition, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { globalSearchAction } from "@/actions/search";
+import type { User } from "@/lib/types";
 import type { SearchResults } from "@/lib/types/search";
 
 /**
@@ -14,11 +15,13 @@ import type { SearchResults } from "@/lib/types/search";
  * - React 18 startTransition for non-blocking UI updates
  * - Component mounted state tracking to prevent memory leaks
  * - Automatic reset when search dialog closes
+ * - Role-aware search filtering (members see only assigned items)
  *
  * @param open - Whether the search dialog is currently open
+ * @param user - Current user (used for role-aware filtering)
  * @returns Object containing search state and handlers
  */
-export function useSearch(open: boolean) {
+export function useSearch(open: boolean, user?: User | null) {
   const isMountedRef = useRef(true);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<SearchResults | null>(null);
@@ -48,6 +51,7 @@ export function useSearch(open: boolean) {
    * - 400ms debounce reduces API calls on slower devices
    * - AbortController prevents race conditions from overlapping requests
    * - startTransition keeps input field responsive during result updates
+   * - User role/id passed to backend for role-aware filtering
    */
   useEffect(() => {
     // Clear results if search is too short
@@ -68,7 +72,7 @@ export function useSearch(open: boolean) {
 
       setIsLoading(true);
       try {
-        const result = await globalSearchAction(search);
+        const result = await globalSearchAction(search, user);
 
         // Bail early if component unmounted or request was aborted
         if (!isMountedRef.current || controller.signal.aborted) {
@@ -107,7 +111,7 @@ export function useSearch(open: boolean) {
       clearTimeout(timeoutId);
       controller.abort();
     };
-  }, [search]);
+  }, [search, user]);
 
   /**
    * Reset search state when dialog closes

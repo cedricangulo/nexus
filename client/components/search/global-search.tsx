@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useSearch } from "@/hooks/use-search";
+import type { User } from "@/lib/types";
 import { SearchResults } from "./search-results";
 
 /**
@@ -20,6 +21,8 @@ type GlobalSearchProps = {
   open: boolean;
   /** Callback to change dialog state */
   onOpenChange: (open: boolean) => void;
+  /** Current user (used for role-aware search filtering) */
+  user?: User | null;
 };
 
 /**
@@ -39,6 +42,7 @@ type GlobalSearchProps = {
  * - Backdrop click and cancel button to close
  * - Auto-focuses input when opened
  * - Resets state when closed
+ * - Role-aware filtering (members see only assigned items)
  *
  * Performance:
  * - startTransition keeps input responsive during result updates
@@ -51,9 +55,9 @@ type GlobalSearchProps = {
  * - aria-labels on interactive elements
  * - Proper focus management
  */
-export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
+export function GlobalSearch({ open, onOpenChange, user }: GlobalSearchProps) {
   const router = useRouter();
-  const { search, setSearch, results, isLoading } = useSearch(open);
+  const { search, setSearch, results, isLoading } = useSearch(open, user);
 
   /**
    * Handle result selection

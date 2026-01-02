@@ -1,3 +1,2 @@
-import { ActivityLogsClient as Client } from "./client";
-
-export { Client as ActivityLogsClient };
+export { ActivityLogCard } from "./activity-log-card";
+export { ActivityLogsClient } from "./client";

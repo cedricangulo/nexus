@@ -1,6 +1,8 @@
 "use client";
 
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useTransition } from "react";
 import { logoutAction } from "@/actions/logout";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -12,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { User } from "@/lib/types";
+import { getInitials } from "@/lib/utils";
 
 /**
  * User Menu Component
@@ -23,20 +26,23 @@ export function UserMenu({ user }: { user: User | null }) {
     return null;
   }
 
-  const initials = user.name
-    ?.split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase();
+  const { setTheme, theme } = useTheme();
+  const [isPending, startTransition] = useTransition();
+
+  const handleLogout = () => {
+    startTransition(async () => {
+      await logoutAction();
+    });
+  };
 
   return (
     <div className="md:hidden">
       {/* Mobile only */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className="rounded-full" size="icon" variant="secondary">
+          <Button className="rounded-full" size="icon" variant="outline">
             <Avatar className="h-8 w-8">
-              <AvatarFallback>{initials}</AvatarFallback>
+              <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
@@ -54,12 +60,25 @@ export function UserMenu({ user }: { user: User | null }) {
           <DropdownMenuSeparator />
 
           <DropdownMenuItem
-            className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
-            onClick={() => logoutAction()}
-            variant="destructive"
+            className="cursor-pointer"
+            onSelect={(e) => {
+              e.preventDefault();
+              setTheme(theme === "light" ? "dark" : "light");
+            }}
           >
+            {theme === "light" ? (
+              <Sun className="size-4" />
+            ) : (
+              <Moon className="size-4" />
+            )}
+            <span>{theme === "light" ? "Light Mode" : "Dark Mode"}</span>
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem disabled={isPending} onClick={handleLogout}>
             <LogOutIcon size={16} />
-            Log out
+            {isPending ? "Logging out..." : "Log out"}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

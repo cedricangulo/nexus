@@ -1,30 +1,32 @@
 "use client";
 
 import {
+  Atom,
   CalendarDays,
-  ClipboardList,
-  FolderOpen,
-  GalleryVerticalEnd,
+  IterationCcw,
+  Layers,
   LayoutDashboard,
   type LucideIcon,
-  Shapes,
+  Package,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import { Badge } from "@/components/ui/badge";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import type { BadgeCounts } from "@/lib/data/badge-counts";
 import type { User } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { NavUser } from "../nav-user";
 
 type NavItem = {
@@ -36,19 +38,20 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { title: "Phases", href: "/phases", icon: Shapes },
-  { title: "Sprints", href: "/sprints", icon: ClipboardList },
+  { title: "Phases", href: "/phases", icon: Layers },
+  { title: "Sprints", href: "/sprints", icon: IterationCcw },
   { title: "Meetings", href: "/meetings", icon: CalendarDays },
-  { title: "Deliverables", href: "/deliverables", icon: FolderOpen },
+  { title: "Deliverables", href: "/deliverables", icon: Package },
 ] as const;
 
 const AUTH_ROUTE_REGEX = /^\/(auth)/;
 
 type AppSidebarProps = {
   user: User | null;
+  badgeCounts?: BadgeCounts;
 };
 
-export function AppSidebar({ user }: AppSidebarProps) {
+export function AppSidebar({ user, badgeCounts }: AppSidebarProps) {
   const pathname = usePathname();
 
   // Strip the (auth) route group from pathname
@@ -59,6 +62,56 @@ export function AppSidebar({ user }: AppSidebarProps) {
       return false;
     }
     return cleanPathname === href;
+  };
+
+  // Badge display helper: hide if 0, show "9+" if > 9
+  const _formatBadge = (count: number): string | null => {
+    if (count === 0) {
+      return null;
+    }
+    if (count > 9) {
+      return "9+";
+    }
+    return count.toString();
+  };
+
+  // Get badge config for each route
+  const getBadgeConfig = (href: string) => {
+    if (!badgeCounts) {
+      return null;
+    }
+
+    switch (href) {
+      case "/deliverables":
+        if (badgeCounts.deliverablesInReview === 0) {
+          return null;
+        }
+        return {
+          count: badgeCounts.deliverablesInReview,
+          variant: "info" as const, // Blue
+          label: `${badgeCounts.deliverablesInReview > 9 ? "9+" : badgeCounts.deliverablesInReview} Review`,
+        };
+      case "/sprints":
+        if (badgeCounts.blockedTasks === 0) {
+          return null;
+        }
+        return {
+          count: badgeCounts.blockedTasks,
+          variant: "error" as const, // Red
+          label: `${badgeCounts.blockedTasks > 9 ? "9+" : badgeCounts.blockedTasks} Blocked`,
+        };
+      case "/meetings":
+        if (badgeCounts.phasesWithoutMeetings === 0) {
+          return null;
+        }
+        return {
+          count: badgeCounts.phasesWithoutMeetings,
+          variant: "warning" as const, // Amber/Warning
+          label: `${badgeCounts.phasesWithoutMeetings > 9 ? "9+" : badgeCounts.phasesWithoutMeetings} Missing`,
+        };
+      default:
+        return null;
+    }
   };
 
   const isMobile = useIsMobile();
@@ -74,12 +127,16 @@ export function AppSidebar({ user }: AppSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton asChild size="lg">
               <Link href="/dashboard">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <GalleryVerticalEnd className="size-4" />
+                <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-linear-to-tl from-sidebar-primary to-sidebar-primary/70 text-sidebar-primary-foreground shadow-blue-300 shadow-inner">
+                  <Atom className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-medium">Nexus</span>
-                  <span className="">v1.0.0</span>
+                  <span className="font-bold font-sora text-foreground">
+                    Nexus
+                  </span>
+                  <span className="text-muted-foreground text-xs">
+                    Capstone Management System
+                  </span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -90,46 +147,37 @@ export function AppSidebar({ user }: AppSidebarProps) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
-            {navItems.map((item) => (
-              <React.Fragment key={item.title}>
-                {item.items ? (
-                  <>
-                    <SidebarGroupLabel className="mt-4">
-                      {item.title}
-                    </SidebarGroupLabel>
-                    <SidebarMenu>
-                      {item.items.map((subItem) => (
-                        <SidebarMenuItem key={subItem.href}>
-                          <SidebarMenuButton
-                            asChild
-                            isActive={isActive(subItem.href || "")}
-                          >
-                            <Link href={subItem.href || ""}>
-                              {subItem.icon ? (
-                                <subItem.icon className="size-4" />
-                              ) : null}
-                              <span>{subItem.title}</span>
-                            </Link>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))}
-                    </SidebarMenu>
-                  </>
-                ) : (
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive(item.href || "")}
-                    >
-                      <Link href={item.href || ""}>
-                        {item.icon ? <item.icon className="size-4" /> : null}
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )}
-              </React.Fragment>
-            ))}
+            {navItems.map((item) => {
+              const badgeConfig = getBadgeConfig(item.href || "");
+              return (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive(item.href || "")}
+                  >
+                    <Link href={item.href || ""}>
+                      {item.icon ? (
+                        <item.icon
+                          className={cn(
+                            isActive(item.href || "")
+                              ? "text-primary dark:text-blue-500"
+                              : null
+                          )}
+                        />
+                      ) : null}
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                  {badgeConfig?.label && (
+                    <SidebarMenuBadge>
+                      <Badge variant={badgeConfig.variant}>
+                        {badgeConfig.label}
+                      </Badge>
+                    </SidebarMenuBadge>
+                  )}
+                </SidebarMenuItem>
+              );
+            })}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>

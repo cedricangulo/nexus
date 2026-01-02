@@ -77,7 +77,7 @@ async function NotificationBadge() {
   }
 
   return (
-    <Badge className="absolute -top-2 left-full min-w-5 -translate-x-1/2 px-1">
+    <Badge className="absolute -top-1 left-full -translate-x-1/2 px-1 font-sora">
       {unreadCount > 99 ? "99+" : unreadCount}
     </Badge>
   );

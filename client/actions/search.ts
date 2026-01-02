@@ -4,9 +4,10 @@ import type { AxiosError } from "axios";
 import { apiClient } from "@/lib/api/client";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
 import { requireUser } from "@/lib/helpers/rbac";
+import type { User } from "@/lib/types";
 import type { SearchResults } from "@/lib/types/search";
 
-export async function globalSearchAction(query: string) {
+export async function globalSearchAction(query: string, user?: User | null) {
   try {
     await requireUser();
 
@@ -17,7 +18,11 @@ export async function globalSearchAction(query: string) {
     const response = await apiClient.get<SearchResults>(
       API_ENDPOINTS.SEARCH.GLOBAL,
       {
-        params: { q: query },
+        params: {
+          q: query,
+          userId: user?.id,
+          userRole: user?.role,
+        },
       }
     );
 

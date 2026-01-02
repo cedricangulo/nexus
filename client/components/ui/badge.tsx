@@ -33,7 +33,7 @@ const badgeVariants = cva(
           "bg-info text-info-foreground",
       },
       size: {
-        default: "p-0.5 has-[>svg]:pr-1 has-[>svg]:gap-1",
+        default: "px-1 has-[>svg]:pl-0.5 has-[>svg]:pr-1 has-[>svg]:gap-1",
         sm: "px-1.5 py-0.25 text-[0.65rem]",
         lg: "px-2.5 py-1 text-sm",
       },
