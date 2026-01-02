@@ -51,12 +51,20 @@ export function MeetingRowActions({
 
   const handleView = () => {
     setDropdownOpen(false);
-    onAction("view", meeting);
+    window.open(meeting.fileUrl, "_blank");
   };
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     setDropdownOpen(false);
-    onAction("copy", meeting);
+    const url = `${window.location.origin}/meetings/${meeting.id}`;
+    
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard");
+    } catch (error) {
+      console.error("Failed to copy link:", error);
+      toast.error("Failed to copy link");
+    }
   };
 
   const handleDeleteConfirm = () => {
