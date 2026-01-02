@@ -4,10 +4,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { GlobalSearch } from "@/components/search/global-search";
 import { SearchTrigger } from "@/components/search/search-trigger";
-import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import type { Project } from "@/lib/types";
+import type { Project, User } from "@/lib/types";
 
 // Centralized route-to-title mapping (excludes /dashboard which gets project name)
 const ROUTE_TITLES: Record<string, string> = {
@@ -53,9 +52,11 @@ function getPageTitle(pathname: string): string | undefined {
 export function AppHeader({
   project,
   notificationComponent,
+  user,
 }: {
   project: Project | null;
   notificationComponent: React.ReactNode;
+  user?: User | null;
 }) {
   const pathname = usePathname();
   const [searchOpen, setSearchOpen] = useState(false);
@@ -81,11 +82,11 @@ export function AppHeader({
     title = getPageTitle(pathname);
   }
   return (
-    <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-3 border-b bg-sidebar/60 backdrop-blur-2xl">
+    <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-3 border-b bg-sidebar">
       <div className="flex items-center gap-2 px-3">
         <SidebarTrigger
           aria-label="Toggle sidebar navigation"
-          className="hidden sm:flex rounded-md transition-colors hover:bg-accent"
+          className="hidden rounded-md transition-colors hover:bg-accent sm:flex"
         />
         <Separator aria-hidden="true" className="h-4" orientation="vertical" />
         {title ? (
@@ -100,14 +101,17 @@ export function AppHeader({
           <SearchTrigger onOpenSearch={() => setSearchOpen(true)} />
         </div>
         {notificationComponent}
-        <ThemeToggle />
         <SidebarTrigger
           aria-label="Toggle sidebar navigation"
-          className="sm:hidden flex rounded-md transition-colors hover:bg-accent"
+          className="flex rounded-md transition-colors hover:bg-accent sm:hidden"
         />
       </div>
 
-      <GlobalSearch onOpenChange={setSearchOpen} open={searchOpen} />
+      <GlobalSearch
+        onOpenChange={setSearchOpen}
+        open={searchOpen}
+        user={user}
+      />
     </header>
   );
 }
