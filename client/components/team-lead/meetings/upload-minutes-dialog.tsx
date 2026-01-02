@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -42,6 +43,7 @@ export function UploadMinutesDialog({
   onOpenChange,
 }: UploadMinutesDialogProps) {
   const [_isPending, startTransition] = useTransition();
+  const router = useRouter();
   const maxSize = 10 * 1024 * 1024; // 10MB
 
   const form = useForm<UploadInput>({
@@ -108,6 +110,7 @@ export function UploadMinutesDialog({
         if (result.success) {
           toast.success("Meeting minutes uploaded successfully");
           form.reset();
+          router.refresh();
         } else {
           toast.error(result.error || "Failed to upload meeting minutes");
           throw new Error(result.error);

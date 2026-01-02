@@ -3,7 +3,7 @@
 import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { AppRole } from "@/auth";
 import { MeetingRowActions } from "@/components/shared/meetings/table/row-actions";
-import { formatDateTime } from "@/lib/helpers/format-date";
+import { formatDate } from "@/lib/helpers/format-date";
 import type { MeetingLog, Phase, Sprint } from "@/lib/types";
 
 export type MeetingsTableRow = MeetingLog & {
@@ -27,7 +27,7 @@ export const multiColumnFilterFn: FilterFn<MeetingsTableRow> = (
     uploader?.name,
     uploader?.email,
     row.getValue("scope") as string,
-    formatDateTime(row.getValue("date") as string),
+    formatDate(row.getValue("date") as string),
   ]
     .filter(Boolean)
     .join(" ")
@@ -128,7 +128,7 @@ export function createMeetingColumns(context: ColumnsContext): {
       size: 180,
       header: "Date",
       cell: ({ row }) => (
-        <div className="text-sm">{formatDateTime(row.getValue("date"))}</div>
+        <div className="text-sm">{formatDate(row.getValue("date"))}</div>
       ),
     },
     {
