@@ -41,10 +41,26 @@ export async function getBadgeCounts(user?: User | null): Promise<BadgeCounts> {
 
   try {
     const [deliverables, tasks, phases, activityLogs] = await Promise.all([
-      deliverableApi.listDeliverables(),
-      taskApi.listTasks(),
-      phaseApi.listPhases(),
-      activityLogApi.listActivityLogs(),
+      deliverableApi.listDeliverables().catch((error) => {
+        if (error.status === 403) return [];
+        console.error("Error fetching deliverables:", error);
+        return [];
+      }),
+      taskApi.listTasks().catch((error) => {
+        if (error.status === 403) return [];
+        console.error("Error fetching tasks:", error);
+        return [];
+      }),
+      phaseApi.listPhases().catch((error) => {
+        if (error.status === 403) return [];
+        console.error("Error fetching phases:", error);
+        return [];
+      }),
+      activityLogApi.listActivityLogs().catch((error) => {
+        if (error.status === 403) return [];
+        console.error("Error fetching activity logs:", error);
+        return [];
+      }),
     ]);
 
     // For TEAM_LEAD: show all counts; for MEMBER: show only assigned items
