@@ -12,6 +12,7 @@ import {
 import { useSearch } from "@/hooks/use-search";
 import type { User } from "@/lib/types";
 import { SearchResults } from "./search-results";
+import { X } from "lucide-react";
 
 /**
  * Props for GlobalSearch component
@@ -106,11 +107,11 @@ export function GlobalSearch({ open, onOpenChange, user }: GlobalSearchProps) {
           aria-label="Close search"
           className="absolute top-2 right-2 z-10"
           onClick={() => onOpenChange(false)}
-          size="sm"
+          size="icon"
           type="button"
-          variant="outline"
+          variant="ghost"
         >
-          Cancel
+          <X />
         </Button>
 
         {/* Search input */}

@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/drawer";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Send } from "lucide-react";
 
 export type RequestChangesDialogProps = {
   comment: string;
@@ -67,7 +68,7 @@ export function RequestChangesDialog({
               disabled={isPending || comment.trim() === ""}
               onClick={onSubmit}
             >
-              Submit
+              <Send /> Submit
             </Button>
             <DrawerClose asChild>
               <Button disabled={isPending} variant="outline">
@@ -97,7 +98,7 @@ export function RequestChangesDialog({
             disabled={isPending || comment.trim() === ""}
             onClick={onSubmit}
           >
-            Submit
+            <Send /> Submit
           </Button>
         </DialogFooter>
       </DialogContent>

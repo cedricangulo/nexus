@@ -34,6 +34,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Task, TaskStatus } from "@/lib/types";
+import { Spinner } from "@/components/ui/spinner";
+import { Save } from "lucide-react";
 
 const STATUS_OPTIONS = [
   { value: "TODO", label: "To Do" },
@@ -266,7 +268,15 @@ export function MemberTaskDetailDialog({
               }
               onClick={handleSave}
             >
-              {isPending ? "Saving..." : "Save"}
+            {isPending ? (
+                <>
+                  <Spinner /> Save Changes
+                </>
+              ) : (
+                <>
+                  <Save /> Save Changes
+                </>
+              )}
             </Button>
             <DrawerClose asChild>
               <Button disabled={isPending} variant="outline">
@@ -310,7 +320,15 @@ export function MemberTaskDetailDialog({
             }
             onClick={handleSave}
           >
-            {isPending ? "Saving..." : "Save"}
+            {isPending ? (
+              <>
+                <Spinner /> Save Changes
+              </>
+            ) : (
+              <>
+                <Save /> Save Changes
+              </>
+            )}
           </Button>
         </div>
       </DialogContent>

@@ -2,20 +2,39 @@ import { getPrismaClient } from "../../utils/database.js";
 
 const prisma = getPrismaClient();
 
-export async function searchGlobal(query: string) {
+export async function searchGlobal(
+  query: string,
+  userId?: string,
+  userRole?: "TEAM_LEAD" | "MEMBER"
+) {
   // Normalize search term
   const searchTerm = query.trim();
+
+  // Determine if user is a member (needs filtering)
+  const isMember = userRole === "MEMBER" && userId;
 
   // Run searches in parallel for better performance
   const [tasks, deliverables, comments, meetingLogs] = await Promise.all([
     // 1. Search Tasks (title or description)
     prisma.task.findMany({
       where: {
-        OR: [
-          { title: { contains: searchTerm, mode: "insensitive" } },
-          { description: { contains: searchTerm, mode: "insensitive" } },
+        AND: [
+          {
+            OR: [
+              { title: { contains: searchTerm, mode: "insensitive" } },
+              { description: { contains: searchTerm, mode: "insensitive" } },
+            ],
+          },
+          { deletedAt: null },
+          // Filter by assignment if user is a member
+          isMember
+            ? {
+                assignments: {
+                  some: { userId },
+                },
+              }
+            : {},
         ],
-        deletedAt: null,
       },
       select: {
         id: true,
@@ -30,11 +49,16 @@ export async function searchGlobal(query: string) {
     // 2. Search Deliverables (title or description)
     prisma.deliverable.findMany({
       where: {
-        OR: [
-          { title: { contains: searchTerm, mode: "insensitive" } },
-          { description: { contains: searchTerm, mode: "insensitive" } },
+        AND: [
+          {
+            OR: [
+              { title: { contains: searchTerm, mode: "insensitive" } },
+              { description: { contains: searchTerm, mode: "insensitive" } },
+            ],
+          },
+          { deletedAt: null },
+          // Members see all deliverables (they may need to review team deliverables)
         ],
-        deletedAt: null,
       },
       select: {
         id: true,
@@ -49,7 +73,19 @@ export async function searchGlobal(query: string) {
     // 3. Search Comments (content)
     prisma.comment.findMany({
       where: {
-        content: { contains: searchTerm, mode: "insensitive" },
+        AND: [
+          { content: { contains: searchTerm, mode: "insensitive" } },
+          // Filter comments: members only see comments on their assigned tasks
+          isMember
+            ? {
+                task: {
+                  assignments: {
+                    some: { userId },
+                  },
+                },
+              }
+            : {},
+        ],
       },
       select: {
         id: true,
@@ -65,6 +101,7 @@ export async function searchGlobal(query: string) {
     }),
 
     // 4. Search Meeting Logs (title)
+    // All users can search meeting logs
     prisma.meetingLog.findMany({
       where: {
         title: { contains: searchTerm, mode: "insensitive" },

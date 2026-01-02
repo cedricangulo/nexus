@@ -1,7 +1,9 @@
 import { z } from "zod";
 
 export const searchQuerySchema = z.object({
-  q: z.string().min(1, "Search term cannot be empty"),
+  q: z.string().min(3, "Search term must be at least 3 characters"),
+  userId: z.string().optional(),
+  userRole: z.enum(["TEAM_LEAD", "MEMBER"]).optional(),
 });
 
 export type SearchQuery = z.infer<typeof searchQuerySchema>;

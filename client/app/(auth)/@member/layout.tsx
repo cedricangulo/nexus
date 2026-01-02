@@ -28,7 +28,7 @@ export default async function TeamLeadLayout({
           project={project}
           user={user}
         />
-        <main className="p-4 sm:p-8" suppressHydrationWarning>
+        <main className="p-4 pb-32 sm:p-8" suppressHydrationWarning>
           {children}
         </main>
       </SidebarInset>
