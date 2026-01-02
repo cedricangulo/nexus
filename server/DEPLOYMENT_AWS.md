@@ -116,8 +116,25 @@ This guide outlines how to deploy the Nexus backend to **AWS** using **EC2** (fo
     PORT=3000
     DATABASE_URL=postgres://postgres:<PASSWORD>@<RDS-ENDPOINT>:5432/postgres
     JWT_SECRET=...
-    FRONTEND_URL=...
-    # ... (Cloudinary & SMTP config)
+    JWT_EXPIRES_IN=7d
+    FRONTEND_URL=https://your-frontend.vercel.app
+
+    # Email (SMTP)
+    SMTP_HOST=smtp.resend.com
+    SMTP_PORT=587
+    SMTP_USER=...
+    SMTP_PASS=...
+    EMAIL_FROM=noreply@yourdomain.com
+
+    # Cloudinary (File uploads)
+    CLOUDINARY_CLOUD_NAME=...
+    CLOUDINARY_API_KEY=...
+    CLOUDINARY_API_SECRET=...
+
+    # Firebase (Push notifications)
+    FIREBASE_PROJECT_ID=...
+    FIREBASE_CLIENT_EMAIL=...
+    FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
     ```
     *Press `Ctrl+X`, `Y`, `Enter` to save.*
 
@@ -176,3 +193,70 @@ To access via standard HTTP (port 80) instead of `:3000`:
     ```
 4.  **Restart Nginx:** `sudo systemctl restart nginx`.
 5.  Now access via `http://<EC2-PUBLIC-IP>`.
+
+---
+
+## Part 8: Frontend Deployment (AWS Amplify - Recommended)
+
+AWS Amplify is the recommended platform for deploying the Next.js frontend if you want to stay within the AWS ecosystem.
+
+### Step 1: Connect Repository
+
+1.  In the AWS Console, search for **AWS Amplify**.
+2.  Click **Create new app** -> **GitHub**.
+3.  Authorize AWS Amplify to access your GitHub account and select your repository.
+4.  **App Name:** `nexus-frontend`.
+5.  **Branch:** `main`.
+6.  **Root Directory:** Set this to `client`.
+
+### Step 2: Build Settings
+
+Amplify should automatically detect Next.js. Ensure the build settings look like this:
+
+```yaml
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - nvm use 22
+        - pnpm install
+    build:
+      commands:
+        - pnpm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - .next/cache/**/*
+      - node_modules/**/*
+```
+
+### Step 3: Configure Environment Variables
+
+In the Amplify console, go to **App settings** -> **Environment variables**:
+
+| Key | Value |
+| :--- | :--- |
+| `NEXT_PUBLIC_API_URL` | `http://<EC2-PUBLIC-IP>:3000/api/v1` (or your domain) |
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | From Firebase Console |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | From Firebase Console |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | From Firebase Console |
+| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | From Firebase Console |
+| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | From Firebase Console |
+| `NEXT_PUBLIC_FIREBASE_APP_ID` | From Firebase Console |
+| `NEXT_PUBLIC_FIREBASE_VAPID_KEY` | From Cloud Messaging settings |
+
+### Step 4: Deploy & Update CORS
+
+1.  Click **Save and deploy**.
+2.  Once deployed, copy your Amplify URL (e.g., `https://main.dxxxxxxxxxxxxx.amplifyapp.com`).
+3.  SSH back into EC2 and update `.env`:
+    ```bash
+    nano ~/nexus/server/.env
+    # Update FRONTEND_URL=https://your-amplify-url.amplifyapp.com
+    ```
+4.  Restart the app: `pm2 restart nexus-api`.
+
