@@ -1,21 +1,17 @@
 import 'dotenv/config'
 import { PrismaClient, Role, PhaseType, DeliverableStatus, DeliverableStage } from '../src/generated/client.js'
+import { PrismaPg } from '@prisma/adapter-pg'
 import bcrypt from 'bcryptjs'
 
 const databaseUrl = process.env.DATABASE_URL
 
 if (!databaseUrl) {
-  throw new Error("DATABASE_URL is not defined in your environment variables.")
+    throw new Error("DATABASE_URL is not defined in your environment variables.")
 }
 
-// 2. Explicitly pass the datasource URL to the constructor
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: databaseUrl,
-    },
-  },
-})
+// Prisma 7 requires driver adapters - use PrismaPg for PostgreSQL
+const adapter = new PrismaPg({ connectionString: databaseUrl })
+const prisma = new PrismaClient({ adapter })
 
 
 // Configuration - Customize these for your deployment
