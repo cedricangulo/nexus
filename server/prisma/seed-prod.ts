@@ -2,9 +2,21 @@ import 'dotenv/config'
 import { PrismaClient, Role, PhaseType, DeliverableStatus, DeliverableStage } from '../src/generated/client.js'
 import bcrypt from 'bcryptjs'
 
-// No need for Pool or PrismaPg anymore. 
-// PrismaClient will automatically use the DATABASE_URL from your .env file.
-const prisma = new PrismaClient()
+const databaseUrl = process.env.DATABASE_URL
+
+if (!databaseUrl) {
+  throw new Error("DATABASE_URL is not defined in your environment variables.")
+}
+
+// 2. Explicitly pass the datasource URL to the constructor
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: databaseUrl,
+    },
+  },
+})
+
 
 // Configuration - Customize these for your deployment
 const TEAM_LEAD_EMAIL = process.env.SEED_TEAM_LEAD_EMAIL || 'teamlead@nexus.app'
