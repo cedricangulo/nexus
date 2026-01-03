@@ -1,14 +1,10 @@
 import 'dotenv/config'
 import { PrismaClient, Role, PhaseType, DeliverableStatus, DeliverableStage } from '../src/generated/client.js'
-import { PrismaPg } from '@prisma/adapter-pg'
-import { Pool } from 'pg'
 import bcrypt from 'bcryptjs'
 
-const connectionString = process.env.DATABASE_URL
-
-const pool = new Pool({ connectionString })
-const adapter = new PrismaPg(pool)
-const prisma = new PrismaClient({ adapter })
+// No need for Pool or PrismaPg anymore. 
+// PrismaClient will automatically use the DATABASE_URL from your .env file.
+const prisma = new PrismaClient()
 
 // Configuration - Customize these for your deployment
 const TEAM_LEAD_EMAIL = process.env.SEED_TEAM_LEAD_EMAIL || 'teamlead@nexus.app'
@@ -162,11 +158,6 @@ async function main() {
     console.log('   ✓ Created 3 WSF phases with default deliverables')
 
     console.log('\n✅ Production seed complete!')
-    console.log('\n📋 Summary:')
-    console.log(`   • Team Lead: ${TEAM_LEAD_EMAIL}`)
-    console.log(`   • Project: ${PROJECT_NAME}`)
-    console.log('   • Phases: Planning & Design, Development & Iteration, Testing & Closure')
-    console.log('   • Deliverables: 9 default deliverables across phases')
 }
 
 main()
@@ -175,5 +166,6 @@ main()
         process.exit(1)
     })
     .finally(async () => {
+        // Important: Close the connection
         await prisma.$disconnect()
     })
