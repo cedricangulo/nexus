@@ -10,6 +10,7 @@ if (!databaseUrl) {
 }
 
 // Prisma 7 requires driver adapters - use PrismaPg for PostgreSQL
+// SSL is configured via DATABASE_URL with sslmode=no-verify for AWS RDS
 const adapter = new PrismaPg({ connectionString: databaseUrl })
 const prisma = new PrismaClient({ adapter })
 

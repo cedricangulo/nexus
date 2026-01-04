@@ -1,12 +1,14 @@
+import { cache } from "react";
 import { phaseApi } from "@/lib/api";
 import { requireUser } from "@/lib/helpers/rbac";
 import type { Phase, PhaseDetail } from "@/lib/types";
 
 /**
  * Fetches all phases with basic information
+ * Wrapped in cache() to eliminate redundant API calls during a single render pass.
  * All authenticated roles can view
  */
-export async function getPhases(): Promise<Phase[]> {
+export const getPhases = cache(async (): Promise<Phase[]> => {
   try {
     await requireUser();
     const response = await phaseApi.listPhases();
@@ -15,14 +17,15 @@ export async function getPhases(): Promise<Phase[]> {
     console.error("Failed to fetch phases:", error);
     return [];
   }
-}
+});
 
 /**
  * Fetches all phases with detailed information including deliverables
+ * Wrapped in cache() to eliminate redundant API calls during a single render pass.
  * Uses Promise.all for parallel fetching
  * All authenticated roles can view
  */
-export async function getPhasesWithDetails(): Promise<PhaseDetail[]> {
+export const getPhasesWithDetails = cache(async (): Promise<PhaseDetail[]> => {
   try {
     await requireUser();
     const phases = await phaseApi.listPhases();
@@ -49,19 +52,22 @@ export async function getPhasesWithDetails(): Promise<PhaseDetail[]> {
     console.error("Failed to fetch phases with details:", error);
     return [];
   }
-}
+});
 
 /**
  * Fetches a single phase by ID with details
+ * Wrapped in cache() to eliminate redundant API calls during a single render pass.
  * All authenticated roles can view
  */
-export async function getPhaseById(id: string): Promise<PhaseDetail | null> {
-  try {
-    await requireUser();
-    const response = await phaseApi.getPhaseById(id);
-    return response;
-  } catch (error) {
-    console.error(`Failed to fetch phase ${id}:`, error);
-    return null;
+export const getPhaseById = cache(
+  async (id: string): Promise<PhaseDetail | null> => {
+    try {
+      await requireUser();
+      const response = await phaseApi.getPhaseById(id);
+      return response;
+    } catch (error) {
+      console.error(`Failed to fetch phase ${id}:`, error);
+      return null;
+    }
   }
-}
+);

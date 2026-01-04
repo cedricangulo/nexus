@@ -1,16 +1,15 @@
+import { cache } from "react";
 import { createApiClient } from "@/lib/api/client";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
 import { requireUser } from "@/lib/helpers/rbac";
 import type { User } from "@/lib/types";
 
 /**
- * Fetches the current authenticated user
- * Used in Server Components to get user details
- * All authenticated roles can access their own data
- *
+ * Fetches the current authenticated user.
+ * Wrapped in cache() to eliminate redundant API calls during a single render pass.
  * @returns Current user data or null if not authenticated
  */
-export async function getCurrentUser(): Promise<User | null> {
+export const getCurrentUser = cache(async (): Promise<User | null> => {
   try {
     await requireUser();
     const client = await createApiClient();
@@ -20,4 +19,4 @@ export async function getCurrentUser(): Promise<User | null> {
     console.error("Failed to fetch current user:", error);
     return null;
   }
-}
+});

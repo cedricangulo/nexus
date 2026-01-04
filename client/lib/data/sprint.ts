@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { auth } from "@/auth";
 import { sprintApi } from "@/lib/api/sprint";
 import type { Sprint, SprintProgress } from "@/lib/types";
@@ -12,8 +13,10 @@ import type { Sprint, SprintProgress } from "@/lib/types";
  *
  * This centralizes authorization logic and prevents members from
  * accessing unauthorized sprint data via the frontend.
+ *
+ * Wrapped in cache() to eliminate redundant API calls during a single render pass.
  */
-export async function getSprints(): Promise<Sprint[]> {
+export const getSprints = cache(async (): Promise<Sprint[]> => {
   const session = await auth();
 
   if (!session?.user) {
@@ -34,7 +37,7 @@ export async function getSprints(): Promise<Sprint[]> {
     console.error("Failed to fetch sprints:", error);
     return [];
   }
-}
+});
 
 /**
  * Get sprint progress with role-based access control

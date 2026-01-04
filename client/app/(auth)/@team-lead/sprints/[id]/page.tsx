@@ -4,7 +4,6 @@ import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { auth } from "@/auth";
 import { CreateTaskDialog } from "@/components/team-lead/sprints/create-task-dialog";
 import { KanbanBoard } from "@/components/team-lead/sprints/tasks/board/kanban-board";
 import { Button } from "@/components/ui/button";
@@ -95,12 +94,7 @@ type PageProps = {
 };
 
 export default async function Page({ params }: PageProps) {
-  const session = await auth();
-
-  // HARD GATE: Team Lead only
-  if (session?.user?.role !== "teamLead") {
-    return null;
-  }
+  // Auth and role validation handled by parent layout
   const { id } = await params;
 
   return (

@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
 import { Plus, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import type { DateValue, RangeValue } from "react-aria-components";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -55,6 +55,9 @@ export function SprintFormDialog({
   sprint,
 }: SprintFormDialogProps) {
   const [isPending, startTransition] = useTransition();
+  const [dateRange, setDateRange] = useState<RangeValue<DateValue> | null>(
+    null
+  );
   const router = useRouter();
   const isMobile = useIsMobile();
   const isEditing = !!sprint;
@@ -75,12 +78,22 @@ export function SprintFormDialog({
         startDate: sprint.startDate.split("T")[0],
         endDate: sprint.endDate.split("T")[0],
       });
+      // Initialize dateRange state for existing sprint
+      try {
+        setDateRange({
+          start: parseDate(sprint.startDate.split("T")[0]),
+          end: parseDate(sprint.endDate.split("T")[0]),
+        });
+      } catch {
+        setDateRange(null);
+      }
     } else if (open && !sprint) {
       form.reset({
         goal: "",
         startDate: "",
         endDate: "",
       });
+      setDateRange(null);
     }
   }, [open, sprint, form]);
 
@@ -142,6 +155,7 @@ export function SprintFormDialog({
                 <FormControl>
                   <DateRange
                     onChange={(range: RangeValue<DateValue> | null) => {
+                      setDateRange(range);
                       if (!range) {
                         form.setValue("startDate", "");
                         form.setValue("endDate", "");
@@ -151,14 +165,7 @@ export function SprintFormDialog({
                       form.setValue("startDate", range.start.toString());
                       form.setValue("endDate", range.end.toString());
                     }}
-                    value={
-                      form.getValues("startDate") && form.getValues("endDate")
-                        ? {
-                            start: parseDate(form.getValues("startDate")),
-                            end: parseDate(form.getValues("endDate")),
-                          }
-                        : null
-                    }
+                    value={dateRange}
                   />
                 </FormControl>
                 {fieldState.invalid ? (

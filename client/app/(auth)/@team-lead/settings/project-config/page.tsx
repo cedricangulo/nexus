@@ -1,17 +1,10 @@
 // import ThemePicker from "@/components/shared/settings/theme-picker";
-import { auth } from "@/auth";
 import ProjectConfig from "@/components/team-lead/settings/project-config";
 import { getPhasesWithDetails } from "@/lib/data/phases";
 import { getProject } from "@/lib/data/project";
 
 export default async function ProjectConfigPage() {
-  const session = await auth();
-
-  // HARD GATE: Team Lead only
-  if (session?.user?.role !== "teamLead") {
-    return null;
-  }
-
+  // Auth and role validation handled by parent layout
   // Fetch data on the server
   const [project, phases] = await Promise.all([
     getProject(),
