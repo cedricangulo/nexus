@@ -4,7 +4,6 @@ import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { notFound, unauthorized } from "next/navigation";
 import { Suspense } from "react";
-import { auth } from "@/auth";
 import { MemberKanbanBoard } from "@/components/member/sprints/member-kanban-board";
 import { Button } from "@/components/ui/button";
 import { FramePanel } from "@/components/ui/frame";
@@ -105,13 +104,7 @@ type PageProps = {
 };
 
 export default async function Page({ params }: PageProps) {
-  const session = await auth();
-
-  // HARD GATE: Member only
-  if (session?.user?.role !== "member") {
-    return unauthorized();
-  }
-
+  // Auth and role validation handled by parent layout
   const { id } = await params;
 
   return (

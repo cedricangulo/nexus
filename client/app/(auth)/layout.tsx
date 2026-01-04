@@ -1,51 +1,46 @@
 import { unauthorized } from "next/navigation";
-import type { ReactNode } from "react";
 import { auth } from "@/auth";
 import { PushNotificationProvider } from "@/providers/push-notification-provider";
 
+// app/(auth)/layout.tsx
 export default async function AuthLayout({
   children,
   member,
   "team-lead": teamLead,
   adviser,
 }: {
-  children: ReactNode;
-  member: ReactNode;
-  "team-lead": ReactNode;
-  adviser: ReactNode;
+  children: React.ReactNode;
+  member: React.ReactNode;
+  "team-lead": React.ReactNode;
+  adviser: React.ReactNode;
 }) {
   const session = await auth();
 
-  // 1. Session Protection - Redirect unauthorized users
   if (!session?.user) {
-    unauthorized();
+    return unauthorized();
   }
 
-  const currentRole = session.user.role;
+  // 1. Select the slot based on the user's role
+  const role = session.user.role;
+  let activeSlot: React.ReactNode;
 
-  // 2. Select the correct slot based on Role
-  let roleSlot: ReactNode;
-
-  switch (currentRole) {
-    case "member":
-      roleSlot = member;
-      break;
-    case "teamLead":
-      roleSlot = teamLead;
-      break;
-    case "adviser":
-      roleSlot = adviser;
-      break;
-    default:
-      unauthorized();
+  if (role === "teamLead") {
+    activeSlot = teamLead;
+  } else if (role === "member") {
+    activeSlot = member;
+  } else if (role === "adviser") {
+    activeSlot = adviser;
+  } else {
+    return unauthorized();
   }
 
+  // 2. Return the children AND the active slot
   return (
     <PushNotificationProvider>
-      {/* 3. Render children so Next.js can manage route states and sub-routes */}
+      {/* Children allows for sub-pages like /settings to work */}
       {children}
-      {/* 4. Render the role-specific dashboard/UI */}
-      {roleSlot}
+      {/* The slot renders the specific dashboard UI */}
+      {activeSlot}
     </PushNotificationProvider>
   );
 }

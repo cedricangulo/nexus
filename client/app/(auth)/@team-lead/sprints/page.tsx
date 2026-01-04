@@ -1,13 +1,8 @@
-import { auth } from "@/auth";
 import { SprintsView } from "@/components/shared/sprints/sprints-view";
 import { getSprints, getSprintsProgress } from "@/lib/data/sprint";
 
 export default async function Page() {
-  const session = await auth();
-  if (session?.user?.role !== "teamLead") {
-    return null;
-  }
-
+  // Auth and role validation handled by parent layout
   const sprints = await getSprints();
   const progressById = await getSprintsProgress(sprints.map((s) => s.id));
 
@@ -15,7 +10,7 @@ export default async function Page() {
     <SprintsView
       progressById={progressById}
       sprints={sprints}
-      userRole={session?.user?.role}
+      userRole="teamLead"
     />
   );
 }

@@ -1,5 +1,6 @@
+import { cache } from "react";
 import { userApi } from "@/lib/api";
-import { requireTeamLead, requireUser } from "@/lib/helpers/rbac";
+import { requireUser } from "@/lib/helpers/rbac";
 import type { User } from "@/lib/types/models";
 
 /**
@@ -7,18 +8,20 @@ import type { User } from "@/lib/types/models";
  * Used in Server Components for team management UI
  * Team Lead only - per US-022
  *
+ * Accessed only by team-lead components; layout already validates role.
+ * API layer still enforces authorization on the server.
+ *
  * Use `getAllUsersForDisplay()` if you need user list for display purposes (all roles)
  */
-export async function getTeamUsers(): Promise<User[]> {
+export const getTeamUsers = cache(async (): Promise<User[]> => {
   try {
-    await requireTeamLead();
     const users = await userApi.listUsers();
     return users;
   } catch (error) {
     console.error("Failed to fetch team users:", error);
     return [];
   }
-}
+});
 
 /**
  * Fetches all users for display purposes only (showing names in cards, assignments, etc.)
@@ -32,7 +35,7 @@ export async function getTeamUsers(): Promise<User[]> {
  *
  * This is separate from `getTeamUsers()` which is for management purposes only
  */
-export async function getAllUsersForDisplay(): Promise<User[]> {
+export const getAllUsersForDisplay = cache(async (): Promise<User[]> => {
   try {
     await requireUser(); // All authenticated users allowed
     const users = await userApi.listUsers();
@@ -41,4 +44,4 @@ export async function getAllUsersForDisplay(): Promise<User[]> {
     console.error("Failed to fetch users for display:", error);
     return [];
   }
-}
+});

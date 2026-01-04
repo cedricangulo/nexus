@@ -14,11 +14,9 @@ export const metadata = {
 };
 
 export default async function DashboardPage() {
+  // Prevent evaluation if wrong role (parallel routes evaluate all slots)
   const session = await auth();
-
-  // HARD GATE: Stop execution immediately if user is not Team Lead
-  // Prevents background API calls from failing with 403 errors
-  if (session?.user?.role !== "teamLead") {
+  if (session?.user.role !== "teamLead") {
     return null;
   }
 

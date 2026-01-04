@@ -5,6 +5,7 @@
  * Aggregates meeting data from sprints and phases
  */
 
+import { cache } from "react";
 import { meetingLogApi } from "@/lib/api/meeting-log";
 import { phaseApi } from "@/lib/api/phase";
 import { sprintApi } from "@/lib/api/sprint";
@@ -20,6 +21,7 @@ export type MeetingsPageData = {
 
 /**
  * Fetch all meeting logs and calculate metrics
+ * Wrapped in cache() to eliminate redundant API calls during a single render pass.
  *
  * Aggregates meeting logs from all sprints and phases
  * totalExpected is the number of sprints (since meetings are linked to sprints)
@@ -28,7 +30,7 @@ export type MeetingsPageData = {
  * @returns Object containing logs and totalExpected count
  * @throws Error if data fetching fails
  */
-export async function getMeetingsData(): Promise<MeetingsPageData> {
+export const getMeetingsData = cache(async (): Promise<MeetingsPageData> => {
   try {
     await requireUser();
     const [sprints, phases] = await Promise.all([
@@ -64,4 +66,4 @@ export async function getMeetingsData(): Promise<MeetingsPageData> {
       totalExpected: 0,
     };
   }
-}
+});

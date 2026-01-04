@@ -2,6 +2,7 @@
 
 import { decodeJwt } from "jose";
 import { cookies } from "next/headers";
+import { cache } from "react";
 
 import { createApiClient } from "@/lib/api/client";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
@@ -68,7 +69,8 @@ function decodeToken(token: string): SessionUser | null {
   }
 }
 
-export async function auth(): Promise<Session | null> {
+// Wrap auth() with React cache() to deduplicate requests within the same render pass
+export const auth = cache(async (): Promise<Session | null> => {
   const cookieStore = await cookies();
   const token = cookieStore.get("auth_token")?.value;
 
@@ -112,7 +114,7 @@ export async function auth(): Promise<Session | null> {
       user: decoded,
     };
   }
-}
+});
 
 export const authRole = {
   normalize: normalizeRole,

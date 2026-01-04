@@ -7,19 +7,21 @@
 
 import "server-only";
 
+import { cache } from "react";
 import { activityLogApi } from "@/lib/api/activity-log";
-import { requireTeamLead } from "@/lib/helpers/rbac";
+import { requireUser } from "@/lib/helpers/rbac";
 import type { ActivityLog } from "@/lib/types";
 
 /**
  * Fetch all activity logs sorted by most recent first
+ * Wrapped in cache() to eliminate redundant API calls during a single render pass.
  *
  * @returns Array of activity logs sorted by creation date (newest first)
  * @throws Error if data fetching fails
  */
-export async function getActivityLogs(): Promise<ActivityLog[]> {
+export const getActivityLogs = cache(async (): Promise<ActivityLog[]> => {
   try {
-    await requireTeamLead();
+    await requireUser();
     const activities = await activityLogApi.listActivityLogs();
 
     // Sort by most recent first
@@ -31,7 +33,7 @@ export async function getActivityLogs(): Promise<ActivityLog[]> {
     console.error("Failed to fetch activity logs:", error);
     return [];
   }
-}
+});
 
 /**
  * Fetch activity logs for a specific entity
@@ -46,7 +48,7 @@ export async function getActivityLogsByEntity(
   entityId: string
 ): Promise<ActivityLog[]> {
   try {
-    await requireTeamLead();
+    await requireUser();
     const activities = await activityLogApi.getActivityLogsByEntity(
       entityType,
       entityId

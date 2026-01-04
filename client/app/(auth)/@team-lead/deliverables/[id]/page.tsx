@@ -1,9 +1,8 @@
-import { notFound, unauthorized } from "next/navigation";
-import { Suspense } from "react";
-import { auth } from "@/auth";
+import { notFound } from "next/navigation";
 import TeamLeadDeliverableActions from "@/components/team-lead/deliverables/actions";
 import { getDeliverableDetail } from "@/lib/data/deliverables";
 import { getTeamMembersForMentions } from "@/lib/data/team-members";
+import { getCurrentUser } from "@/lib/data/user";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -12,34 +11,28 @@ type PageProps = {
 export default async function TeamLeadDeliverableDetailPage({
   params,
 }: PageProps) {
-  const session = await auth();
-
-  // HARD GATE: Team Lead only
-  if (session?.user?.role !== "teamLead") {
-    return unauthorized();
-  }
-
+  // Auth and role validation handled by parent layout
   const { id } = await params;
 
-  const [{ deliverable, evidence, phase, comments }, teamMembers] =
-    await Promise.all([getDeliverableDetail(id), getTeamMembersForMentions()]);
+  const [{ deliverable, evidence, phase, comments }, teamMembers, user] =
+    await Promise.all([
+      getDeliverableDetail(id),
+      getTeamMembersForMentions(),
+      getCurrentUser(),
+    ]);
 
-  if (!deliverable) {
+  if (!(deliverable && user)) {
     notFound();
   }
 
   return (
-    <Suspense
-      fallback={<div className="py-8 text-center">Loading deliverable...</div>}
-    >
-      <TeamLeadDeliverableActions
-        comments={comments}
-        deliverable={deliverable}
-        evidence={evidence}
-        phase={phase}
-        teamMembers={teamMembers}
-        user={session.user}
-      />
-    </Suspense>
+    <TeamLeadDeliverableActions
+      comments={comments}
+      deliverable={deliverable}
+      evidence={evidence}
+      phase={phase}
+      teamMembers={teamMembers}
+      user={user}
+    />
   );
 }
