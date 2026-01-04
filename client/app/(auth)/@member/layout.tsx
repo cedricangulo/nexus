@@ -1,9 +1,9 @@
+import { auth } from "@/auth";
 import { AppHeader } from "@/components/layouts/member/header";
-import { AppSidebar } from "@/components/layouts/member/member-sidebar";
 import { MemberMobileNav } from "@/components/layouts/member/nav";
+import { SidebarBadgeLoader } from "@/components/layouts/sidebar-with-badges";
 import Notification from "@/components/shared/notifications";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { getBadgeCounts } from "@/lib/data/badge-counts";
 import { getProject } from "@/lib/data/project";
 import { getCurrentUser } from "@/lib/data/user";
 
@@ -12,15 +12,19 @@ export default async function TeamLeadLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Fetch user, project, and badge counts server-side
-  const [user, project] = await Promise.all([getCurrentUser(), getProject()]);
+  // Early return if not a member (prevents data fetching for wrong roles)
+  const session = await auth();
+  if (session?.user.role !== "member") {
+    return null;
+  }
 
-  // Get badge counts for the user (members see only their assigned items)
-  const badgeCounts = await getBadgeCounts(user);
+  // Fetch only what's needed for initial render
+  // Badge counts are fetched asynchronously via Suspense
+  const [user, project] = await Promise.all([getCurrentUser(), getProject()]);
 
   return (
     <SidebarProvider suppressHydrationWarning>
-      <AppSidebar badgeCounts={badgeCounts} user={user} />
+      <SidebarBadgeLoader user={user} variant="member" />
       <MemberMobileNav />
       <SidebarInset suppressHydrationWarning>
         <AppHeader

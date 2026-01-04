@@ -1,10 +1,9 @@
 import axios from "axios";
 import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
-import { notFound, unauthorized } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-import { auth } from "@/auth";
 import { PhaseDetailContent } from "@/components/team-lead/phases/phase-detail-content";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status";
@@ -78,13 +77,7 @@ type PageProps = {
 };
 
 export default async function MemberPhaseDetailPage({ params }: PageProps) {
-  const session = await auth();
-
-  // HARD GATE: Member only
-  if (session?.user?.role !== "member") {
-    return unauthorized();
-  }
-
+  // Auth and role validation handled by parent layout
   const { id } = await params;
 
   return (

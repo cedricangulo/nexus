@@ -1,9 +1,9 @@
-import { notFound, unauthorized } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { auth } from "@/auth";
 import MemberDeliverableActions from "@/components/member/deliverables/actions";
 import { getDeliverableDetail } from "@/lib/data/deliverables";
 import { getTeamMembersForMentions } from "@/lib/data/team-members";
+import { getCurrentUser } from "@/lib/data/user";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -12,19 +12,17 @@ type PageProps = {
 export default async function MemberDeliverableDetailPage({
   params,
 }: PageProps) {
-  const session = await auth();
-
-  // HARD GATE: Member only
-  if (session?.user?.role !== "member") {
-    return unauthorized();
-  }
-
+  // Auth and role validation handled by parent layout
   const { id } = await params;
 
-  const [{ deliverable, evidence, phase, comments }, teamMembers] =
-    await Promise.all([getDeliverableDetail(id), getTeamMembersForMentions()]);
+  const [{ deliverable, evidence, phase, comments }, teamMembers, user] =
+    await Promise.all([
+      getDeliverableDetail(id),
+      getTeamMembersForMentions(),
+      getCurrentUser(),
+    ]);
 
-  if (!deliverable) {
+  if (!(deliverable && user)) {
     notFound();
   }
 
@@ -38,7 +36,7 @@ export default async function MemberDeliverableDetailPage({
         evidence={evidence}
         phase={phase}
         teamMembers={teamMembers}
-        user={session.user}
+        user={user}
       />
     </Suspense>
   );

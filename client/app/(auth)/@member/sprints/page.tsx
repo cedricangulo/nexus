@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import { SprintsView } from "@/components/shared/sprints/sprints-view";
 import { getSprints, getSprintsProgress } from "@/lib/data/sprint";
 
@@ -8,13 +7,7 @@ export const metadata = {
 };
 
 export default async function Page() {
-  const session = await auth();
-
-  // HARD GATE: Member only
-  if (session?.user?.role !== "member") {
-    return null;
-  }
-
+  // Auth and role validation handled by parent layout
   const sprints = await getSprints();
   const progressById = await getSprintsProgress(sprints.map((s) => s.id));
 
@@ -22,7 +15,7 @@ export default async function Page() {
     <SprintsView
       progressById={progressById}
       sprints={sprints}
-      userRole={session?.user?.role}
+      userRole="member"
     />
   );
 }

@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { commentApi } from "@/lib/api/comment";
 import { deliverableApi } from "@/lib/api/deliverable";
 import { evidenceApi } from "@/lib/api/evidence";
@@ -7,19 +8,19 @@ import { phaseApi } from "@/lib/api/phase";
 import type { Comment, Deliverable, Evidence, Phase } from "@/lib/types";
 import { requireUser } from "../helpers/rbac";
 
-export async function getDeliverableById(
-  id: string
-): Promise<Deliverable | null> {
-  try {
-    await requireUser();
-    return await deliverableApi.getDeliverableById(id);
-  } catch (error) {
-    console.error(`Failed to fetch deliverable ${id}:`, error);
-    return null;
+export const getDeliverableById = cache(
+  async (id: string): Promise<Deliverable | null> => {
+    try {
+      await requireUser();
+      return await deliverableApi.getDeliverableById(id);
+    } catch (error) {
+      console.error(`Failed to fetch deliverable ${id}:`, error);
+      return null;
+    }
   }
-}
+);
 
-export async function getDeliverables(): Promise<Deliverable[]> {
+export const getDeliverables = cache(async (): Promise<Deliverable[]> => {
   try {
     await requireUser();
     return await deliverableApi.listDeliverables();
@@ -27,9 +28,9 @@ export async function getDeliverables(): Promise<Deliverable[]> {
     console.error("Failed to fetch deliverables:", error);
     return [];
   }
-}
+});
 
-export async function getPhases(): Promise<Phase[]> {
+export const getPhases = cache(async (): Promise<Phase[]> => {
   try {
     await requireUser();
     return await phaseApi.listPhases();
@@ -37,7 +38,7 @@ export async function getPhases(): Promise<Phase[]> {
     console.error("Failed to fetch phases:", error);
     return [];
   }
-}
+});
 
 export async function getEvidenceByDeliverable(
   deliverableId: string

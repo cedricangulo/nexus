@@ -107,7 +107,7 @@ export function LoginForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Frame className="backdrop-blur-2xl">
-        <FrameHeader className="space-y-0">
+        <FrameHeader className="space-y-0 p-4">
           <FrameTitle className="text-xl">Welcome!</FrameTitle>
           <FrameDescription>
             Sign in to your account to get started
