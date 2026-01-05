@@ -1,6 +1,10 @@
+"use client";
+
 import { House, UserLock } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { startTransition } from "react";
+import { logoutAction } from "@/actions/logout";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -11,7 +15,13 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 
-export default function UnauthorizedPage() {
+export default function Forbidden() {
+  const handleLogout = () => {
+    startTransition(async () => {
+      await logoutAction();
+    });
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-white p-4">
       <Empty>
@@ -25,27 +35,25 @@ export default function UnauthorizedPage() {
             />
           </EmptyMedia>
           <EmptyTitle className="font-bold text-3xl text-blue-900">
-            Please Log In
+            Access Restricted
           </EmptyTitle>
           <EmptyDescription className="text-blue-600 text-sm md:text-base">
-            We couldn't verify your identity. This usually happens if your
-            session has timed out or you haven't logged in yet. Please sign in
-            to continue working on your project.
+            It looks like you don't have the necessary permissions to view this
+            page. This section is reserved for Team Lead. If you believe you
+            should have access, please reach out to your project manager.
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
           <div className="flex flex-col justify-center gap-3 sm:flex-row">
             <Button asChild>
-              <Link href="/login">
-                <UserLock className="size-4" />
-                Go to Login
+              <Link href="/dashboard">
+                <House />
+                Go to Dashboard
               </Link>
             </Button>
-            <Button asChild variant="secondary">
-              <Link href="/dashboard">
-                <House className="size-4" />
-                Back Home
-              </Link>
+            <Button onClick={handleLogout} variant="secondary">
+              <UserLock />
+              Logout & Switch Account
             </Button>
           </div>
         </EmptyContent>

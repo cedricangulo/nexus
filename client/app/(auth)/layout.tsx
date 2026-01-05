@@ -1,4 +1,4 @@
-import { unauthorized } from "next/navigation";
+import { forbidden, unauthorized } from "next/navigation";
 import { Suspense } from "react";
 import { auth } from "@/auth";
 import { AuthLoadingFallback } from "@/components/layouts/loading";
@@ -51,5 +51,5 @@ async function RoleBasedSlot({ member, teamLead, adviser }: any) {
     return adviser;
   }
 
-  return unauthorized();
+  return forbidden();
 }

@@ -1,3 +1,9 @@
+import {
+  Frame,
+  FrameHeader,
+  FramePanel,
+  FrameTitle,
+} from "@/components/ui/frame";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function MeetingListSkeleton() {

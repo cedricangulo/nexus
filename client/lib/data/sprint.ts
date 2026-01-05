@@ -1,3 +1,4 @@
+import axios from "axios";
 import { cacheLife, cacheTag } from "next/cache";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
 import { createAuthHeaders, serverClient } from "@/lib/api/server-client";
@@ -14,7 +15,7 @@ export async function getSprints(
   try {
     // Members see only their assigned sprints
     const endpoint =
-      role === "member"
+      role === "MEMBER"
         ? API_ENDPOINTS.SPRINTS.LIST_MINE
         : API_ENDPOINTS.SPRINTS.LIST;
 
@@ -76,6 +77,10 @@ export async function getSprintById(
     );
     return response.data;
   } catch (error) {
+    // Re-throw 403 Forbidden errors to be handled at page level
+    if (axios.isAxiosError(error) && error.response?.status === 403) {
+      throw error;
+    }
     console.error(`Failed to fetch sprint ${id}:`, error);
     return null;
   }

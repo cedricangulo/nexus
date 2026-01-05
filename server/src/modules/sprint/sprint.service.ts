@@ -1,6 +1,6 @@
-import { getPrismaClient, NotFoundError, ValidationError } from "../../utils/database.js";
+import { getPrismaClient, NotFoundError, ValidationError, AuthorizationError } from "../../utils/database.js";
 import { CreateSprintInput, UpdateSprintInput } from "./sprint.schema.js";
-import { TaskStatus } from "../../generated/client.js";
+import { TaskStatus, Role } from "../../generated/client.js";
 import { createActivityLog } from "../activity-log/activity-log.service.js";
 
 const prisma = getPrismaClient();
@@ -36,16 +36,31 @@ export async function getSprintsByUser(userId: string) {
   });
 }
 
-export async function getSprintById(id: string) {
+export async function getSprintById(id: string, userId?: string, userRole?: string) {
   const sprint = await prisma.sprint.findUnique({
     where: { id },
     include: {
-      tasks: true,
+      tasks: {
+        include: {
+          assignments: true,
+        },
+      },
     },
   });
 
   if (!sprint || sprint.deletedAt) {
     throw new NotFoundError("Sprint", id);
+  }
+
+  // Members can only access sprints where they have assigned tasks
+  if (userRole === Role.MEMBER && userId) {
+    const hasAssignedTasks = sprint.tasks.some(
+      (task) => task.deletedAt === null && task.assignments.some((a) => a.userId === userId)
+    );
+
+    if (!hasAssignedTasks) {
+      throw new AuthorizationError("You do not have access to this sprint");
+    }
   }
 
   return sprint;

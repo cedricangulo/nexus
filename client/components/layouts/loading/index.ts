@@ -1,4 +1,5 @@
 export { ActivityLogListSkeleton } from "./activity-log-list-skeleton";
+export { AuthLoadingFallback } from "./auth-loading";
 export { DeliverableDetailSkeleton } from "./deliverables/deliverable-detail-skeleton";
 export { DeliverableListSkeleton } from "./deliverables/deliverable-list-skeleton";
 export { MeetingListSkeleton } from "./meeting-list-skeleton";
@@ -7,4 +8,3 @@ export { PhaseListSkeleton } from "./phases/phase-list-skeleton";
 export { SprintDetailSkeleton } from "./sprints/sprint-detail-skeleton";
 export { SprintListSkeleton } from "./sprints/sprint-list-skeleton";
 export { TeamMemberListSkeleton } from "./team-member-list-skeleton";
-export { AuthLoadingFallback } from "./auth-loading";

@@ -2,7 +2,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
-import { notFound, unauthorized } from "next/navigation";
+import { forbidden, notFound } from "next/navigation";
 import { Suspense } from "react";
 import { SprintDetailSkeleton } from "@/components/layouts/loading";
 import { MemberKanbanBoard } from "@/components/member/sprints/member-kanban-board";
@@ -28,6 +28,9 @@ async function SprintBoardContent({ sprintId }: { sprintId: string }) {
       getSprintTasks(sprintId, token),
     ]);
   } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response?.status === 403) {
+      return forbidden();
+    }
     if (axios.isAxiosError(error) && error.response?.status === 404) {
       notFound();
     }
@@ -45,7 +48,7 @@ async function SprintBoardContent({ sprintId }: { sprintId: string }) {
 
   // AUTHORIZATION: Member can only access sprints where they have assigned tasks
   if (userTasks.length === 0) {
-    return unauthorized();
+    return forbidden();
   }
 
   const status = getSprintStatus(sprint);
