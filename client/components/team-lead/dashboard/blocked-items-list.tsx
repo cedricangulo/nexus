@@ -13,8 +13,9 @@ import {
   FramePanel,
   FrameTitle,
 } from "@/components/ui/frame";
-import { taskApi } from "@/lib/api/task";
-import { userApi } from "@/lib/api/user";
+import { getTasks } from "@/lib/data/tasks";
+import { getUsers } from "@/lib/data/users";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 import type { BlockedItem } from "@/lib/helpers/dashboard-computations";
 import { getBlockedTasks } from "@/lib/helpers/dashboard-computations";
 
@@ -112,10 +113,9 @@ function BlockedItemsListDisplay({ items }: BlockedItemsListProps) {
 }
 
 export async function BlockedItemsList() {
-  const [tasks, users] = await Promise.all([
-    taskApi.listTasks(),
-    userApi.listUsers(),
-  ]);
+  const { token } = await getAuthContext();
+
+  const [tasks, users] = await Promise.all([getTasks(token), getUsers(token)]);
 
   const blockedTasks = getBlockedTasks(tasks, users);
   const allBlockedItems = [...blockedTasks].sort(

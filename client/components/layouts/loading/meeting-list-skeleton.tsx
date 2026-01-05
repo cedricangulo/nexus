@@ -1,12 +1,6 @@
-import {
-  Frame,
-  FrameHeader,
-  FramePanel,
-  FrameTitle,
-} from "@/components/ui/frame";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function MeetingsLoading() {
+export function MeetingListSkeleton() {
   return (
     <div className="relative space-y-8">
       <div className="absolute -bottom-8 left-0 z-20 h-full w-full bg-linear-to-t from-background to-transparent" />

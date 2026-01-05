@@ -9,7 +9,7 @@
  * For bulk methodology configuration syncing, see phase-deliverables.ts
  */
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import type { z } from "zod";
 
 import { deliverableApi } from "@/lib/api/deliverable";
@@ -37,6 +37,8 @@ export async function updatePhaseAction(
     };
 
     await phaseApi.updatePhase(id, transformedData);
+    updateTag("phases");
+    updateTag(`phase-${id}`);
     revalidatePath("/phases");
     return { success: true };
   } catch (error) {
@@ -59,6 +61,8 @@ export async function createDeliverableAction(
     };
 
     await deliverableApi.createDeliverable(transformedData);
+    updateTag("phases");
+    updateTag("deliverables");
     revalidatePath("/phases");
     return { success: true };
   } catch (error) {
@@ -81,6 +85,8 @@ export async function updateDeliverableAction(
     };
 
     await deliverableApi.updateDeliverable(id, transformedData);
+    updateTag("phases");
+    updateTag("deliverables");
     revalidatePath("/phases");
     return { success: true };
   } catch (error) {
@@ -93,6 +99,8 @@ export async function deleteDeliverableAction(id: string) {
   try {
     await requireTeamLead();
     await deliverableApi.deleteDeliverable(id);
+    updateTag("phases");
+    updateTag("deliverables");
     revalidatePath("/phases");
     return { success: true };
   } catch (error) {

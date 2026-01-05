@@ -2,8 +2,9 @@ import { TrendingDown, TrendingUp } from "lucide-react";
 import { Suspense } from "react";
 import { FramePanel } from "@/components/ui/frame";
 import { Tracker } from "@/components/ui/tracker";
-import { deliverableApi } from "@/lib/api/deliverable";
-import { phaseApi } from "@/lib/api/phase";
+import { getDeliverables } from "@/lib/data/deliverables";
+import { getPhases } from "@/lib/data/phases";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 import { computeProjectCompletion } from "@/lib/helpers/dashboard-computations";
 import { formatMonthDay } from "@/lib/helpers/format-date";
 import { cn } from "@/lib/utils";
@@ -160,9 +161,10 @@ function ProjectHealthError() {
 
 export async function ProjectHealthCard() {
   try {
+    const { token } = await getAuthContext();
     const [deliverables, phases] = await Promise.all([
-      deliverableApi.listDeliverables(),
-      phaseApi.listPhases(),
+      getDeliverables(token),
+      getPhases(token),
     ]);
     const completion = computeProjectCompletion(deliverables, phases);
     const hasContent = completion.totalDeliverables > 0;

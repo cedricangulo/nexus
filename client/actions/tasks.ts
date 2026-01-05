@@ -1,7 +1,7 @@
 "use server";
 
 import type { AxiosError } from "axios";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 
 import { phaseApi } from "@/lib/api/phase";
 import { taskApi } from "@/lib/api/task";
@@ -32,6 +32,7 @@ export async function createSprintTaskAction(input: unknown) {
           : undefined,
     });
 
+    updateTag("sprints");
     revalidatePath(`/sprints/${parsed.sprintId}`);
     return { success: true } as const;
   } catch (error) {
@@ -53,6 +54,7 @@ export async function updateTaskStatusAction(input: unknown) {
       comment,
     });
 
+    updateTag("sprints");
     revalidatePath(`/sprints/${parsed.sprintId}`);
     return { success: true } as const;
   } catch (error) {
@@ -88,6 +90,7 @@ export async function updateTaskAction(input: unknown) {
           : [],
     });
 
+    updateTag("sprints");
     revalidatePath(`/sprints/${parsed.sprintId}`);
     return { success: true } as const;
   } catch (error) {
@@ -124,6 +127,7 @@ export async function updatePhaseTaskAction(input: unknown, phaseId: string) {
           : [],
     });
 
+    updateTag("phases");
     revalidatePath(`/phases/${phaseId}`);
     return { success: true } as const;
   } catch (error) {
@@ -175,6 +179,7 @@ export async function createPhaseTaskAction(input: unknown) {
           : undefined,
     });
 
+    updateTag("phases");
     revalidatePath(`/phases/${parsed.phaseId}`);
     return { success: true } as const;
   } catch (error) {
@@ -201,6 +206,7 @@ export async function deletePhaseTaskAction(taskId: string, phaseId: string) {
 
     await taskApi.deleteTask(taskId);
 
+    updateTag("phases");
     revalidatePath(`/phases/${phaseId}`);
     return { success: true } as const;
   } catch (error) {

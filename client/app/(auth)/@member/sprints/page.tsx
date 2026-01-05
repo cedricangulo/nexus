@@ -1,5 +1,8 @@
+import { Suspense } from "react";
+import { SprintListSkeleton } from "@/components/layouts/loading";
 import { SprintsView } from "@/components/shared/sprints/sprints-view";
 import { getSprints, getSprintsProgress } from "@/lib/data/sprint";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 
 export const metadata = {
   title: "My Sprints",
@@ -7,15 +10,20 @@ export const metadata = {
 };
 
 export default async function Page() {
-  // Auth and role validation handled by parent layout
-  const sprints = await getSprints();
-  const progressById = await getSprintsProgress(sprints.map((s) => s.id));
+  const { user, token } = await getAuthContext();
+  const sprints = await getSprints(token, user.role);
+  const progressById = await getSprintsProgress(
+    sprints.map((s) => s.id),
+    token
+  );
 
   return (
-    <SprintsView
-      progressById={progressById}
-      sprints={sprints}
-      userRole="member"
-    />
+    <Suspense fallback={<SprintListSkeleton />}>
+      <SprintsView
+        progressById={progressById}
+        sprints={sprints}
+        userRole="member"
+      />
+    </Suspense>
   );
 }

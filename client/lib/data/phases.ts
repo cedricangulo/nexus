@@ -1,40 +1,73 @@
-import { cache } from "react";
-import { phaseApi } from "@/lib/api";
-import { requireUser } from "@/lib/helpers/rbac";
+/**
+ * Phase Data Fetching Layer - Cache Components Compatible
+ *
+ * Uses "Pass-Through Authentication" pattern:
+ * 1. Page extracts token (dynamic boundary)
+ * 2. Token passed as string to cached function
+ * 3. Clean serverClient makes API call with manual auth header
+ *
+ * This prevents the "Dynamic data sources inside cache scope" error.
+ */
+
+import { cacheLife, cacheTag } from "next/cache";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
+import { createAuthHeaders, serverClient } from "@/lib/api/server-client";
 import type { Phase, PhaseDetail } from "@/lib/types";
 
 /**
  * Fetches all phases with basic information
- * Wrapped in cache() to eliminate redundant API calls during a single render pass.
- * All authenticated roles can view
+ * Token must be passed from dynamic page layer
  */
-export const getPhases = cache(async (): Promise<Phase[]> => {
+export async function getPhases(token: string): Promise<Phase[]> {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("phases");
+
   try {
-    await requireUser();
-    const response = await phaseApi.listPhases();
-    return response;
+    const response = await serverClient.get<Phase[]>(
+      API_ENDPOINTS.PHASES.LIST,
+      {
+        headers: createAuthHeaders(token),
+      }
+    );
+    return response.data;
   } catch (error) {
     console.error("Failed to fetch phases:", error);
     return [];
   }
-});
+}
 
 /**
  * Fetches all phases with detailed information including deliverables
- * Wrapped in cache() to eliminate redundant API calls during a single render pass.
+ * Token must be passed from dynamic page layer
  * Uses Promise.all for parallel fetching
- * All authenticated roles can view
  */
-export const getPhasesWithDetails = cache(async (): Promise<PhaseDetail[]> => {
+export async function getPhasesWithDetails(
+  token: string
+): Promise<PhaseDetail[]> {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("phases", "deliverables");
+
   try {
-    await requireUser();
-    const phases = await phaseApi.listPhases();
+    const phasesResponse = await serverClient.get<Phase[]>(
+      API_ENDPOINTS.PHASES.LIST,
+      {
+        headers: createAuthHeaders(token),
+      }
+    );
+    const phases = phasesResponse.data;
 
     const phasesWithDetails = await Promise.all(
       phases.map(async (phase: Phase) => {
         try {
-          const detailResponse = await phaseApi.getPhaseById(phase.id);
-          return detailResponse;
+          const detailResponse = await serverClient.get<PhaseDetail>(
+            API_ENDPOINTS.PHASES.GET(phase.id),
+            {
+              headers: createAuthHeaders(token),
+            }
+          );
+          return detailResponse.data;
         } catch (error) {
           console.error(
             `Failed to fetch details for phase ${phase.id}:`,
@@ -52,22 +85,30 @@ export const getPhasesWithDetails = cache(async (): Promise<PhaseDetail[]> => {
     console.error("Failed to fetch phases with details:", error);
     return [];
   }
-});
+}
 
 /**
  * Fetches a single phase by ID with details
- * Wrapped in cache() to eliminate redundant API calls during a single render pass.
- * All authenticated roles can view
+ * Token must be passed from dynamic page layer
  */
-export const getPhaseById = cache(
-  async (id: string): Promise<PhaseDetail | null> => {
-    try {
-      await requireUser();
-      const response = await phaseApi.getPhaseById(id);
-      return response;
-    } catch (error) {
-      console.error(`Failed to fetch phase ${id}:`, error);
-      return null;
-    }
+export async function getPhaseById(
+  id: string,
+  token: string
+): Promise<PhaseDetail | null> {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("phases", `phase-${id}`, "deliverables");
+
+  try {
+    const response = await serverClient.get<PhaseDetail>(
+      API_ENDPOINTS.PHASES.GET(id),
+      {
+        headers: createAuthHeaders(token),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to fetch phase ${id}:`, error);
+    return null;
   }
-);
+}

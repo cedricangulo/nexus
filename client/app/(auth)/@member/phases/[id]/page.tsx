@@ -3,21 +3,24 @@ import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-
+import { PhaseDetailSkeleton } from "@/components/layouts/loading";
 import { PhaseDetailContent } from "@/components/team-lead/phases/phase-detail-content";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status";
 import { getPhaseById } from "@/lib/data/phases";
 import { getAllUsersForDisplay } from "@/lib/data/team";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 import { formatDate } from "@/lib/helpers/format-date";
 
 async function PhaseContent({ phaseId }: { phaseId: string }) {
+  const { token } = await getAuthContext();
+
   let phase, users;
 
   try {
     [phase, users] = await Promise.all([
-      getPhaseById(phaseId),
-      getAllUsersForDisplay(),
+      getPhaseById(phaseId, token),
+      getAllUsersForDisplay(token),
     ]);
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
@@ -81,9 +84,7 @@ export default async function MemberPhaseDetailPage({ params }: PageProps) {
   const { id } = await params;
 
   return (
-    <Suspense
-      fallback={<div className="py-8 text-center">Loading phase...</div>}
-    >
+    <Suspense fallback={<PhaseDetailSkeleton />}>
       <PhaseContent phaseId={id} />
     </Suspense>
   );

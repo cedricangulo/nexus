@@ -1,6 +1,10 @@
-import { cache } from "react";
-import { userApi } from "@/lib/api";
-import { requireUser } from "@/lib/helpers/rbac";
+/**
+ * Team Users Data Fetching - Cache Components Compatible
+ */
+
+import { cacheLife, cacheTag } from "next/cache";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
+import { createAuthHeaders, serverClient } from "@/lib/api/server-client";
 import type { User } from "@/lib/types/models";
 
 /**
@@ -13,15 +17,21 @@ import type { User } from "@/lib/types/models";
  *
  * Use `getAllUsersForDisplay()` if you need user list for display purposes (all roles)
  */
-export const getTeamUsers = cache(async (): Promise<User[]> => {
+export async function getTeamUsers(token: string): Promise<User[]> {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("users");
+
   try {
-    const users = await userApi.listUsers();
-    return users;
+    const response = await serverClient.get<User[]>(API_ENDPOINTS.USERS.LIST, {
+      headers: createAuthHeaders(token),
+    });
+    return response.data;
   } catch (error) {
     console.error("Failed to fetch team users:", error);
     return [];
   }
-});
+}
 
 /**
  * Fetches all users for display purposes only (showing names in cards, assignments, etc.)
@@ -35,13 +45,18 @@ export const getTeamUsers = cache(async (): Promise<User[]> => {
  *
  * This is separate from `getTeamUsers()` which is for management purposes only
  */
-export const getAllUsersForDisplay = cache(async (): Promise<User[]> => {
+export async function getAllUsersForDisplay(token: string): Promise<User[]> {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("users");
+
   try {
-    await requireUser(); // All authenticated users allowed
-    const users = await userApi.listUsers();
-    return users;
+    const response = await serverClient.get<User[]>(API_ENDPOINTS.USERS.LIST, {
+      headers: createAuthHeaders(token),
+    });
+    return response.data;
   } catch (error) {
     console.error("Failed to fetch users for display:", error);
     return [];
   }
-});
+}
