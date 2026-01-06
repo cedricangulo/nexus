@@ -81,7 +81,11 @@ export function PhaseDetailContent({
           <FrameHeader className="flex-row items-center justify-between p-4">
             <FrameTitle>Waterfall Tasks</FrameTitle>
             {isTeamLead ? (
-              <CreateTaskButton phaseId={phase.id} users={users} />
+              <CreateTaskButton
+                phaseId={phase.id}
+                userRole="teamLead"
+                users={users}
+              />
             ) : null}
           </FrameHeader>
           <FramePanel className="space-y-2 p-2">
@@ -183,6 +187,7 @@ export function PhaseDetailContent({
         }}
         initialData={selectedTask}
         phaseId={phase.id}
+        userRole={isTeamLead ? "teamLead" : "member"}
         users={users}
       />
 

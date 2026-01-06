@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { sprintApi } from "@/lib/api/sprint";
 import { cleanDateInput, toISODateTime } from "@/lib/helpers/date";
@@ -34,6 +34,8 @@ export async function createSprintAction(input: unknown) {
     };
 
     await sprintApi.createSprint(transformed);
+    updateTag("sprints");
+    updateTag("meetings");
     revalidatePath("/sprints");
 
     return { success: true } as const;
@@ -67,6 +69,8 @@ export async function updateSprintAction(input: UpdateSprintActionInput) {
     };
 
     await sprintApi.updateSprint(input.id, transformed);
+    updateTag("sprints");
+    updateTag("meetings");
     revalidatePath("/sprints");
 
     return { success: true } as const;
@@ -80,6 +84,8 @@ export async function deleteSprintAction(id: string) {
   try {
     await requireTeamLead();
     await sprintApi.deleteSprint(id);
+    updateTag("sprints");
+    updateTag("meetings");
     revalidatePath("/sprints");
 
     return { success: true } as const;

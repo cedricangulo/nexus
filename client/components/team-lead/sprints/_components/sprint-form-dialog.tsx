@@ -10,8 +10,6 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 import { createSprintAction, updateSprintAction } from "@/actions/sprints";
-import DateRange from "@/components/shared/date-range";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +17,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/animate-ui/components/radix/dialog";
+import DateRange from "@/components/shared/date-range";
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerClose,

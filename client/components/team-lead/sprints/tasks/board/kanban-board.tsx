@@ -89,22 +89,22 @@ export function KanbanBoard({ tasks, users, sprintId }: KanbanBoardProps) {
     {
       status: "TODO",
       label: "To Do",
-      color: "bg-neutral-50 dark:bg-neutral-900",
+      color: "bg-accent/50",
     },
     {
       status: "IN_PROGRESS",
       label: "In Progress",
-      color: "bg-blue-50 dark:bg-blue-950/30",
+      color: "bg-info",
     },
     {
       status: "BLOCKED",
       label: "Blocked",
-      color: "bg-red-50 dark:bg-red-950/30",
+      color: "bg-error",
     },
     {
       status: "DONE",
       label: "Done",
-      color: "bg-green-50 dark:bg-green-950/30",
+      color: "bg-success",
     },
   ];
 

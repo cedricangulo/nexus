@@ -1,6 +1,9 @@
+import { Suspense } from "react";
+import { MeetingListSkeleton } from "@/components/layouts/loading";
 import SummaryCardsRow from "@/components/shared/meetings/summary-cards";
 import { MeetingsTable } from "@/components/shared/meetings/table/body";
 import { getMeetingsData } from "@/lib/data/meetings";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 
 /**
  * Team Lead Meetings Page
@@ -8,20 +11,25 @@ import { getMeetingsData } from "@/lib/data/meetings";
  * Displays meeting analytics and documentation for the project
  * Fetches and aggregates meetings from all sprints and phases
  * Allows Team Lead to upload meeting minutes
+ *
+ * Role validation is handled by RoleBasedSlot in (auth)/layout.tsx
  */
 export default async function TeamLeadMeetingsPage() {
-  // Auth and role validation handled by parent layout
-  const { logs, sprints, phases } = await getMeetingsData();
+  const { token } = await getAuthContext();
+
+  const { logs, sprints, phases } = await getMeetingsData(token);
 
   return (
-    <div className="space-y-8 pb-16">
-      <SummaryCardsRow logs={logs} phases={phases} sprints={sprints} />
-      <MeetingsTable
-        currentUserRole="teamLead"
-        initialLogs={logs}
-        phases={phases}
-        sprints={sprints}
-      />
-    </div>
+    <Suspense fallback={<MeetingListSkeleton />}>
+      <div className="space-y-8 pb-16">
+        <SummaryCardsRow logs={logs} phases={phases} sprints={sprints} />
+        <MeetingsTable
+          currentUserRole="teamLead"
+          initialLogs={logs}
+          phases={phases}
+          sprints={sprints}
+        />
+      </div>
+    </Suspense>
   );
 }

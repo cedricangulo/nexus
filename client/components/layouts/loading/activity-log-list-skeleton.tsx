@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function ActivityLogsLoading() {
+export function ActivityLogListSkeleton() {
   return (
     <div className="relative space-y-8">
       <div className="absolute -bottom-8 left-0 z-20 h-full w-full bg-linear-to-t from-background to-transparent" />

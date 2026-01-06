@@ -3,7 +3,6 @@
 import { Upload, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -12,7 +11,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/animate-ui/components/radix/dialog";
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerClose,

@@ -4,27 +4,29 @@ import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { SprintDetailSkeleton } from "@/components/layouts/loading";
 import { CreateTaskDialog } from "@/components/team-lead/sprints/create-task-dialog";
 import { KanbanBoard } from "@/components/team-lead/sprints/tasks/board/kanban-board";
 import { Button } from "@/components/ui/button";
 import { FramePanel } from "@/components/ui/frame";
 import { StatusBadge } from "@/components/ui/status";
-import { sprintApi } from "@/lib/api/sprint";
-import { taskApi } from "@/lib/api/task";
+import { getSprintById, getSprintTasks } from "@/lib/data/sprint";
 import { getAllUsersForDisplay } from "@/lib/data/team";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 import {
   getSprintStatus,
   mapSprintStatusToTaskStatus,
 } from "@/lib/helpers/sprint";
 
 async function SprintBoardContent({ sprintId }: { sprintId: string }) {
+  const { token } = await getAuthContext();
   let sprint, tasks, users;
 
   try {
     [sprint, tasks, users] = await Promise.all([
-      sprintApi.getSprintById(sprintId),
-      taskApi.listTasks({ sprintId }),
-      getAllUsersForDisplay(),
+      getSprintById(sprintId, token),
+      getSprintTasks(sprintId, token),
+      getAllUsersForDisplay(token),
     ]);
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
@@ -98,9 +100,7 @@ export default async function Page({ params }: PageProps) {
   const { id } = await params;
 
   return (
-    <Suspense
-      fallback={<div className="py-8 text-center">Loading sprint...</div>}
-    >
+    <Suspense fallback={<SprintDetailSkeleton />}>
       <SprintBoardContent sprintId={id} />
     </Suspense>
   );

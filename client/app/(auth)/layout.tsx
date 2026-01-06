@@ -1,9 +1,10 @@
-import { unauthorized } from "next/navigation";
+import { forbidden, unauthorized } from "next/navigation";
+import { Suspense } from "react";
 import { auth } from "@/auth";
+import { AuthLoadingFallback } from "@/components/layouts/loading";
 import { PushNotificationProvider } from "@/providers/push-notification-provider";
 
-// app/(auth)/layout.tsx
-export default async function AuthLayout({
+export default function AuthLayout({
   children,
   member,
   "team-lead": teamLead,
@@ -14,33 +15,41 @@ export default async function AuthLayout({
   "team-lead": React.ReactNode;
   adviser: React.ReactNode;
 }) {
-  const session = await auth();
+  return (
+    <PushNotificationProvider>
+      {/* 1. Static Content: Sent to browser immediately */}
+      {children}
+
+      {/* 2. Dynamic Content: Wrapped in Suspense to allow shell rendering */}
+      <Suspense fallback={<AuthLoadingFallback />}>
+        <RoleBasedSlot adviser={adviser} member={member} teamLead={teamLead} />
+      </Suspense>
+    </PushNotificationProvider>
+  );
+}
+
+/**
+ * Inner component that handles the dynamic auth check.
+ * This component is deferred to request time.
+ */
+async function RoleBasedSlot({ member, teamLead, adviser }: any) {
+  const session = await auth(); // Accesses cookies()
 
   if (!session?.user) {
     return unauthorized();
   }
 
-  // 1. Select the slot based on the user's role
   const role = session.user.role;
-  let activeSlot: React.ReactNode;
 
   if (role === "teamLead") {
-    activeSlot = teamLead;
-  } else if (role === "member") {
-    activeSlot = member;
-  } else if (role === "adviser") {
-    activeSlot = adviser;
-  } else {
-    return unauthorized();
+    return teamLead;
+  }
+  if (role === "member") {
+    return member;
+  }
+  if (role === "adviser") {
+    return adviser;
   }
 
-  // 2. Return the children AND the active slot
-  return (
-    <PushNotificationProvider>
-      {/* Children allows for sub-pages like /settings to work */}
-      {children}
-      {/* The slot renders the specific dashboard UI */}
-      {activeSlot}
-    </PushNotificationProvider>
-  );
+  return forbidden();
 }

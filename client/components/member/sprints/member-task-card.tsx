@@ -8,6 +8,7 @@ export type MemberTaskCardProps = {
   task: Task;
   interaction?: "tap" | "drag";
   onTaskClick?: (task: Task) => void;
+  onBlockClick?: (task: Task) => void;
 };
 
 /**
@@ -20,6 +21,7 @@ export function MemberTaskCard({
   task,
   interaction = "drag",
   onTaskClick,
+  onBlockClick,
 }: MemberTaskCardProps) {
   const cursorClass = interaction === "tap" ? "cursor-pointer" : "cursor-move";
 
@@ -30,15 +32,25 @@ export function MemberTaskCard({
           ? "border-destructive/70 bg-card/20"
           : "bg-card hover:bg-accent/50"
       }`}
-      onClick={() => onTaskClick?.(task)}
-      onKeyDown={(e) => {
-        if (onTaskClick && (e.key === "Enter" || e.key === " ")) {
-          e.preventDefault();
-          onTaskClick(task);
+      onClick={() => {
+        if (task.status === "BLOCKED" && onBlockClick) {
+          onBlockClick(task);
+        } else {
+          onTaskClick?.(task);
         }
       }}
-      role={onTaskClick ? "button" : undefined}
-      tabIndex={onTaskClick ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          if (task.status === "BLOCKED" && onBlockClick) {
+            onBlockClick(task);
+          } else if (onTaskClick) {
+            onTaskClick(task);
+          }
+        }
+      }}
+      role="button"
+      tabIndex={0}
     >
       <div className="flex justify-between gap-2">
         <div className="space-y-1">

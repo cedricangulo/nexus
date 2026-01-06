@@ -1,15 +1,18 @@
 /**
- * Meeting Data Fetching Layer
+ * Meeting Data Fetching Layer - Cache Components Compatible
+ *
+ * Uses "Pass-Through Authentication" pattern:
+ * 1. Page extracts token (dynamic boundary)
+ * 2. Token passed as string to cached function
+ * 3. Clean serverClient makes API call with manual auth header
  *
  * Server-side data fetching for meeting logs
  * Aggregates meeting data from sprints and phases
  */
 
-import { cache } from "react";
-import { meetingLogApi } from "@/lib/api/meeting-log";
-import { phaseApi } from "@/lib/api/phase";
-import { sprintApi } from "@/lib/api/sprint";
-import { requireUser } from "@/lib/helpers/rbac";
+import { cacheLife, cacheTag } from "next/cache";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
+import { createAuthHeaders, serverClient } from "@/lib/api/server-client";
 import type { MeetingLog, Phase, Sprint } from "@/lib/types";
 
 export type MeetingsPageData = {
@@ -21,34 +24,58 @@ export type MeetingsPageData = {
 
 /**
  * Fetch all meeting logs and calculate metrics
- * Wrapped in cache() to eliminate redundant API calls during a single render pass.
+ * Token must be passed from dynamic page layer
  *
  * Aggregates meeting logs from all sprints and phases
  * totalExpected is the number of sprints (since meetings are linked to sprints)
- * All authenticated roles can view
  *
  * @returns Object containing logs and totalExpected count
  * @throws Error if data fetching fails
  */
-export const getMeetingsData = cache(async (): Promise<MeetingsPageData> => {
+export async function getMeetingsData(
+  token: string
+): Promise<MeetingsPageData> {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("meetings", "sprints", "phases");
+
   try {
-    await requireUser();
-    const [sprints, phases] = await Promise.all([
-      sprintApi.listSprints(),
-      phaseApi.listPhases(),
+    const authHeaders = createAuthHeaders(token);
+
+    // Fetch sprints and phases in parallel
+    const [sprintsResponse, phasesResponse] = await Promise.all([
+      serverClient.get<Sprint[]>(API_ENDPOINTS.SPRINTS.LIST, {
+        headers: authHeaders,
+      }),
+      serverClient.get<Phase[]>(API_ENDPOINTS.PHASES.LIST, {
+        headers: authHeaders,
+      }),
     ]);
+
+    const sprints = sprintsResponse.data;
+    const phases = phasesResponse.data;
 
     // Collect all meeting logs from sprints and phases in parallel
-    const allLogs = await Promise.all([
+    const allLogsPromises = await Promise.all([
       ...sprints.map((sprint) =>
-        meetingLogApi.getMeetingLogsBySprint(sprint.id).catch(() => [])
+        serverClient
+          .get<MeetingLog[]>(API_ENDPOINTS.MEETING_LOGS.BY_SPRINT(sprint.id), {
+            headers: authHeaders,
+          })
+          .then((res) => res.data)
+          .catch(() => [])
       ),
       ...phases.map((phase) =>
-        meetingLogApi.getMeetingLogsByPhase(phase.id).catch(() => [])
+        serverClient
+          .get<MeetingLog[]>(API_ENDPOINTS.MEETING_LOGS.BY_PHASE(phase.id), {
+            headers: authHeaders,
+          })
+          .then((res) => res.data)
+          .catch(() => [])
       ),
     ]);
 
-    const logs = allLogs.flat();
+    const logs = allLogsPromises.flat();
     const totalExpected = sprints.length;
 
     return {
@@ -66,4 +93,4 @@ export const getMeetingsData = cache(async (): Promise<MeetingsPageData> => {
       totalExpected: 0,
     };
   }
-});
+}

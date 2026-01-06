@@ -1,6 +1,10 @@
+import { Suspense } from "react";
+import { MeetingListSkeleton } from "@/components/layouts/loading";
 import SummaryCardsRow from "@/components/shared/meetings/summary-cards";
 import { MeetingsTable } from "@/components/shared/meetings/table/body";
 import { getMeetingsData } from "@/lib/data/meetings";
+import { getAuthContext } from "@/lib/helpers/auth-token";
+import { requireUser } from "@/lib/helpers/rbac";
 
 /**
  * Member Meetings Page
@@ -10,18 +14,23 @@ import { getMeetingsData } from "@/lib/data/meetings";
  * but cannot upload or manage meeting minutes (Team Lead only).
  */
 export default async function MemberMeetingsPage() {
-  // Auth and role validation handled by parent layout
-  const { logs, sprints, phases } = await getMeetingsData();
+  // DYNAMIC: Validate user is authenticated
+  await requireUser();
+  const { token } = await getAuthContext();
+
+  const { logs, sprints, phases } = await getMeetingsData(token);
 
   return (
-    <div className="space-y-8 pb-16">
-      <SummaryCardsRow logs={logs} phases={phases} sprints={sprints} />
-      <MeetingsTable
-        currentUserRole="member"
-        initialLogs={logs}
-        phases={phases}
-        sprints={sprints}
-      />
-    </div>
+    <Suspense fallback={<MeetingListSkeleton />}>
+      <div className="space-y-8 pb-16">
+        <SummaryCardsRow logs={logs} phases={phases} sprints={sprints} />
+        <MeetingsTable
+          currentUserRole="member"
+          initialLogs={logs}
+          phases={phases}
+          sprints={sprints}
+        />
+      </div>
+    </Suspense>
   );
 }

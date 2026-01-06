@@ -16,6 +16,7 @@ import {
   FrameTitle,
 } from "@/components/ui/frame";
 import { getActivityLogs } from "@/lib/data/activity-logs";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 import { formatTitleCase } from "@/lib/helpers/format-title-case";
 import type { ActivityLog } from "@/lib/types";
 
@@ -107,7 +108,8 @@ function ActivityLogsDisplay({
 }
 
 export async function ActivityLogs() {
-  const activities = await getActivityLogs();
+  const { token } = await getAuthContext();
+  const activities = await getActivityLogs(token);
 
   return <ActivityLogsDisplay activities={activities} limit={5} />;
 }

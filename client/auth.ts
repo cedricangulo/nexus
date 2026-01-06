@@ -4,9 +4,6 @@ import { decodeJwt } from "jose";
 import { cookies } from "next/headers";
 import { cache } from "react";
 
-import { createApiClient } from "@/lib/api/client";
-import { API_ENDPOINTS } from "@/lib/api/endpoints";
-
 export type AppRole = "member" | "teamLead" | "adviser";
 
 export type SessionUser = {
@@ -69,7 +66,20 @@ function decodeToken(token: string): SessionUser | null {
   }
 }
 
-// Wrap auth() with React cache() to deduplicate requests within the same render pass
+/**
+ * Instant auth() function using JWT decoding only
+ *
+ * This function decodes the JWT token stored in cookies without making
+ * any network requests. This allows the page to render the static shell
+ * instantly without being blocked by network I/O.
+ *
+ * The JWT contains: id, email, name, role - sufficient for role-based routing.
+ *
+ * If components need fresh/updated user data from the database, they should:
+ * 1. Call getAuthContext() to get the token
+ * 2. Pass the token to getCurrentUser(token)
+ * 3. Wrap that call in <Suspense> boundary
+ */
 export const auth = cache(async (): Promise<Session | null> => {
   const cookieStore = await cookies();
   const token = cookieStore.get("auth_token")?.value;
@@ -78,42 +88,17 @@ export const auth = cache(async (): Promise<Session | null> => {
     return null;
   }
 
-  try {
-    const client = await createApiClient();
-    const response = await client.get(API_ENDPOINTS.AUTH.ME);
+  // Decode the JWT token instantly - no network call
+  const decoded = decodeToken(token);
 
-    const me = response.data as {
-      id?: string;
-      email?: string;
-      name?: string;
-      role?: string;
-    };
-
-    const normalizedRole = normalizeRole(me.role);
-
-    return {
-      token,
-      user: {
-        id: me.id,
-        email: me.email,
-        name: me.name,
-        role: normalizedRole,
-      },
-    };
-  } catch {
-    // Fall back to decoding the token so role-based routing still works
-    // even if /auth/me is temporarily unavailable.
-    const decoded = decodeToken(token);
-
-    if (!decoded) {
-      return null;
-    }
-
-    return {
-      token,
-      user: decoded,
-    };
+  if (!decoded) {
+    return null;
   }
+
+  return {
+    token,
+    user: decoded,
+  };
 });
 
 export const authRole = {

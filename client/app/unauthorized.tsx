@@ -25,11 +25,12 @@ export default function UnauthorizedPage() {
             />
           </EmptyMedia>
           <EmptyTitle className="font-bold text-3xl text-blue-900">
-            Access Denied
+            Please Log In
           </EmptyTitle>
           <EmptyDescription className="text-blue-600 text-sm md:text-base">
-            You're not authorized to access this page. You need to be logged in
-            to continue.
+            We couldn't verify your identity. This usually happens if your
+            session has timed out or you haven't logged in yet. Please sign in
+            to continue working on your project.
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
@@ -40,12 +41,8 @@ export default function UnauthorizedPage() {
                 Go to Login
               </Link>
             </Button>
-            <Button
-              asChild
-              className="text-blue-950 hover:text-blue-800 dark:border-blue-300"
-              variant="outline"
-            >
-              <Link href="/">
+            <Button asChild variant="secondary">
+              <Link href="/dashboard">
                 <House className="size-4" />
                 Back Home
               </Link>

@@ -1,7 +1,7 @@
 import { Frame, FramePanel, FrameTitle } from "@/components/ui/frame";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function PhasesLoading() {
+export function PhaseListSkeleton() {
   return (
     <div className="relative space-y-8">
       <div className="absolute -bottom-8 left-0 z-20 h-full w-full bg-linear-to-t from-background to-transparent" />
@@ -10,7 +10,7 @@ export default function PhasesLoading() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {Array.from({ length: 3 }).map((_, i) => (
           <Frame key={`phase-${i}`}>
-            <FrameTitle>
+            <FrameTitle className="p-4">
               <Skeleton className="h-5 w-32" />
             </FrameTitle>
             <FramePanel className="space-y-2 p-2">

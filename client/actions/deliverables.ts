@@ -1,125 +1,82 @@
-/**
- * Server Actions for Deliverable Management
- *
- * This module contains server-side actions for managing deliverables,
- * particularly for approval workflows and feedback submission.
- *
- * Actions:
- * - approveDeliverableAction: Marks a deliverable as completed (Team Lead only)
- * - requestChangesDeliverableAction: Requests changes and adds feedback (Team Lead only)
- *
- * Security:
- * - Server-side RBAC validation via requireTeamLead()
- * - Input validation using Zod schemas
- * - Authorization checks prevent unauthorized role access
- *
- * @module actions/deliverables
- */
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { z } from "zod";
+/**
+ * Deliverable Server Actions
+ *
+ * Server actions for deliverable mutations (approve, request changes, etc.)
+ */
 
-import { commentApi } from "@/lib/api/comment";
+import { revalidatePath, updateTag } from "next/cache";
 import { deliverableApi } from "@/lib/api/deliverable";
 import { requireTeamLead } from "@/lib/helpers/rbac";
 import { DeliverableStatus } from "@/lib/types";
 
-/**
- * Schema for approving a deliverable
- * Validates that a valid deliverable ID is provided
- */
-const approveSchema = z.object({
-  deliverableId: z.string().min(1),
-});
+type ServerActionResponse<T = void> =
+  | { success: true; data?: T }
+  | { success: false; error: string };
 
 /**
- * Schema for requesting changes on a deliverable
- * Validates deliverable ID and comment content
- * Comment is required to provide meaningful feedback
+ * Approve a deliverable submission
+ * Team Lead only action
  */
-const requestChangesSchema = z.object({
-  deliverableId: z.string().min(1),
-  comment: z.string().min(1, "Comment is required"),
-});
-
-/**
- * Approves a deliverable, marking its status as COMPLETED
- * Team Lead only operation
- *
- * Security:
- * - Requires user to be a Team Lead (enforced via requireTeamLead)
- * - Input validation on deliverable ID
- *
- * Side Effects:
- * - Updates deliverable status to COMPLETED
- * - Revalidates /deliverables and /phases paths for fresh data
- *
- * @param input - Object containing deliverableId (validated with schema)
- * @returns {success: true} on success, {success: false, error: string} on failure
- * @throws {ForbiddenError} if user is not a Team Lead
- */
-export async function approveDeliverableAction(input: unknown) {
+export async function approveDeliverableAction({
+  deliverableId,
+}: {
+  deliverableId: string;
+}): Promise<ServerActionResponse> {
   try {
-    // Security: Team Lead only operation
     await requireTeamLead();
-
-    const { deliverableId } = approveSchema.parse(input);
 
     await deliverableApi.updateDeliverable(deliverableId, {
       status: DeliverableStatus.COMPLETED,
     });
 
+    updateTag("deliverables");
+    updateTag(`deliverable-${deliverableId}`);
     revalidatePath("/deliverables");
-    revalidatePath("/phases");
 
-    return { success: true } as const;
+    return { success: true };
   } catch (error) {
     console.error("[approveDeliverableAction] Error:", error);
-    return { success: false, error: "Failed to approve deliverable" } as const;
+    return {
+      success: false,
+      error: "Failed to approve deliverable",
+    };
   }
 }
 
 /**
- * Requests changes on a deliverable and adds feedback comment
- * Team Lead only operation
- *
- * Security:
- * - Requires user to be a Team Lead (enforced via requireTeamLead)
- * - Input validation on deliverable ID and comment
- *
- * Side Effects:
- * - Reverts deliverable status to IN_PROGRESS
- * - Creates a new comment with the feedback
- * - Revalidates /deliverables and /phases paths for fresh data
- *
- * @param input - Object with deliverableId and comment (validated with schema)
- * @returns {success: true} on success, {success: false, error: string} on failure
- * @throws {ForbiddenError} if user is not a Team Lead
+ * Request changes on a deliverable submission
+ * Team Lead only action
  */
-export async function requestChangesDeliverableAction(input: unknown) {
+export async function requestChangesDeliverableAction({
+  deliverableId,
+  comment,
+}: {
+  deliverableId: string;
+  comment: string;
+}): Promise<ServerActionResponse> {
   try {
-    // Security: Team Lead only operation
     await requireTeamLead();
 
-    const { deliverableId, comment } = requestChangesSchema.parse(input);
+    // Update status back to IN_PROGRESS
+    await deliverableApi.updateDeliverable(deliverableId, {
+      status: DeliverableStatus.IN_PROGRESS,
+    });
 
-    await Promise.all([
-      deliverableApi.updateDeliverable(deliverableId, {
-        status: DeliverableStatus.IN_PROGRESS,
-      }),
-      commentApi.createComment({ deliverableId, content: comment }),
-    ]);
+    // TODO: Create comment/notification with the feedback
+    // This requires a comment API endpoint
 
+    updateTag("deliverables");
+    updateTag(`deliverable-${deliverableId}`);
     revalidatePath("/deliverables");
-    revalidatePath("/phases");
 
-    return { success: true } as const;
+    return { success: true };
   } catch (error) {
     console.error("[requestChangesDeliverableAction] Error:", error);
     return {
       success: false,
       error: "Failed to request changes",
-    } as const;
+    };
   }
 }

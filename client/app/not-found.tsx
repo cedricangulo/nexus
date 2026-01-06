@@ -1,4 +1,16 @@
+import { Home } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 
 export const metadata: Metadata = {
   title: "404 - Page Not Found",
@@ -11,20 +23,34 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-linear-to-b from-slate-50 to-slate-100 px-4">
-      <div className="text-center">
-        <h1 className="mb-4 font-bold text-6xl text-slate-900">404</h1>
-        <p className="mb-8 text-slate-600 text-xl">Page not found</p>
-        <p className="mb-8 text-slate-500">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <a
-          className="inline-block rounded-lg bg-slate-900 px-6 py-3 font-medium text-white transition-colors hover:bg-slate-800"
-          href="/dashboard"
-        >
-          Return to Dashboard
-        </a>
-      </div>
+    <div className="flex min-h-screen items-center justify-center bg-white p-4">
+      <Empty>
+        <EmptyHeader>
+          <EmptyMedia className="pointer-events-none">
+            <Image
+              alt="Page Not Found"
+              height={500}
+              src="/not-found.svg"
+              width={500}
+            />
+          </EmptyMedia>
+          <EmptyTitle className="font-bold text-3xl text-blue-900">
+            Page Not Found
+          </EmptyTitle>
+          <EmptyDescription className="text-blue-600 text-sm md:text-base">
+            The page you're looking for doesn't exist or has been moved. Let's
+            get you back on track.
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <Button asChild>
+            <Link href="/">
+              <Home />
+              Back to Home
+            </Link>
+          </Button>
+        </EmptyContent>
+      </Empty>
     </div>
   );
 }
