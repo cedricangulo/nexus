@@ -2,30 +2,35 @@ import axios from "axios";
 import { format } from "date-fns";
 import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
-import { notFound, unauthorized } from "next/navigation";
+import { forbidden, notFound } from "next/navigation";
 import { Suspense } from "react";
+import { SprintDetailSkeleton } from "@/components/layouts/loading";
 import { MemberKanbanBoard } from "@/components/member/sprints/member-kanban-board";
 import { Button } from "@/components/ui/button";
 import { FramePanel } from "@/components/ui/frame";
 import { StatusBadge } from "@/components/ui/status";
-import { authApi } from "@/lib/api/auth";
-import { sprintApi } from "@/lib/api/sprint";
-import { taskApi } from "@/lib/api/task";
+import { getSprintById, getSprintTasks } from "@/lib/data/sprint";
+import { getCurrentUser } from "@/lib/data/user";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 import {
   getSprintStatus,
   mapSprintStatusToTaskStatus,
 } from "@/lib/helpers/sprint";
 
 async function SprintBoardContent({ sprintId }: { sprintId: string }) {
+  const { token } = await getAuthContext();
   let sprint, currentUser, allTasks;
 
   try {
     [sprint, currentUser, allTasks] = await Promise.all([
-      sprintApi.getSprintById(sprintId),
-      authApi.getCurrentUser(),
-      taskApi.listTasks({ sprintId }),
+      getSprintById(sprintId, token),
+      getCurrentUser(token),
+      getSprintTasks(sprintId, token),
     ]);
   } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response?.status === 403) {
+      return forbidden();
+    }
     if (axios.isAxiosError(error) && error.response?.status === 404) {
       notFound();
     }
@@ -43,7 +48,7 @@ async function SprintBoardContent({ sprintId }: { sprintId: string }) {
 
   // AUTHORIZATION: Member can only access sprints where they have assigned tasks
   if (userTasks.length === 0) {
-    return unauthorized();
+    return forbidden();
   }
 
   const status = getSprintStatus(sprint);
@@ -108,9 +113,7 @@ export default async function Page({ params }: PageProps) {
   const { id } = await params;
 
   return (
-    <Suspense
-      fallback={<div className="py-8 text-center">Loading sprint...</div>}
-    >
+    <Suspense fallback={<SprintDetailSkeleton />}>
       <SprintBoardContent sprintId={id} />
     </Suspense>
   );

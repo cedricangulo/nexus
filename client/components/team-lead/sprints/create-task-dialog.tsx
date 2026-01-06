@@ -9,8 +9,6 @@ import { toast } from "sonner";
 import type { z } from "zod";
 
 import { createSprintTaskAction } from "@/actions/tasks";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +16,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/animate-ui/components/radix/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerClose,

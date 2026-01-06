@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
     },
   },
 
+  cacheComponents: true,
+
   // Performance optimizations
   compress: true,
 

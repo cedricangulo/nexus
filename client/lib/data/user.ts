@@ -1,22 +1,24 @@
-import { cache } from "react";
-import { createApiClient } from "@/lib/api/client";
+/**
+ * User Data Fetching Layer - Cache Components Compatible
+ */
+
+import { cacheLife, cacheTag } from "next/cache";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
-import { requireUser } from "@/lib/helpers/rbac";
+import { createAuthHeaders, serverClient } from "@/lib/api/server-client";
 import type { User } from "@/lib/types";
 
-/**
- * Fetches the current authenticated user.
- * Wrapped in cache() to eliminate redundant API calls during a single render pass.
- * @returns Current user data or null if not authenticated
- */
-export const getCurrentUser = cache(async (): Promise<User | null> => {
+export async function getCurrentUser(token: string): Promise<User | null> {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("current-user");
+
   try {
-    await requireUser();
-    const client = await createApiClient();
-    const response = await client.get(API_ENDPOINTS.AUTH.ME);
+    const response = await serverClient.get<User>(API_ENDPOINTS.AUTH.ME, {
+      headers: createAuthHeaders(token),
+    });
     return response.data;
   } catch (error) {
     console.error("Failed to fetch current user:", error);
     return null;
   }
-});
+}

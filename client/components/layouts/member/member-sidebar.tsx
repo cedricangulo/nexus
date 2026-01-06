@@ -34,14 +34,35 @@ type NavItem = {
   href?: string;
   icon?: LucideIcon;
   items?: NavItem[];
+  tooltip?: string;
 };
 
 const navItems: NavItem[] = [
-  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { title: "Phases", href: "/phases", icon: Layers },
-  { title: "Sprints", href: "/sprints", icon: IterationCcw },
-  { title: "Meetings", href: "/meetings", icon: CalendarDays },
-  { title: "Deliverables", href: "/deliverables", icon: Package },
+  {
+    title: "Dashboard",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+    tooltip: "Dashboard",
+  },
+  { title: "Phases", href: "/phases", icon: Layers, tooltip: "Phases" },
+  {
+    title: "Deliverables",
+    href: "/deliverables",
+    icon: Package,
+    tooltip: "Deliverables",
+  },
+  {
+    title: "Sprints",
+    href: "/sprints",
+    icon: IterationCcw,
+    tooltip: "Sprints",
+  },
+  {
+    title: "Meetings",
+    href: "/meetings",
+    icon: CalendarDays,
+    tooltip: "Meetings",
+  },
 ] as const;
 
 const AUTH_ROUTE_REGEX = /^\/(auth)/;
@@ -154,6 +175,7 @@ export function AppSidebar({ user, badgeCounts }: AppSidebarProps) {
                   <SidebarMenuButton
                     asChild
                     isActive={isActive(item.href || "")}
+                    tooltip={item.tooltip}
                   >
                     <Link href={item.href || ""}>
                       {item.icon ? (

@@ -5,7 +5,7 @@ import { SidebarBadgeLoader } from "@/components/layouts/sidebar-with-badges";
 import Notification from "@/components/shared/notifications";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { getProject } from "@/lib/data/project";
-import { getCurrentUser } from "@/lib/data/user";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 
 export default async function TeamLeadLayout({
   children,
@@ -18,9 +18,8 @@ export default async function TeamLeadLayout({
     return null;
   }
 
-  // Fetch only what's needed for initial render
-  // Badge counts are fetched asynchronously via Suspense
-  const [user, project] = await Promise.all([getCurrentUser(), getProject()]);
+  const { user, token } = await getAuthContext();
+  const project = await getProject(token);
 
   return (
     <SidebarProvider suppressHydrationWarning>

@@ -1,31 +1,36 @@
 /**
  * Activity Logs Data Fetching Layer
  *
- * Server-side data fetching for activity logs
- * Handles fetching and sorting of activity log entries
+ * Server-side data fetching for activity logs with Cache Components support
+ * Handles fetching and sorting of activity log entries using "use cache" directive
  */
 
 import "server-only";
 
-import { cache } from "react";
-import { activityLogApi } from "@/lib/api/activity-log";
-import { requireUser } from "@/lib/helpers/rbac";
+import { cacheLife, cacheTag } from "next/cache";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
+import { createAuthHeaders, serverClient } from "@/lib/api/server-client";
 import type { ActivityLog } from "@/lib/types";
 
 /**
  * Fetch all activity logs sorted by most recent first
- * Wrapped in cache() to eliminate redundant API calls during a single render pass.
  *
+ * @param token - Authentication token for the request
  * @returns Array of activity logs sorted by creation date (newest first)
- * @throws Error if data fetching fails
  */
-export const getActivityLogs = cache(async (): Promise<ActivityLog[]> => {
+export async function getActivityLogs(token: string): Promise<ActivityLog[]> {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("activity-logs");
+
   try {
-    await requireUser();
-    const activities = await activityLogApi.listActivityLogs();
+    const response = await serverClient.get<ActivityLog[]>(
+      API_ENDPOINTS.ACTIVITY_LOGS.LIST,
+      { headers: createAuthHeaders(token) }
+    );
 
     // Sort by most recent first
-    return activities.sort(
+    return response.data.sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
@@ -33,29 +38,33 @@ export const getActivityLogs = cache(async (): Promise<ActivityLog[]> => {
     console.error("Failed to fetch activity logs:", error);
     return [];
   }
-});
+}
 
 /**
  * Fetch activity logs for a specific entity
  *
  * @param entityType - Type of entity (e.g., 'deliverable', 'task')
  * @param entityId - ID of the entity
+ * @param token - Authentication token for the request
  * @returns Array of activity logs for the entity, sorted newest first
- * @throws Error if data fetching fails
  */
 export async function getActivityLogsByEntity(
   entityType: string,
-  entityId: string
+  entityId: string,
+  token: string
 ): Promise<ActivityLog[]> {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("activity-logs", `entity-${entityType}-${entityId}`);
+
   try {
-    await requireUser();
-    const activities = await activityLogApi.getActivityLogsByEntity(
-      entityType,
-      entityId
+    const response = await serverClient.get<ActivityLog[]>(
+      API_ENDPOINTS.ACTIVITY_LOGS.BY_ENTITY(entityType, entityId),
+      { headers: createAuthHeaders(token) }
     );
 
     // Sort by most recent first
-    return activities.sort(
+    return response.data.sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );

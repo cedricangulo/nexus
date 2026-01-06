@@ -14,7 +14,8 @@ import {
   FramePanel,
   FrameTitle,
 } from "@/components/ui/frame";
-import { deliverableApi } from "@/lib/api/deliverable";
+import { getDeliverables } from "@/lib/data/deliverables";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 import type { PendingApproval } from "@/lib/helpers/dashboard-computations";
 import { getPendingApprovals } from "@/lib/helpers/dashboard-computations";
 
@@ -98,7 +99,8 @@ function PendingApprovalsListDisplay({ items }: PendingApprovalsListProps) {
 }
 
 export async function PendingApprovalsList() {
-  const deliverables = await deliverableApi.listDeliverables();
+  const { token } = await getAuthContext();
+  const deliverables = await getDeliverables(token);
   const pendingApprovals = getPendingApprovals(deliverables);
   const sortedApprovals = [...pendingApprovals].sort(
     (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()

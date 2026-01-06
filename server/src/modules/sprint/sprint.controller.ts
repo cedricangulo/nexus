@@ -25,7 +25,7 @@ export async function getSprintByIdHandler(
   request: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply
 ) {
-  const sprint = await getSprintById(request.params.id);
+  const sprint = await getSprintById(request.params.id, request.user!.id, request.user!.role);
   return reply.code(200).send(sprint);
 }
 

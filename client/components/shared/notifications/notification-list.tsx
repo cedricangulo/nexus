@@ -117,7 +117,7 @@ export function NotificationList({
             onClick={handleMarkAllAsRead}
             type="button"
           >
-            {isPending ? "Updating..." : "Mark all as read"}
+            Mark all as read
           </button>
         )}
       </div>

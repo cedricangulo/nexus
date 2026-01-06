@@ -58,7 +58,7 @@ export async function taskRoutes(app: FastifyInstance) {
       preHandler: requireRole([Role.TEAM_LEAD]),
     }, createTaskHandler as any);
 
-    // Update task (Team Lead only)
+    // Update task (Team Lead only for assignments, Members can update details)
     protectedServer.put("/:id", {
       schema: {
         params: z.object({ id: z.string() }),
@@ -67,7 +67,7 @@ export async function taskRoutes(app: FastifyInstance) {
           200: taskResponseSchema,
         },
       },
-      preHandler: requireRole([Role.TEAM_LEAD]),
+      preHandler: requireRole([Role.TEAM_LEAD, Role.MEMBER]),
     }, updateTaskHandler as any);
 
     // Update task status

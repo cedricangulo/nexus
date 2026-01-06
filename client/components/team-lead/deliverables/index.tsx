@@ -18,9 +18,12 @@
  * @access Team Lead role only
  */
 import { DeliverablesClient } from "@/components/team-lead/deliverables/client";
-import { deliverableApi } from "@/lib/api/deliverable";
-import { evidenceApi } from "@/lib/api/evidence";
-import { phaseApi } from "@/lib/api/phase";
+import {
+  getDeliverables,
+  getEvidenceByDeliverable,
+  getPhases,
+} from "@/lib/data/deliverables";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 
 export const metadata = {
   title: "Deliverables",
@@ -28,21 +31,17 @@ export const metadata = {
 };
 
 export default async function TeamLeadDeliverablesPage() {
+  const { token } = await getAuthContext();
+
   const [deliverables, phases] = await Promise.all([
-    deliverableApi.listDeliverables(),
-    phaseApi.listPhases(),
+    getDeliverables(token),
+    getPhases(token),
   ]);
 
   const evidenceEntries = await Promise.all(
     deliverables.map(async (deliverable) => {
-      try {
-        const evidence = await evidenceApi.getEvidenceByDeliverable(
-          deliverable.id
-        );
-        return [deliverable.id, evidence] as const;
-      } catch {
-        return [deliverable.id, []] as const;
-      }
+      const evidence = await getEvidenceByDeliverable(deliverable.id, token);
+      return [deliverable.id, evidence] as const;
     })
   );
 

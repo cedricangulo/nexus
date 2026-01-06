@@ -10,12 +10,14 @@ import {
   FrameTitle,
 } from "@/components/ui/frame";
 import { Tracker } from "@/components/ui/tracker";
-import { sprintApi } from "@/lib/api/sprint";
-import { taskApi } from "@/lib/api/task";
+import { getSprints } from "@/lib/data/sprint";
+import { getTasks } from "@/lib/data/tasks";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 import {
   computeSprintHealth,
   findCurrentSprint,
 } from "@/lib/helpers/dashboard-computations";
+import type { Task } from "@/lib/types";
 import { SprintHealthSkeleton } from "./skeletons";
 
 function SprintHealthNormal({
@@ -23,7 +25,7 @@ function SprintHealthNormal({
   sprintTasks,
 }: {
   sprintHealth: Awaited<ReturnType<typeof computeSprintHealth>>;
-  sprintTasks: Awaited<ReturnType<typeof taskApi.listTasks>>;
+  sprintTasks: Task[];
 }) {
   const isOverdue = sprintHealth.daysRemaining < 0;
   const isNearEnd =
@@ -195,9 +197,10 @@ function SprintHealthError() {
 
 export async function SprintHealthCard() {
   try {
+    const { token } = await getAuthContext();
     const [sprints, tasks] = await Promise.all([
-      sprintApi.listSprints(),
-      taskApi.listTasks(),
+      getSprints(token, "teamLead"),
+      getTasks(token),
     ]);
 
     const currentSprint = findCurrentSprint(sprints);

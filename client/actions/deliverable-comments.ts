@@ -17,7 +17,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { commentApi } from "@/lib/api/comment";
-import { getCurrentUser } from "@/lib/data/user";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 
 /**
  * Schema for creating a deliverable comment
@@ -57,8 +57,8 @@ export async function createDeliverableCommentAction(
 ): Promise<ActionResult> {
   try {
     // Verify user is authenticated
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
+    const { user } = await getAuthContext();
+    if (!user) {
       return { success: false, error: "Unauthorized" };
     }
 

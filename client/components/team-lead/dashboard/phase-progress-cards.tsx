@@ -13,8 +13,9 @@ import {
 } from "@/components/ui/frame";
 import { Separator } from "@/components/ui/separator";
 import { StatusBadge } from "@/components/ui/status";
-import { deliverableApi } from "@/lib/api/deliverable";
-import { phaseApi } from "@/lib/api/phase";
+import { getDeliverables } from "@/lib/data/deliverables";
+import { getPhases } from "@/lib/data/phases";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 import { computePhaseProgress } from "@/lib/helpers/dashboard-computations";
 import type { DeliverableStatus, TaskStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -168,9 +169,10 @@ function PhaseProgressError() {
 
 export async function PhaseProgressCardsDisplay() {
   try {
+    const { token } = await getAuthContext();
     const [deliverables, phases] = await Promise.all([
-      deliverableApi.listDeliverables(),
-      phaseApi.listPhases(),
+      getDeliverables(token),
+      getPhases(token),
     ]);
 
     if (phases.length === 0) {

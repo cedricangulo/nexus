@@ -14,12 +14,15 @@
  * @access Member role only
  */
 
+import { Suspense } from "react";
+import { DeliverableListSkeleton } from "@/components/layouts/loading";
 import { MemberDeliverablesClient } from "@/components/member/deliverables/client";
 import {
   getDeliverables,
   getEvidenceByDeliverable,
   getPhases,
 } from "@/lib/data/deliverables";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 
 export const metadata = {
   title: "Deliverables",
@@ -27,14 +30,15 @@ export const metadata = {
 };
 
 export default async function MemberDeliverablesPage() {
+  const { token } = await getAuthContext();
   const [deliverables, phases] = await Promise.all([
-    getDeliverables(),
-    getPhases(),
+    getDeliverables(token),
+    getPhases(token),
   ]);
 
   const evidenceEntries = await Promise.all(
     deliverables.map(async (deliverable) => {
-      const evidence = await getEvidenceByDeliverable(deliverable.id);
+      const evidence = await getEvidenceByDeliverable(deliverable.id, token);
       return [deliverable.id, evidence] as const;
     })
   );
@@ -42,10 +46,12 @@ export default async function MemberDeliverablesPage() {
   const evidenceByDeliverableId = Object.fromEntries(evidenceEntries);
 
   return (
-    <MemberDeliverablesClient
-      deliverables={deliverables}
-      evidenceByDeliverableId={evidenceByDeliverableId}
-      phases={phases}
-    />
+    <Suspense fallback={<DeliverableListSkeleton />}>
+      <MemberDeliverablesClient
+        deliverables={deliverables}
+        evidenceByDeliverableId={evidenceByDeliverableId}
+        phases={phases}
+      />
+    </Suspense>
   );
 }

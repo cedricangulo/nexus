@@ -1,7 +1,8 @@
-import { FolderX } from "lucide-react";
+import { Suspense } from "react";
+import { PhaseListSkeleton } from "@/components/layouts/loading";
 import { MemberPhaseCard } from "@/components/member/phases/member-phase-card";
-import { EmptyState } from "@/components/shared/empty-state";
 import { getPhasesWithDetails } from "@/lib/data/phases";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 
 export const metadata = {
   title: "Project Phases",
@@ -9,23 +10,14 @@ export const metadata = {
 };
 
 export default async function PhasesPage() {
-  const phasesWithDeliverables = await getPhasesWithDetails();
+  const { token } = await getAuthContext();
 
-  if (phasesWithDeliverables.length === 0) {
-    return (
-      <EmptyState
-        description="No phases have been created yet. Please wait for the team lead to set up the project."
-        icon={FolderX}
-        title="No Phases Available"
-      />
-    );
-  }
+  // Await the cached data directly - instant when cached, no Suspense needed
+  const phasesWithDeliverables = await getPhasesWithDetails(token);
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {phasesWithDeliverables.map((phase) => (
-        <MemberPhaseCard key={phase.id} phase={phase} />
-      ))}
-    </div>
+    <Suspense fallback={<PhaseListSkeleton />}>
+      <MemberPhaseCard phase={phasesWithDeliverables} />
+    </Suspense>
   );
 }

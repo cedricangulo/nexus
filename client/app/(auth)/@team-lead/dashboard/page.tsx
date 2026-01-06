@@ -21,23 +21,21 @@ export default async function DashboardPage() {
   }
 
   return (
-    <main className="min-w-0 flex-1 overflow-y-auto">
-      <div className="mx-auto max-w-screen-2xl space-y-8">
-        <ProjectHealthCard />
-        <PhaseProgressCardsDisplay />
+    <div className="mx-auto max-w-screen-2xl space-y-8">
+      <ProjectHealthCard />
+      <PhaseProgressCardsDisplay />
 
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <SprintHealthCard />
-          <ActivityLogs />
-          <BlockedItemsList />
-          <PendingApprovalsList />
-        </div>
-
-        <div className="space-y-8">
-          <Separator />
-          <TeamContributions />
-        </div>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <SprintHealthCard />
+        <ActivityLogs />
+        <BlockedItemsList />
+        <PendingApprovalsList />
       </div>
-    </main>
+
+      <div className="space-y-8">
+        <Separator />
+        <TeamContributions />
+      </div>
+    </div>
   );
 }

@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/frame";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function DeliverablesLoading() {
+export function DeliverableListSkeleton() {
   return (
     <div className="relative space-y-8">
       <div className="absolute -bottom-8 left-0 z-20 h-full w-full bg-linear-to-t from-background to-transparent" />
@@ -62,7 +62,6 @@ export default function DeliverablesLoading() {
         </div>
       </div>
 
-      {/* Grid of DeliverableCards (3 columns) */}
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
           <Skeleton className="h-36 rounded-lg" key={`card-${i}`} />

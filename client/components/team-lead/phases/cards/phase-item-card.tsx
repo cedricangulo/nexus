@@ -74,44 +74,46 @@ export function PhaseItemCard({
           {children}
           <h4 className="mt-2 font-medium text-sm leading-tight">{title}</h4>
         </div>
-        {Boolean(isTeamLead && onEdit && onDelete) && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                className="shrink-0"
-                onClick={(e) => e.stopPropagation()}
-                size="icon"
-                variant="ghost"
-              >
-                <MoreVertical className="size-4" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit?.();
-                }}
-              >
-                <Pencil className="size-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete?.();
-                }}
-                variant="destructive"
-              >
-                <Trash2 className="size-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              className="shrink-0"
+              onClick={(e) => e.stopPropagation()}
+              size="icon"
+              variant="ghost"
+            >
+              <MoreVertical className="size-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit?.();
+              }}
+            >
+              <Pencil className="size-4" />
+              Edit
+            </DropdownMenuItem>
+            {Boolean(isTeamLead && onEdit && onDelete) && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete?.();
+                  }}
+                  variant="destructive"
+                >
+                  <Trash2 className="size-4" />
+                  Delete
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {description ? (

@@ -1,5 +1,8 @@
+import { Suspense } from "react";
+import { ActivityLogListSkeleton } from "@/components/layouts/loading";
 import { ActivityLogsClient } from "@/components/team-lead/settings/activity-logs/client";
-import { activityLogApi } from "@/lib/api/activity-log";
+import { getActivityLogs } from "@/lib/data/activity-logs";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 
 export const metadata = {
   title: "Activity Logs",
@@ -7,8 +10,13 @@ export const metadata = {
 };
 
 export default async function ActivityLogsPage() {
+  const { token } = await getAuthContext();
   // Auth and role validation handled by parent layout
-  const activities = await activityLogApi.listActivityLogs();
+  const activities = await getActivityLogs(token);
 
-  return <ActivityLogsClient activities={activities} userRole="teamLead" />;
+  return (
+    <Suspense fallback={<ActivityLogListSkeleton />}>
+      <ActivityLogsClient activities={activities} userRole="teamLead" />
+    </Suspense>
+  );
 }

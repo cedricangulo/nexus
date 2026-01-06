@@ -3,6 +3,7 @@
 import type { UpdateProjectInput } from "@/lib/api/project";
 import { projectApi } from "@/lib/api/project";
 import { getProject } from "@/lib/data/project";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 import { requireTeamLead } from "@/lib/helpers/rbac";
 import type { Project } from "@/lib/types";
 
@@ -17,8 +18,10 @@ export async function updateProjectAction(
   try {
     await requireTeamLead();
 
+    const { token } = await getAuthContext();
+
     // Check if project exists
-    const existingProject = await getProject();
+    const existingProject = await getProject(token);
 
     // If no project exists, create one
     if (!existingProject) {

@@ -1,51 +1,80 @@
-import "server-only";
+/**
+ * Deliverable Data Fetching Layer - Cache Components Compatible
+ */
 
-import { cache } from "react";
-import { commentApi } from "@/lib/api/comment";
-import { deliverableApi } from "@/lib/api/deliverable";
-import { evidenceApi } from "@/lib/api/evidence";
-import { phaseApi } from "@/lib/api/phase";
+import { cacheLife, cacheTag } from "next/cache";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
+import { createAuthHeaders, serverClient } from "@/lib/api/server-client";
 import type { Comment, Deliverable, Evidence, Phase } from "@/lib/types";
-import { requireUser } from "../helpers/rbac";
 
-export const getDeliverableById = cache(
-  async (id: string): Promise<Deliverable | null> => {
-    try {
-      await requireUser();
-      return await deliverableApi.getDeliverableById(id);
-    } catch (error) {
-      console.error(`Failed to fetch deliverable ${id}:`, error);
-      return null;
-    }
-  }
-);
+export async function getDeliverableById(
+  id: string,
+  token: string
+): Promise<Deliverable | null> {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("deliverables", `deliverable-${id}`);
 
-export const getDeliverables = cache(async (): Promise<Deliverable[]> => {
   try {
-    await requireUser();
-    return await deliverableApi.listDeliverables();
+    const response = await serverClient.get<Deliverable>(
+      API_ENDPOINTS.DELIVERABLES.GET(id),
+      { headers: createAuthHeaders(token) }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to fetch deliverable ${id}:`, error);
+    return null;
+  }
+}
+
+export async function getDeliverables(token: string): Promise<Deliverable[]> {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("deliverables");
+
+  try {
+    const response = await serverClient.get<Deliverable[]>(
+      API_ENDPOINTS.DELIVERABLES.LIST,
+      { headers: createAuthHeaders(token) }
+    );
+    return response.data;
   } catch (error) {
     console.error("Failed to fetch deliverables:", error);
     return [];
   }
-});
+}
 
-export const getPhases = cache(async (): Promise<Phase[]> => {
+export async function getPhases(token: string): Promise<Phase[]> {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("phases");
+
   try {
-    await requireUser();
-    return await phaseApi.listPhases();
+    const response = await serverClient.get<Phase[]>(
+      API_ENDPOINTS.PHASES.LIST,
+      { headers: createAuthHeaders(token) }
+    );
+    return response.data;
   } catch (error) {
     console.error("Failed to fetch phases:", error);
     return [];
   }
-});
+}
 
 export async function getEvidenceByDeliverable(
-  deliverableId: string
+  deliverableId: string,
+  token: string
 ): Promise<Evidence[]> {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("evidence", `deliverable-${deliverableId}`);
+
   try {
-    await requireUser();
-    return await evidenceApi.getEvidenceByDeliverable(deliverableId);
+    const response = await serverClient.get<Evidence[]>(
+      API_ENDPOINTS.EVIDENCE.BY_DELIVERABLE(deliverableId),
+      { headers: createAuthHeaders(token) }
+    );
+    return response.data;
   } catch (error) {
     console.error(
       `Failed to fetch evidence for deliverable ${deliverableId}:`,
@@ -56,11 +85,15 @@ export async function getEvidenceByDeliverable(
 }
 
 export async function getCommentsByDeliverable(
-  deliverableId: string
+  deliverableId: string,
+  token: string
 ): Promise<Comment[]> {
   try {
-    await requireUser();
-    return await commentApi.listComments({ deliverableId });
+    const response = await serverClient.get<Comment[]>(
+      `${API_ENDPOINTS.COMMENTS.LIST}?deliverableId=${deliverableId}`,
+      { headers: createAuthHeaders(token) }
+    );
+    return response.data;
   } catch (error) {
     console.error(
       `Failed to fetch comments for deliverable ${deliverableId}:`,
@@ -70,12 +103,15 @@ export async function getCommentsByDeliverable(
   }
 }
 
-export async function getDeliverableDetail(deliverableId: string) {
+export async function getDeliverableDetail(
+  deliverableId: string,
+  token: string
+) {
   const [deliverable, phases, evidence, comments] = await Promise.all([
-    getDeliverableById(deliverableId),
-    getPhases(),
-    getEvidenceByDeliverable(deliverableId),
-    getCommentsByDeliverable(deliverableId),
+    getDeliverableById(deliverableId, token),
+    getPhases(token),
+    getEvidenceByDeliverable(deliverableId, token),
+    getCommentsByDeliverable(deliverableId, token),
   ]);
 
   return {

@@ -1,6 +1,6 @@
 import { TeamMembersClient } from "@/components/team-lead/settings/team-members/client";
 import { getTeamUsers } from "@/lib/data/team";
-import { getCurrentUser } from "@/lib/data/user";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 
 export const metadata = {
   title: "Team Members",
@@ -8,10 +8,8 @@ export const metadata = {
 };
 
 export default async function TeamMembersPage() {
-  const [data, currentUser] = await Promise.all([
-    getTeamUsers(),
-    getCurrentUser(),
-  ]);
+  const { user: currentUser, token } = await getAuthContext();
+  const data = await getTeamUsers(token);
 
   return <TeamMembersClient currentUser={currentUser} data={data} />;
 }

@@ -17,7 +17,7 @@
  */
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 
 import { meetingLogApi } from "@/lib/api/meeting-log";
@@ -105,6 +105,9 @@ export async function uploadMeetingLogAction(
       phaseId: parsed.data.scope === "phase" ? parsed.data.entityId : undefined,
     });
 
+    updateTag("meetings");
+    updateTag("sprints");
+    updateTag("phases");
     revalidatePath("/meetings");
     return { success: true } as const;
   } catch (error) {
@@ -120,24 +123,10 @@ export async function deleteMeetingLog(meetingLogId: string): Promise<void> {
   try {
     await requireTeamLead();
     await meetingLogApi.deleteMeetingLog(meetingLogId);
+    updateTag("meetings");
     revalidatePath("/meetings");
   } catch (error) {
     console.error("[deleteMeetingLog] Error:", error);
-    throw new Error("Failed to delete meeting minutes");
-  }
-}
-
-export async function deleteMeetingLogs(
-  meetingLogIds: string[]
-): Promise<void> {
-  try {
-    await requireTeamLead();
-    await Promise.all(
-      meetingLogIds.map((id) => meetingLogApi.deleteMeetingLog(id))
-    );
-    revalidatePath("/meetings");
-  } catch (error) {
-    console.error("[deleteMeetingLogs] Error:", error);
     throw new Error("Failed to delete meeting minutes");
   }
 }
