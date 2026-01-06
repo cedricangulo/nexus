@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { formatTitleCase } from "@/lib/helpers";
+import { StatusBadge } from "@/components/ui/status";
 import type { Phase } from "@/lib/types";
 import { DeliverableStatus } from "@/lib/types";
 import type { PhaseFilter, StatusFilter } from "@/lib/types/deliverables-types";
@@ -92,7 +92,8 @@ export function DeliverablesFilters({
             <SelectItem value="ALL">All phases</SelectItem>
             {phases.map((phase) => (
               <SelectItem key={phase.id} value={phase.id}>
-                {phase.name}
+                {/* {phase.name} */}
+                <StatusBadge status={phase.type} />
               </SelectItem>
             ))}
           </SelectContent>
@@ -113,7 +114,8 @@ export function DeliverablesFilters({
             <SelectItem value="ALL">All statuses</SelectItem>
             {statusItems.map((status) => (
               <SelectItem key={status} value={status}>
-                {formatTitleCase(status)}
+                {/* {formatTitleCase(status)} */}
+                <StatusBadge status={status} />
               </SelectItem>
             ))}
           </SelectContent>

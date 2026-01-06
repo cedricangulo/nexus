@@ -1,10 +1,9 @@
-import { cookies } from "next/headers";
 import { Suspense } from "react";
 import { MeetingListSkeleton } from "@/components/layouts/loading";
 import SummaryCardsRow from "@/components/shared/meetings/summary-cards";
 import { MeetingsTable } from "@/components/shared/meetings/table/body";
 import { getMeetingsData } from "@/lib/data/meetings";
-import { requireTeamLead } from "@/lib/helpers/rbac";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 
 /**
  * Team Lead Meetings Page
@@ -12,14 +11,12 @@ import { requireTeamLead } from "@/lib/helpers/rbac";
  * Displays meeting analytics and documentation for the project
  * Fetches and aggregates meetings from all sprints and phases
  * Allows Team Lead to upload meeting minutes
+ *
+ * Role validation is handled by RoleBasedSlot in (auth)/layout.tsx
  */
 export default async function TeamLeadMeetingsPage() {
-  // DYNAMIC: Validation & Token Extraction
-  await requireTeamLead();
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token")?.value || "";
+  const { token } = await getAuthContext();
 
-  // STATIC/CACHED: Pass token to cached function
   const { logs, sprints, phases } = await getMeetingsData(token);
 
   return (

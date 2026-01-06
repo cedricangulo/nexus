@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import type { z } from "zod";
 
 import { createPhaseTaskAction, updatePhaseTaskAction } from "@/actions/tasks";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -19,7 +18,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/animate-ui/components/radix/dialog";
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerClose,
@@ -48,6 +48,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
+import { StatusBadge } from "@/components/ui/status";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { type Task, TaskStatus, type User } from "@/lib/types";
@@ -56,6 +57,7 @@ import { createPhaseTaskSchema, updatePhaseTaskSchema } from "@/lib/validation";
 type TaskDialogProps = {
   phaseId: string;
   users: User[];
+  userRole?: "teamLead" | "member";
   initialData?: Task | null;
   dialogControl?: {
     open: boolean;
@@ -90,12 +92,14 @@ function getButtonLabel(
 export function TaskDialog({
   phaseId,
   users,
+  userRole = "teamLead",
   initialData = null,
   dialogControl,
   trigger,
 }: TaskDialogProps) {
   const isControlled = !!dialogControl;
   const isEditMode = !!initialData;
+  const isMember = userRole === "member";
 
   const [internalOpen, setInternalOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -254,12 +258,18 @@ export function TaskDialog({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value={TaskStatus.TODO}>To Do</SelectItem>
-                  <SelectItem value={TaskStatus.IN_PROGRESS}>
-                    In Progress
+                  <SelectItem value={TaskStatus.TODO}>
+                    <StatusBadge status={TaskStatus.TODO} />
                   </SelectItem>
-                  <SelectItem value={TaskStatus.BLOCKED}>Blocked</SelectItem>
-                  <SelectItem value={TaskStatus.DONE}>Done</SelectItem>
+                  <SelectItem value={TaskStatus.IN_PROGRESS}>
+                    <StatusBadge status={TaskStatus.IN_PROGRESS} />
+                  </SelectItem>
+                  <SelectItem value={TaskStatus.BLOCKED}>
+                    <StatusBadge status={TaskStatus.BLOCKED} />
+                  </SelectItem>
+                  <SelectItem value={TaskStatus.DONE}>
+                    <StatusBadge status={TaskStatus.DONE} />
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -267,33 +277,35 @@ export function TaskDialog({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="assigneeIds"
-          render={() => (
-            <FormItem>
-              <FormLabel>Assignees (Optional)</FormLabel>
-              <FormControl>
-                <MultipleSelector
-                  commandProps={{
-                    label: "Select assignees",
-                  }}
-                  defaultOptions={assigneeOptions}
-                  disabled={isPending}
-                  emptyIndicator={
-                    <p className="text-center text-sm">No members found</p>
-                  }
-                  hideClearAllButton
-                  hidePlaceholderWhenSelected
-                  onChange={handleAssigneeChange}
-                  placeholder="Select team members..."
-                  value={selectedAssignees}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {!isMember && (
+          <FormField
+            control={form.control}
+            name="assigneeIds"
+            render={() => (
+              <FormItem>
+                <FormLabel>Assignees (Optional)</FormLabel>
+                <FormControl>
+                  <MultipleSelector
+                    commandProps={{
+                      label: "Select assignees",
+                    }}
+                    defaultOptions={assigneeOptions}
+                    disabled={isPending}
+                    emptyIndicator={
+                      <p className="text-center text-sm">No members found</p>
+                    }
+                    hideClearAllButton
+                    hidePlaceholderWhenSelected
+                    onChange={handleAssigneeChange}
+                    placeholder="Select team members..."
+                    value={selectedAssignees}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
       </form>
     </Form>
   );
@@ -372,9 +384,11 @@ export function TaskDialog({
 export function CreateTaskButton({
   phaseId,
   users,
+  userRole = "teamLead",
 }: {
   phaseId: string;
   users: User[];
+  userRole?: "teamLead" | "member";
 }) {
   return (
     <TaskDialog
@@ -385,6 +399,7 @@ export function CreateTaskButton({
           Add
         </Button>
       }
+      userRole={userRole}
       users={users}
     />
   );

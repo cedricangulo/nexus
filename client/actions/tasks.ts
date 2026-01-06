@@ -5,7 +5,11 @@ import { revalidatePath, updateTag } from "next/cache";
 
 import { phaseApi } from "@/lib/api/phase";
 import { taskApi } from "@/lib/api/task";
-import { requireTeamLead, requireUser } from "@/lib/helpers/rbac";
+import {
+  requireContributor,
+  requireTeamLead,
+  requireUser,
+} from "@/lib/helpers/rbac";
 import type { Task } from "@/lib/types";
 import {
   createPhaseTaskSchema,
@@ -112,20 +116,25 @@ export async function updateTaskAction(input: unknown) {
 
 export async function updatePhaseTaskAction(input: unknown, phaseId: string) {
   try {
-    // Security: Team Lead only
-    await requireTeamLead();
+    // Security: Team Lead & Members
+    const user = await requireContributor();
 
     const parsed = updatePhaseTaskSchema.parse(input);
 
-    await taskApi.updateTask(parsed.taskId, {
+    // Members cannot modify assignees - don't send assigneeIds
+    const updateData = {
       title: parsed.title,
       description: parsed.description ? parsed.description : undefined,
       status: parsed.status,
-      assigneeIds:
-        parsed.assigneeIds && parsed.assigneeIds.length > 0
-          ? parsed.assigneeIds
-          : [],
-    });
+    };
+
+    if (user.role === "teamLead" && parsed.assigneeIds) {
+      Object.assign(updateData, {
+        assigneeIds: parsed.assigneeIds.length > 0 ? parsed.assigneeIds : [],
+      });
+    }
+
+    await taskApi.updateTask(parsed.taskId, updateData);
 
     updateTag("phases");
     revalidatePath(`/phases/${phaseId}`);

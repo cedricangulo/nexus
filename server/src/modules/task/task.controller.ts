@@ -38,7 +38,7 @@ export async function updateTaskHandler(
   request: FastifyRequest<{ Params: { id: string }; Body: UpdateTaskInput }>,
   reply: FastifyReply
 ) {
-  const task = await updateTask(request.params.id, request.body, request.user!.id);
+  const task = await updateTask(request.params.id, request.body, request.user!.id, request.user!.role);
   return reply.code(200).send(task);
 }
 

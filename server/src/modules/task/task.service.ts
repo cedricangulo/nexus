@@ -182,7 +182,7 @@ export async function createTask(input: CreateTaskInput, creatorId: string) {
   return transformTaskToResponse({ ...task, comments: [] });
 }
 
-export async function updateTask(id: string, input: UpdateTaskInput, userId: string) {
+export async function updateTask(id: string, input: UpdateTaskInput, userId: string, userRole?: string) {
   const task = await prisma.task.findUnique({
     where: { id },
     include: {
@@ -192,6 +192,11 @@ export async function updateTask(id: string, input: UpdateTaskInput, userId: str
 
   if (!task || task.deletedAt) {
     throw new NotFoundError("Task", id);
+  }
+
+  // Members cannot modify assignees
+  if (userRole === "MEMBER" && input.assigneeIds !== undefined && input.assigneeIds !== null) {
+    throw new Error("Members cannot modify task assignments");
   }
 
   const { assigneeIds, ...updateData } = input;

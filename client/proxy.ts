@@ -1,5 +1,5 @@
-import { type NextRequest, NextResponse } from "next/server";
 import { decodeJwt } from "jose";
+import { type NextRequest, NextResponse } from "next/server";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -17,7 +17,7 @@ export function proxy(request: NextRequest) {
     try {
       // 2. Decode the token to check expiration
       const payload = decodeJwt(token);
-      
+
       // 3. Check if 'exp' (expiration time) is in the past
       // 'exp' is in seconds, Date.now() is in ms
       if (payload.exp && payload.exp * 1000 > Date.now()) {
@@ -25,7 +25,7 @@ export function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL("/dashboard", request.url));
       }
       // If code reaches here, token is expired. Allow access to /login.
-    } catch (e) {
+    } catch (_e) {
       // Token is malformed. Allow access to /login.
     }
   }
@@ -42,7 +42,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
