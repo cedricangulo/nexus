@@ -24,6 +24,8 @@ jobs:
             cd ~/nexus/server
             git pull origin main
             pnpm install --frozen-lockfile
+            pnpm db:generate
+            pnpm db:migrate:deploy
             pnpm build
             pm2 restart nexus-api
             echo "✅ Server deployed successfully!"
