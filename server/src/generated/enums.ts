@@ -57,3 +57,11 @@ export const DeliverableStage = {
 } as const
 
 export type DeliverableStage = (typeof DeliverableStage)[keyof typeof DeliverableStage]
+
+
+export const EvidenceType = {
+  FILE: 'FILE',
+  LINK: 'LINK'
+} as const
+
+export type EvidenceType = (typeof EvidenceType)[keyof typeof EvidenceType]

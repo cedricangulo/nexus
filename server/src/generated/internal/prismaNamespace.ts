@@ -1520,6 +1520,7 @@ export const EvidenceScalarFieldEnum = {
   id: 'id',
   deliverableId: 'deliverableId',
   uploaderId: 'uploaderId',
+  type: 'type',
   fileName: 'fileName',
   fileUrl: 'fileUrl',
   fileType: 'fileType',
@@ -1734,6 +1735,20 @@ export type EnumTaskStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
  * Reference to a field of type 'TaskStatus[]'
  */
 export type ListEnumTaskStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'EvidenceType'
+ */
+export type EnumEvidenceTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EvidenceType'>
+    
+
+
+/**
+ * Reference to a field of type 'EvidenceType[]'
+ */
+export type ListEnumEvidenceTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EvidenceType[]'>
     
 
 

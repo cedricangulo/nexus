@@ -52,6 +52,11 @@ enum DeliverableStage {
   GENERAL
 }
 
+enum EvidenceType {
+  FILE
+  LINK
+}
+
 // --------------------------------------
 // Core Models
 // --------------------------------------
@@ -216,21 +221,22 @@ model TaskAssignment {
 
 // For Deliverable Evidence
 model Evidence {
-  id            String   @id @default(uuid())
+  id            String       @id @default(uuid())
   deliverableId String
-  deliverable   Deliverable @relation(fields: [deliverableId], references: [id])
+  deliverable   Deliverable  @relation(fields: [deliverableId], references: [id])
   
   uploaderId    String
-  uploader      User     @relation(fields: [uploaderId], references: [id])
+  uploader      User         @relation(fields: [uploaderId], references: [id])
 
-  fileName      String
-  fileUrl       String   
-  fileType      String   // e.g. "application/pdf"
+  type          EvidenceType @default(FILE)
+  fileName      String?      // Optional for LINK type
+  fileUrl       String       // Cloudinary URL for FILE, direct URL for LINK
+  fileType      String?      // Optional for LINK type (e.g. "application/pdf")
 
   // Soft Delete
   deletedAt     DateTime?
 
-  createdAt     DateTime @default(now())
+  createdAt     DateTime     @default(now())
 
   @@index([deliverableId])
   @@index([uploaderId])

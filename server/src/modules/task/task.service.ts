@@ -263,7 +263,7 @@ export async function updateTask(id: string, input: UpdateTaskInput, userId: str
   return getTaskById(id);
 }
 
-export async function updateTaskStatus(id: string, userId: string, input: UpdateTaskStatusInput) {
+export async function updateTaskStatus(id: string, userId: string, userRole: string, input: UpdateTaskStatusInput) {
   const task = await prisma.task.findUnique({
     where: { id },
     include: {
@@ -273,6 +273,14 @@ export async function updateTaskStatus(id: string, userId: string, input: Update
 
   if (!task || task.deletedAt) {
     throw new NotFoundError("Task", id);
+  }
+
+  // Authorization: Only assigned members (or TEAM_LEAD/ADVISER) can change status
+  const isAssigned = task.assignments.some(a => a.userId === userId);
+  const canBypass = userRole === "TEAM_LEAD" || userRole === "ADVISER";
+  
+  if (!isAssigned && !canBypass) {
+    throw new Error("Only assigned team members can change task status");
   }
 
   const result = await prisma.$transaction(async (tx) => {

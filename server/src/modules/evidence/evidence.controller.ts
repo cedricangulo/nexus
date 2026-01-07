@@ -1,7 +1,8 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { createEvidence, getEvidenceByDeliverable, deleteEvidence, restoreEvidence } from "./evidence.service.js";
-import { createEvidenceSchema } from "./evidence.schema.js";
+import { createEvidence, createLinkEvidence, getEvidenceByDeliverable, deleteEvidence, restoreEvidence } from "./evidence.service.js";
+import { createEvidenceSchema, createLinkEvidenceSchema, CreateLinkEvidenceInput } from "./evidence.schema.js";
 
+// Handler for file uploads (multipart)
 export async function createEvidenceHandler(request: FastifyRequest, reply: FastifyReply) {
   // Multipart handling
   const parts = request.parts();
@@ -37,6 +38,24 @@ export async function createEvidenceHandler(request: FastifyRequest, reply: Fast
     deliverableId: result.data.deliverableId,
     uploaderId: request.user!.id,
     file: fileData,
+  });
+
+  return reply.code(201).send(evidence);
+}
+
+// Handler for link submissions (JSON body)
+export async function createLinkEvidenceHandler(
+  request: FastifyRequest<{ Body: CreateLinkEvidenceInput }>,
+  reply: FastifyReply
+) {
+  const result = createLinkEvidenceSchema.safeParse(request.body);
+  if (!result.success) {
+    return reply.status(400).send({ message: "Validation error", errors: result.error.format() });
+  }
+
+  const evidence = await createLinkEvidence({
+    ...result.data,
+    uploaderId: request.user!.id,
   });
 
   return reply.code(201).send(evidence);

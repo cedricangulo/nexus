@@ -28,6 +28,7 @@ export type EvidenceMinAggregateOutputType = {
   id: string | null
   deliverableId: string | null
   uploaderId: string | null
+  type: $Enums.EvidenceType | null
   fileName: string | null
   fileUrl: string | null
   fileType: string | null
@@ -39,6 +40,7 @@ export type EvidenceMaxAggregateOutputType = {
   id: string | null
   deliverableId: string | null
   uploaderId: string | null
+  type: $Enums.EvidenceType | null
   fileName: string | null
   fileUrl: string | null
   fileType: string | null
@@ -50,6 +52,7 @@ export type EvidenceCountAggregateOutputType = {
   id: number
   deliverableId: number
   uploaderId: number
+  type: number
   fileName: number
   fileUrl: number
   fileType: number
@@ -63,6 +66,7 @@ export type EvidenceMinAggregateInputType = {
   id?: true
   deliverableId?: true
   uploaderId?: true
+  type?: true
   fileName?: true
   fileUrl?: true
   fileType?: true
@@ -74,6 +78,7 @@ export type EvidenceMaxAggregateInputType = {
   id?: true
   deliverableId?: true
   uploaderId?: true
+  type?: true
   fileName?: true
   fileUrl?: true
   fileType?: true
@@ -85,6 +90,7 @@ export type EvidenceCountAggregateInputType = {
   id?: true
   deliverableId?: true
   uploaderId?: true
+  type?: true
   fileName?: true
   fileUrl?: true
   fileType?: true
@@ -169,9 +175,10 @@ export type EvidenceGroupByOutputType = {
   id: string
   deliverableId: string
   uploaderId: string
-  fileName: string
+  type: $Enums.EvidenceType
+  fileName: string | null
   fileUrl: string
-  fileType: string
+  fileType: string | null
   deletedAt: Date | null
   createdAt: Date
   _count: EvidenceCountAggregateOutputType | null
@@ -201,9 +208,10 @@ export type EvidenceWhereInput = {
   id?: Prisma.StringFilter<"Evidence"> | string
   deliverableId?: Prisma.StringFilter<"Evidence"> | string
   uploaderId?: Prisma.StringFilter<"Evidence"> | string
-  fileName?: Prisma.StringFilter<"Evidence"> | string
+  type?: Prisma.EnumEvidenceTypeFilter<"Evidence"> | $Enums.EvidenceType
+  fileName?: Prisma.StringNullableFilter<"Evidence"> | string | null
   fileUrl?: Prisma.StringFilter<"Evidence"> | string
-  fileType?: Prisma.StringFilter<"Evidence"> | string
+  fileType?: Prisma.StringNullableFilter<"Evidence"> | string | null
   deletedAt?: Prisma.DateTimeNullableFilter<"Evidence"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Evidence"> | Date | string
   deliverable?: Prisma.XOR<Prisma.DeliverableScalarRelationFilter, Prisma.DeliverableWhereInput>
@@ -214,9 +222,10 @@ export type EvidenceOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   deliverableId?: Prisma.SortOrder
   uploaderId?: Prisma.SortOrder
-  fileName?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  fileName?: Prisma.SortOrderInput | Prisma.SortOrder
   fileUrl?: Prisma.SortOrder
-  fileType?: Prisma.SortOrder
+  fileType?: Prisma.SortOrderInput | Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   deliverable?: Prisma.DeliverableOrderByWithRelationInput
@@ -230,9 +239,10 @@ export type EvidenceWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.EvidenceWhereInput | Prisma.EvidenceWhereInput[]
   deliverableId?: Prisma.StringFilter<"Evidence"> | string
   uploaderId?: Prisma.StringFilter<"Evidence"> | string
-  fileName?: Prisma.StringFilter<"Evidence"> | string
+  type?: Prisma.EnumEvidenceTypeFilter<"Evidence"> | $Enums.EvidenceType
+  fileName?: Prisma.StringNullableFilter<"Evidence"> | string | null
   fileUrl?: Prisma.StringFilter<"Evidence"> | string
-  fileType?: Prisma.StringFilter<"Evidence"> | string
+  fileType?: Prisma.StringNullableFilter<"Evidence"> | string | null
   deletedAt?: Prisma.DateTimeNullableFilter<"Evidence"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Evidence"> | Date | string
   deliverable?: Prisma.XOR<Prisma.DeliverableScalarRelationFilter, Prisma.DeliverableWhereInput>
@@ -243,9 +253,10 @@ export type EvidenceOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   deliverableId?: Prisma.SortOrder
   uploaderId?: Prisma.SortOrder
-  fileName?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  fileName?: Prisma.SortOrderInput | Prisma.SortOrder
   fileUrl?: Prisma.SortOrder
-  fileType?: Prisma.SortOrder
+  fileType?: Prisma.SortOrderInput | Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.EvidenceCountOrderByAggregateInput
@@ -260,18 +271,20 @@ export type EvidenceScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Evidence"> | string
   deliverableId?: Prisma.StringWithAggregatesFilter<"Evidence"> | string
   uploaderId?: Prisma.StringWithAggregatesFilter<"Evidence"> | string
-  fileName?: Prisma.StringWithAggregatesFilter<"Evidence"> | string
+  type?: Prisma.EnumEvidenceTypeWithAggregatesFilter<"Evidence"> | $Enums.EvidenceType
+  fileName?: Prisma.StringNullableWithAggregatesFilter<"Evidence"> | string | null
   fileUrl?: Prisma.StringWithAggregatesFilter<"Evidence"> | string
-  fileType?: Prisma.StringWithAggregatesFilter<"Evidence"> | string
+  fileType?: Prisma.StringNullableWithAggregatesFilter<"Evidence"> | string | null
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Evidence"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Evidence"> | Date | string
 }
 
 export type EvidenceCreateInput = {
   id?: string
-  fileName: string
+  type?: $Enums.EvidenceType
+  fileName?: string | null
   fileUrl: string
-  fileType: string
+  fileType?: string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
   deliverable: Prisma.DeliverableCreateNestedOneWithoutEvidenceInput
@@ -282,18 +295,20 @@ export type EvidenceUncheckedCreateInput = {
   id?: string
   deliverableId: string
   uploaderId: string
-  fileName: string
+  type?: $Enums.EvidenceType
+  fileName?: string | null
   fileUrl: string
-  fileType: string
+  fileType?: string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
 }
 
 export type EvidenceUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumEvidenceTypeFieldUpdateOperationsInput | $Enums.EvidenceType
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  fileType?: Prisma.StringFieldUpdateOperationsInput | string
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliverable?: Prisma.DeliverableUpdateOneRequiredWithoutEvidenceNestedInput
@@ -304,9 +319,10 @@ export type EvidenceUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   deliverableId?: Prisma.StringFieldUpdateOperationsInput | string
   uploaderId?: Prisma.StringFieldUpdateOperationsInput | string
-  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumEvidenceTypeFieldUpdateOperationsInput | $Enums.EvidenceType
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  fileType?: Prisma.StringFieldUpdateOperationsInput | string
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -315,18 +331,20 @@ export type EvidenceCreateManyInput = {
   id?: string
   deliverableId: string
   uploaderId: string
-  fileName: string
+  type?: $Enums.EvidenceType
+  fileName?: string | null
   fileUrl: string
-  fileType: string
+  fileType?: string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
 }
 
 export type EvidenceUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumEvidenceTypeFieldUpdateOperationsInput | $Enums.EvidenceType
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  fileType?: Prisma.StringFieldUpdateOperationsInput | string
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -335,9 +353,10 @@ export type EvidenceUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   deliverableId?: Prisma.StringFieldUpdateOperationsInput | string
   uploaderId?: Prisma.StringFieldUpdateOperationsInput | string
-  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumEvidenceTypeFieldUpdateOperationsInput | $Enums.EvidenceType
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  fileType?: Prisma.StringFieldUpdateOperationsInput | string
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -356,6 +375,7 @@ export type EvidenceCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   deliverableId?: Prisma.SortOrder
   uploaderId?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   fileUrl?: Prisma.SortOrder
   fileType?: Prisma.SortOrder
@@ -367,6 +387,7 @@ export type EvidenceMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   deliverableId?: Prisma.SortOrder
   uploaderId?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   fileUrl?: Prisma.SortOrder
   fileType?: Prisma.SortOrder
@@ -378,6 +399,7 @@ export type EvidenceMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   deliverableId?: Prisma.SortOrder
   uploaderId?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   fileUrl?: Prisma.SortOrder
   fileType?: Prisma.SortOrder
@@ -469,11 +491,16 @@ export type EvidenceUncheckedUpdateManyWithoutDeliverableNestedInput = {
   deleteMany?: Prisma.EvidenceScalarWhereInput | Prisma.EvidenceScalarWhereInput[]
 }
 
+export type EnumEvidenceTypeFieldUpdateOperationsInput = {
+  set?: $Enums.EvidenceType
+}
+
 export type EvidenceCreateWithoutUploaderInput = {
   id?: string
-  fileName: string
+  type?: $Enums.EvidenceType
+  fileName?: string | null
   fileUrl: string
-  fileType: string
+  fileType?: string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
   deliverable: Prisma.DeliverableCreateNestedOneWithoutEvidenceInput
@@ -482,9 +509,10 @@ export type EvidenceCreateWithoutUploaderInput = {
 export type EvidenceUncheckedCreateWithoutUploaderInput = {
   id?: string
   deliverableId: string
-  fileName: string
+  type?: $Enums.EvidenceType
+  fileName?: string | null
   fileUrl: string
-  fileType: string
+  fileType?: string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
 }
@@ -522,18 +550,20 @@ export type EvidenceScalarWhereInput = {
   id?: Prisma.StringFilter<"Evidence"> | string
   deliverableId?: Prisma.StringFilter<"Evidence"> | string
   uploaderId?: Prisma.StringFilter<"Evidence"> | string
-  fileName?: Prisma.StringFilter<"Evidence"> | string
+  type?: Prisma.EnumEvidenceTypeFilter<"Evidence"> | $Enums.EvidenceType
+  fileName?: Prisma.StringNullableFilter<"Evidence"> | string | null
   fileUrl?: Prisma.StringFilter<"Evidence"> | string
-  fileType?: Prisma.StringFilter<"Evidence"> | string
+  fileType?: Prisma.StringNullableFilter<"Evidence"> | string | null
   deletedAt?: Prisma.DateTimeNullableFilter<"Evidence"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Evidence"> | Date | string
 }
 
 export type EvidenceCreateWithoutDeliverableInput = {
   id?: string
-  fileName: string
+  type?: $Enums.EvidenceType
+  fileName?: string | null
   fileUrl: string
-  fileType: string
+  fileType?: string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
   uploader: Prisma.UserCreateNestedOneWithoutUploadedEvidenceInput
@@ -542,9 +572,10 @@ export type EvidenceCreateWithoutDeliverableInput = {
 export type EvidenceUncheckedCreateWithoutDeliverableInput = {
   id?: string
   uploaderId: string
-  fileName: string
+  type?: $Enums.EvidenceType
+  fileName?: string | null
   fileUrl: string
-  fileType: string
+  fileType?: string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
 }
@@ -578,18 +609,20 @@ export type EvidenceUpdateManyWithWhereWithoutDeliverableInput = {
 export type EvidenceCreateManyUploaderInput = {
   id?: string
   deliverableId: string
-  fileName: string
+  type?: $Enums.EvidenceType
+  fileName?: string | null
   fileUrl: string
-  fileType: string
+  fileType?: string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
 }
 
 export type EvidenceUpdateWithoutUploaderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumEvidenceTypeFieldUpdateOperationsInput | $Enums.EvidenceType
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  fileType?: Prisma.StringFieldUpdateOperationsInput | string
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliverable?: Prisma.DeliverableUpdateOneRequiredWithoutEvidenceNestedInput
@@ -598,9 +631,10 @@ export type EvidenceUpdateWithoutUploaderInput = {
 export type EvidenceUncheckedUpdateWithoutUploaderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   deliverableId?: Prisma.StringFieldUpdateOperationsInput | string
-  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumEvidenceTypeFieldUpdateOperationsInput | $Enums.EvidenceType
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  fileType?: Prisma.StringFieldUpdateOperationsInput | string
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -608,9 +642,10 @@ export type EvidenceUncheckedUpdateWithoutUploaderInput = {
 export type EvidenceUncheckedUpdateManyWithoutUploaderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   deliverableId?: Prisma.StringFieldUpdateOperationsInput | string
-  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumEvidenceTypeFieldUpdateOperationsInput | $Enums.EvidenceType
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  fileType?: Prisma.StringFieldUpdateOperationsInput | string
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -618,18 +653,20 @@ export type EvidenceUncheckedUpdateManyWithoutUploaderInput = {
 export type EvidenceCreateManyDeliverableInput = {
   id?: string
   uploaderId: string
-  fileName: string
+  type?: $Enums.EvidenceType
+  fileName?: string | null
   fileUrl: string
-  fileType: string
+  fileType?: string | null
   deletedAt?: Date | string | null
   createdAt?: Date | string
 }
 
 export type EvidenceUpdateWithoutDeliverableInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumEvidenceTypeFieldUpdateOperationsInput | $Enums.EvidenceType
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  fileType?: Prisma.StringFieldUpdateOperationsInput | string
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploader?: Prisma.UserUpdateOneRequiredWithoutUploadedEvidenceNestedInput
@@ -638,9 +675,10 @@ export type EvidenceUpdateWithoutDeliverableInput = {
 export type EvidenceUncheckedUpdateWithoutDeliverableInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   uploaderId?: Prisma.StringFieldUpdateOperationsInput | string
-  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumEvidenceTypeFieldUpdateOperationsInput | $Enums.EvidenceType
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  fileType?: Prisma.StringFieldUpdateOperationsInput | string
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -648,9 +686,10 @@ export type EvidenceUncheckedUpdateWithoutDeliverableInput = {
 export type EvidenceUncheckedUpdateManyWithoutDeliverableInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   uploaderId?: Prisma.StringFieldUpdateOperationsInput | string
-  fileName?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumEvidenceTypeFieldUpdateOperationsInput | $Enums.EvidenceType
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  fileType?: Prisma.StringFieldUpdateOperationsInput | string
+  fileType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -661,6 +700,7 @@ export type EvidenceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   id?: boolean
   deliverableId?: boolean
   uploaderId?: boolean
+  type?: boolean
   fileName?: boolean
   fileUrl?: boolean
   fileType?: boolean
@@ -674,6 +714,7 @@ export type EvidenceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   deliverableId?: boolean
   uploaderId?: boolean
+  type?: boolean
   fileName?: boolean
   fileUrl?: boolean
   fileType?: boolean
@@ -687,6 +728,7 @@ export type EvidenceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   deliverableId?: boolean
   uploaderId?: boolean
+  type?: boolean
   fileName?: boolean
   fileUrl?: boolean
   fileType?: boolean
@@ -700,6 +742,7 @@ export type EvidenceSelectScalar = {
   id?: boolean
   deliverableId?: boolean
   uploaderId?: boolean
+  type?: boolean
   fileName?: boolean
   fileUrl?: boolean
   fileType?: boolean
@@ -707,7 +750,7 @@ export type EvidenceSelectScalar = {
   createdAt?: boolean
 }
 
-export type EvidenceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "deliverableId" | "uploaderId" | "fileName" | "fileUrl" | "fileType" | "deletedAt" | "createdAt", ExtArgs["result"]["evidence"]>
+export type EvidenceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "deliverableId" | "uploaderId" | "type" | "fileName" | "fileUrl" | "fileType" | "deletedAt" | "createdAt", ExtArgs["result"]["evidence"]>
 export type EvidenceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   deliverable?: boolean | Prisma.DeliverableDefaultArgs<ExtArgs>
   uploader?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -731,9 +774,10 @@ export type $EvidencePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     id: string
     deliverableId: string
     uploaderId: string
-    fileName: string
+    type: $Enums.EvidenceType
+    fileName: string | null
     fileUrl: string
-    fileType: string
+    fileType: string | null
     deletedAt: Date | null
     createdAt: Date
   }, ExtArgs["result"]["evidence"]>
@@ -1164,6 +1208,7 @@ export interface EvidenceFieldRefs {
   readonly id: Prisma.FieldRef<"Evidence", 'String'>
   readonly deliverableId: Prisma.FieldRef<"Evidence", 'String'>
   readonly uploaderId: Prisma.FieldRef<"Evidence", 'String'>
+  readonly type: Prisma.FieldRef<"Evidence", 'EvidenceType'>
   readonly fileName: Prisma.FieldRef<"Evidence", 'String'>
   readonly fileUrl: Prisma.FieldRef<"Evidence", 'String'>
   readonly fileType: Prisma.FieldRef<"Evidence", 'String'>

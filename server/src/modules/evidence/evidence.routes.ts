@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
-import { createEvidenceHandler, getEvidenceByDeliverableHandler, deleteEvidenceHandler, restoreEvidenceHandler } from "./evidence.controller.js";
-import { evidenceResponseSchema } from "./evidence.schema.js";
+import { createEvidenceHandler, createLinkEvidenceHandler, getEvidenceByDeliverableHandler, deleteEvidenceHandler, restoreEvidenceHandler } from "./evidence.controller.js";
+import { evidenceResponseSchema, createLinkEvidenceSchema } from "./evidence.schema.js";
 import { requireRole } from "../../utils/rbac.js";
 import { Role } from "../../generated/client.js";
 import { z } from "zod";
@@ -13,6 +13,7 @@ export async function evidenceRoutes(app: FastifyInstance) {
     const protectedServer = protectedRoutes.withTypeProvider<ZodTypeProvider>();
     protectedRoutes.addHook("onRequest", app.authenticate);
 
+    // File upload (multipart/form-data)
     protectedServer.post(
       "/",
       {
@@ -21,6 +22,18 @@ export async function evidenceRoutes(app: FastifyInstance) {
         // Validation happens inside the controller
       },
       createEvidenceHandler as any
+    );
+
+    // Link submission (JSON body)
+    protectedServer.post(
+      "/link",
+      {
+        preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
+        schema: {
+          body: createLinkEvidenceSchema,
+        },
+      },
+      createLinkEvidenceHandler as any
     );
 
     protectedServer.get(

@@ -46,7 +46,7 @@ export async function updateTaskStatusHandler(
   request: FastifyRequest<{ Params: { id: string }; Body: UpdateTaskStatusInput }>,
   reply: FastifyReply
 ) {
-  const task = await updateTaskStatus(request.params.id, request.user.id, request.body);
+  const task = await updateTaskStatus(request.params.id, request.user!.id, request.user!.role, request.body);
   return reply.code(200).send(task);
 }
 

@@ -247,6 +247,23 @@ export type EnumTaskStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumTaskStatusFilter<$PrismaModel>
 }
 
+export type EnumEvidenceTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.EvidenceType | Prisma.EnumEvidenceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.EvidenceType[] | Prisma.ListEnumEvidenceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EvidenceType[] | Prisma.ListEnumEvidenceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEvidenceTypeFilter<$PrismaModel> | $Enums.EvidenceType
+}
+
+export type EnumEvidenceTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.EvidenceType | Prisma.EnumEvidenceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.EvidenceType[] | Prisma.ListEnumEvidenceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EvidenceType[] | Prisma.ListEnumEvidenceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEvidenceTypeWithAggregatesFilter<$PrismaModel> | $Enums.EvidenceType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumEvidenceTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumEvidenceTypeFilter<$PrismaModel>
+}
+
 export type BoolFilter<$PrismaModel = never> = {
   equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
   not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
@@ -504,6 +521,23 @@ export type NestedEnumTaskStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumTaskStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumTaskStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumEvidenceTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.EvidenceType | Prisma.EnumEvidenceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.EvidenceType[] | Prisma.ListEnumEvidenceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EvidenceType[] | Prisma.ListEnumEvidenceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEvidenceTypeFilter<$PrismaModel> | $Enums.EvidenceType
+}
+
+export type NestedEnumEvidenceTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.EvidenceType | Prisma.EnumEvidenceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.EvidenceType[] | Prisma.ListEnumEvidenceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EvidenceType[] | Prisma.ListEnumEvidenceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEvidenceTypeWithAggregatesFilter<$PrismaModel> | $Enums.EvidenceType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumEvidenceTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumEvidenceTypeFilter<$PrismaModel>
 }
 
 export type NestedBoolFilter<$PrismaModel = never> = {
