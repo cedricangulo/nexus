@@ -7,11 +7,11 @@ Modify the steps as needed as the AI has not checked the frontend structure
 ## 1. Task Status Restrictions
 **Goal**: Restrict the task status dropdown/actions based on user assignment.
 
-- [ ] **Auth Check**: In the task details/list view, check if the current user is an assignee of the task OR has the `TEAM_LEAD` / `ADVISER` role.
-- [ ] **UI Update**: 
+- [X] **Auth Check**: In the task details/list view, check if the current user is an assignee of the task OR has the `TEAM_LEAD` / `ADVISER` role.
+- [X] **UI Update**: 
     - Disable or hide the "Status" dropdown if the user is not authorized to change it.
     - Add a tooltip or message explaining why the status change is disabled (e.g., "Only assigned members can change task status").
-- [ ] **Error Handling**: Gracefully handle `400/403` errors from the `PATCH /tasks/:id/status` endpoint if a user attempts an unauthorized update.
+- [X] **Error Handling**: Gracefully handle `400/403` errors from the `PATCH /tasks/:id/status` endpoint if a user attempts an unauthorized update
 
 ## 2. Flexible Deliverables (Evidence)
 **Goal**: Support both file uploads (PDF) and links (Figma, etc.) for deliverables.

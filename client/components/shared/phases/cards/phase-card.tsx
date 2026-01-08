@@ -2,7 +2,7 @@
 
 import { Edit } from "lucide-react";
 import Link from "next/link";
-import { DeliverableItem } from "@/components/member/phases/deliverable-item";
+import { DeliverableItem } from "@/components/shared/phases/deliverable-item";
 import { Button } from "@/components/ui/button";
 import {
   Frame,
@@ -24,9 +24,11 @@ import { cn } from "@/lib/utils";
 type PhaseCardProps = {
   phase: PhaseDetail;
   onEditPhase: (phase: PhaseDetail) => void;
+  isTeamLead?: boolean;
 };
 
-export function PhaseCard({ phase, onEditPhase }: PhaseCardProps) {
+export function PhaseCard({ phase, onEditPhase, isTeamLead }: PhaseCardProps) {
+  console.log("[PHASE CARD]:", isTeamLead);
   const totalDeliverables = phase.deliverables.length;
   const completedDeliverables = phase.deliverables.filter(
     (d) => d.status === DeliverableStatus.COMPLETED
@@ -70,17 +72,19 @@ export function PhaseCard({ phase, onEditPhase }: PhaseCardProps) {
               </FrameDescription>
             ) : null}
           </div>
-          <Button
-            onClick={(e) => {
-              e.preventDefault();
-              onEditPhase(phase);
-            }}
-            size="icon"
-            title="Edit Phase"
-            variant="ghost"
-          >
-            <Edit size={16} />
-          </Button>
+          {isTeamLead ? (
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                onEditPhase(phase);
+              }}
+              size="icon"
+              title="Edit Phase"
+              variant="ghost"
+            >
+              <Edit size={16} />
+            </Button>
+          ) : null}
         </div>
         {/* Progress Bar - Only for Active Phase */}
         {isActive ? (

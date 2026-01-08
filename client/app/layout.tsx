@@ -88,7 +88,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${sora.variable} antialiased`}>
-        <Toaster position="top-right" richColors />
+        <Toaster closeButton expand={true} position="top-right" richColors />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

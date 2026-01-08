@@ -116,19 +116,32 @@ export async function updateTaskAction(input: unknown) {
 
 export async function updatePhaseTaskAction(input: unknown, phaseId: string) {
   try {
-    // Security: Team Lead & Members
     const user = await requireContributor();
-
     const parsed = updatePhaseTaskSchema.parse(input);
 
-    // Members cannot modify assignees - don't send assigneeIds
+    // Get the original task to check assignees
+    const originalTask = await taskApi.getTaskById(parsed.taskId);
+    const originalAssigneeIds = originalTask?.assignees?.map((a) => a.id) || [];
+
+    // Check permission to update status
+    const isTeamLead = user.role === "teamLead";
+    const isAssigned = originalAssigneeIds.includes(user.id);
+
+    if (!(isTeamLead || isAssigned)) {
+      return {
+        success: false,
+        error:
+          "You are not assigned to this task. Only assigned members can change the status.",
+      } as const;
+    }
+
     const updateData = {
       title: parsed.title,
       description: parsed.description ? parsed.description : undefined,
       status: parsed.status,
     };
 
-    if (user.role === "teamLead" && parsed.assigneeIds) {
+    if (isTeamLead && parsed.assigneeIds) {
       Object.assign(updateData, {
         assigneeIds: parsed.assigneeIds.length > 0 ? parsed.assigneeIds : [],
       });
@@ -146,6 +159,15 @@ export async function updatePhaseTaskAction(input: unknown, phaseId: string) {
       error?: string;
       message?: string;
     }>;
+
+    // Handle 403 Forbidden specifically
+    if (axiosError.response?.status === 403) {
+      return {
+        success: false,
+        error: "You don't have permission to update this task.",
+      } as const;
+    }
+
     const apiMessage =
       axiosError.response?.data?.error || axiosError.response?.data?.message;
 

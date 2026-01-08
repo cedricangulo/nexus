@@ -20,17 +20,17 @@ import { uploadSchema } from "@/lib/validation";
 
 type UploadInput = z.infer<typeof uploadSchema>;
 
-type UploadPhaseMinutesDialogProps = {
+type UploadMeetingDialogProps = {
   phaseId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
 
-export function UploadPhaseMinutesDialog({
+export function UploadMeetingDialog({
   phaseId,
   open,
   onOpenChange,
-}: UploadPhaseMinutesDialogProps) {
+}: UploadMeetingDialogProps) {
   const [_isPending, startTransition] = useTransition();
   const maxSize = 10 * 1024 * 1024; // 10MB
 

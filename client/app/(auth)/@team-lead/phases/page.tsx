@@ -1,6 +1,4 @@
-import { PhaseManager } from "@/components/team-lead/phases/phase-manager";
-import { getPhasesWithDetails } from "@/lib/data/phases";
-import { getAuthContext } from "@/lib/helpers/auth-token";
+import Phases from "@/components/shared/phases";
 
 export const metadata = {
   title: "Project Phases",
@@ -8,9 +6,5 @@ export const metadata = {
 };
 
 export default async function PhasesPage() {
-  const { token } = await getAuthContext();
-
-  const phasesWithDeliverables = await getPhasesWithDetails(token);
-
-  return <PhaseManager isTeamLead phases={phasesWithDeliverables} />;
+  return <Phases />;
 }

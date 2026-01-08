@@ -4,37 +4,32 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { StatusBadge } from "@/components/ui/status";
 import { formatDate, formatRelativeTime } from "@/lib/helpers/format-date";
-import type { Comment, Deliverable, Evidence, Phase } from "@/lib/types";
+import type { Deliverable, Evidence, Phase } from "@/lib/types";
 import { DeliverableStatus } from "@/lib/types";
 import { isDeliverableOverdue } from "@/lib/types/deliverables-utils";
 import { cn } from "@/lib/utils";
-import { EmptyState } from "../empty-state";
-import { CommentSection } from "./comment-section";
+import { EmptyState } from "../../empty-state";
 
 type DeliverableDetailsProps = {
   deliverable: Deliverable;
   phase?: Phase;
   evidence: Evidence[];
-  comments: Comment[];
-  teamMembers: Array<{ id: string; label: string; value: string }>;
-  user?: { id?: string; role?: string };
   controls: { isPending: boolean; canReview: boolean };
   onApprove?: () => void;
   onRequestChanges?: () => void;
   uploadButton?: React.ReactNode;
+  commentSection: React.ReactNode;
 };
 
 export function DeliverableDetails({
   deliverable,
   phase,
   evidence,
-  comments,
-  teamMembers,
-  user,
   controls,
   onApprove,
   onRequestChanges,
   uploadButton,
+  commentSection,
 }: DeliverableDetailsProps) {
   const overdue = isDeliverableOverdue(deliverable);
   const showReviewActions =
@@ -158,14 +153,7 @@ export function DeliverableDetails({
             </div>
           )}
         </div>
-        <div className="space-y-2 lg:col-span-7">
-          <CommentSection
-            comments={comments}
-            deliverableId={deliverable.id}
-            teamMembers={teamMembers}
-            user={user}
-          />
-        </div>
+        <div className="space-y-2 lg:col-span-7">{commentSection}</div>
       </div>
     </div>
   );

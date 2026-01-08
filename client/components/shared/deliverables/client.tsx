@@ -24,10 +24,10 @@ import {
   DeliverablesSummaryCards,
 } from "@/components/shared/deliverables";
 import { EmptyState } from "@/components/shared/empty-state";
+import { getDeliverablesSummary } from "@/hooks/get-deliverables-summary";
+import { getFilteredDeliverables } from "@/hooks/get-filtered-deliverables";
 import type { Deliverable, Evidence, Phase } from "@/lib/types";
 import type { PhaseFilter, StatusFilter } from "@/lib/types/deliverables-types";
-import { getDeliverablesSummary } from "../../../hooks/get-deliverables-summary";
-import { getFilteredDeliverables } from "../../../hooks/get-filtered-deliverables";
 
 /**
  * Props for the DeliverablesClient component

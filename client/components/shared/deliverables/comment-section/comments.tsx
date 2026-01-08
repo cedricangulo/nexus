@@ -24,12 +24,12 @@ import { formatRelativeTime } from "@/lib/helpers/format-date";
 import { convertDisplayToStorage, parseMentions } from "@/lib/helpers/mentions";
 import type { Comment } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useAuthContext } from "@/providers/auth-context-provider";
 
-type CommentSectionProps = {
+type CommentsProps = {
   comments: Comment[];
   deliverableId: string;
   teamMembers: Array<{ id: string; label: string; value: string }>;
-  user?: { id?: string; role?: string };
 };
 
 /**
@@ -60,17 +60,17 @@ function CommentContent({ content }: { content: string }) {
 
 /**
  * Helper: Determine the role label for a comment
- * @param user - Current user info
- * @param author - Comment author info
  * @param isMine - Whether the comment is from the current user
+ * @param userRole - Current user's role
+ * @param authorRole - Comment author's role
  * @returns Formatted role label string
  */
-function getRoleLabel(
-  user: { id?: string; role?: string } | undefined,
-  author: { role?: string } | undefined,
-  isMine: boolean
+function _getRoleLabel(
+  isMine: boolean,
+  userRole?: string,
+  authorRole?: string
 ): string {
-  const role = isMine ? user?.role : author?.role;
+  const role = isMine ? userRole : authorRole;
   return formatTitleCase(role || "");
 }
 
@@ -84,19 +84,23 @@ type CommentItemProps = {
   comment: Comment;
   index: number;
   allComments: Comment[];
-  currentUser?: { id?: string; role?: string };
+  currentUserId: string;
+  currentUserRole: string;
 };
 
 function CommentItem({
   comment,
   index,
   allComments,
-  currentUser,
+  currentUserId,
+  currentUserRole,
 }: CommentItemProps) {
-  const isMine = !!currentUser?.id && comment.authorId === currentUser.id;
+  const isMine = !!currentUserId && comment.authorId === currentUserId;
   const position = getGroupPosition(allComments, index);
   const showMetadata = shouldShowMetadata(position);
-  const roleLabel = getRoleLabel(currentUser, comment.author, isMine);
+  const roleLabel = formatTitleCase(
+    isMine ? currentUserRole || "MEMBER" : comment.author?.role || "MEMBER"
+  );
   const roundedClasses = getRoundedClasses(isMine, position);
 
   return (
@@ -153,12 +157,12 @@ function CommentItem({
  * - Submit comments with automatic notification creation
  * - Real-time UI updates via server actions
  */
-export function CommentSection({
+export function Comments({
   comments,
   deliverableId,
   teamMembers,
-  user,
-}: CommentSectionProps) {
+}: CommentsProps) {
+  const { user } = useAuthContext();
   const [comment, setComment] = useState("");
   const [mentionIds, setMentionIds] = useState<string[]>([]);
   const [mentionResetKey, setMentionResetKey] = useState(0);
@@ -220,7 +224,8 @@ export function CommentSection({
               <CommentItem
                 allComments={comments}
                 comment={c}
-                currentUser={user}
+                currentUserId={user.id}
+                currentUserRole={user.role || "MEMBER"}
                 index={i}
                 key={c.id}
               />
