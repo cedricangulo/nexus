@@ -60,8 +60,9 @@ export async function loginAction(
 
     cookieStore.set("auth_token", data.token, {
       httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      // Only use secure in actual production deployment (Vercel), not local builds
+      secure: process.env.NODE_ENV === "production" && !!process.env.VERCEL,
       path: "/",
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
