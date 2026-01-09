@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { PhaseListSkeleton } from "@/components/layouts/loading";
 import Phases from "@/components/shared/phases";
 
 export const metadata = {
@@ -5,6 +7,10 @@ export const metadata = {
   description: "Manage project phases and deliverables",
 };
 
-export default async function PhasesPage() {
-  return <Phases />;
+export default function PhasesPage() {
+  return (
+    <Suspense fallback={<PhaseListSkeleton />}>
+      <Phases />
+    </Suspense>
+  );
 }

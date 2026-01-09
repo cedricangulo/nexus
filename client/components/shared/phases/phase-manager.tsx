@@ -77,7 +77,7 @@ export function PhaseManager({ phases }: PhaseManagerProps) {
   return (
     <div className="flex w-full flex-col gap-6">
       {/* Phases List */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
         {sortedPhases.map((phase) => (
           <PhaseCard
             key={phase.id}

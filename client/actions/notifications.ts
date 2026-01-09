@@ -12,6 +12,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { notificationApi } from "@/lib/api/notification";
+import { requireUser } from "@/lib/helpers/rbac";
 import type { Notification } from "@/lib/types";
 
 /**
@@ -32,7 +33,17 @@ const MarkAsReadSchema = z.object({
 export async function markAsReadAction(
   id: string
 ): Promise<{ success: boolean; error?: string; notification?: Notification }> {
-  // 1. Input Validation
+  // 1. Authorization - require authenticated user
+  try {
+    await requireUser();
+  } catch {
+    return {
+      success: false,
+      error: "Unauthorized",
+    };
+  }
+
+  // 2. Input Validation
   const validatedId = MarkAsReadSchema.safeParse({ id });
 
   if (!validatedId.success) {
@@ -43,10 +54,10 @@ export async function markAsReadAction(
   }
 
   try {
-    // 2. API Call
+    // 3. API Call
     await notificationApi.markAsRead(validatedId.data.id);
 
-    // 3. Revalidation - Clear ISR cache
+    // 4. Revalidation - Clear ISR cache
     revalidatePath("/", "layout");
 
     return {
@@ -72,11 +83,21 @@ export async function markAllAsReadAction(): Promise<{
   success: boolean;
   error?: string;
 }> {
+  // 1. Authorization - require authenticated user
   try {
-    // 1. API Call
+    await requireUser();
+  } catch {
+    return {
+      success: false,
+      error: "Unauthorized",
+    };
+  }
+
+  try {
+    // 2. API Call
     await notificationApi.markAllAsRead();
 
-    // 2. Revalidation - Clear ISR cache
+    // 3. Revalidation - Clear ISR cache
     revalidatePath("/", "layout");
 
     return {

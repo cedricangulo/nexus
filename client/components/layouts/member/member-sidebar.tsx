@@ -67,6 +67,68 @@ const navItems: NavItem[] = [
 
 const AUTH_ROUTE_REGEX = /^\/(auth)/;
 
+type NavItemProps = {
+  item: {
+    href?: string;
+    icon?: React.ComponentType<{ className?: string }>;
+    title: string;
+  };
+  isActive: (href: string) => boolean;
+  badgeConfig: {
+    variant: "default" | "info" | "error" | "warning";
+    label: string;
+  } | null;
+};
+
+function SidebarNavMenuItem({ item, isActive, badgeConfig }: NavItemProps) {
+  const href = item.href || "";
+  const active = isActive(href);
+  const Icon = item.icon;
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild isActive={active}>
+        <Link href={href}>
+          {Icon && (
+            <Icon className={cn(active && "text-primary dark:text-blue-500")} />
+          )}
+          <span>{item.title}</span>
+        </Link>
+      </SidebarMenuButton>
+      {badgeConfig?.label && (
+        <SidebarMenuBadge>
+          <Badge variant={badgeConfig.variant}>{badgeConfig.label}</Badge>
+        </SidebarMenuBadge>
+      )}
+    </SidebarMenuItem>
+  );
+}
+
+const BADGE_CONFIG: Record<
+  string,
+  {
+    countKey: keyof BadgeCounts;
+    variant: "default" | "info" | "error" | "warning";
+    labelSuffix: string;
+  }
+> = {
+  "/deliverables": {
+    countKey: "deliverablesInReview",
+    variant: "info",
+    labelSuffix: "Review",
+  },
+  "/sprints": {
+    countKey: "blockedTasks",
+    variant: "error",
+    labelSuffix: "Blocked",
+  },
+  "/meetings": {
+    countKey: "phasesWithoutMeetings",
+    variant: "warning",
+    labelSuffix: "Missing",
+  },
+};
+
 type AppSidebarProps = {
   user: User | null;
   badgeCounts?: BadgeCounts;
@@ -74,6 +136,14 @@ type AppSidebarProps = {
 
 export function AppSidebar({ user, badgeCounts }: AppSidebarProps) {
   const pathname = usePathname();
+
+  // Always provide defaults to ensure consistent rendering
+  const counts: BadgeCounts = badgeCounts ?? {
+    deliverablesInReview: 0,
+    blockedTasks: 0,
+    phasesWithoutMeetings: 0,
+    todayActivityCount: 0,
+  };
 
   // Strip the (auth) route group from pathname
   const cleanPathname = pathname.replace(AUTH_ROUTE_REGEX, "") || "/";
@@ -85,54 +155,27 @@ export function AppSidebar({ user, badgeCounts }: AppSidebarProps) {
     return cleanPathname === href;
   };
 
-  // Badge display helper: hide if 0, show "9+" if > 9
-  const _formatBadge = (count: number): string | null => {
+  // Get badge config for each route using configuration map
+  const getBadgeConfig = (href: string) => {
+    if (!counts) {
+      return null;
+    }
+
+    const config = BADGE_CONFIG[href];
+    if (!config) {
+      return null;
+    }
+
+    const count = counts[config.countKey];
     if (count === 0) {
       return null;
     }
-    if (count > 9) {
-      return "9+";
-    }
-    return count.toString();
-  };
 
-  // Get badge config for each route
-  const getBadgeConfig = (href: string) => {
-    if (!badgeCounts) {
-      return null;
-    }
-
-    switch (href) {
-      case "/deliverables":
-        if (badgeCounts.deliverablesInReview === 0) {
-          return null;
-        }
-        return {
-          count: badgeCounts.deliverablesInReview,
-          variant: "info" as const, // Blue
-          label: `${badgeCounts.deliverablesInReview > 9 ? "9+" : badgeCounts.deliverablesInReview} Review`,
-        };
-      case "/sprints":
-        if (badgeCounts.blockedTasks === 0) {
-          return null;
-        }
-        return {
-          count: badgeCounts.blockedTasks,
-          variant: "error" as const, // Red
-          label: `${badgeCounts.blockedTasks > 9 ? "9+" : badgeCounts.blockedTasks} Blocked`,
-        };
-      case "/meetings":
-        if (badgeCounts.phasesWithoutMeetings === 0) {
-          return null;
-        }
-        return {
-          count: badgeCounts.phasesWithoutMeetings,
-          variant: "warning" as const, // Amber/Warning
-          label: `${badgeCounts.phasesWithoutMeetings > 9 ? "9+" : badgeCounts.phasesWithoutMeetings} Missing`,
-        };
-      default:
-        return null;
-    }
+    return {
+      count,
+      variant: config.variant,
+      label: `${count > 9 ? "9+" : count} ${config.labelSuffix}`,
+    };
   };
 
   const isMobile = useIsMobile();
@@ -168,38 +211,14 @@ export function AppSidebar({ user, badgeCounts }: AppSidebarProps) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
-            {navItems.map((item) => {
-              const badgeConfig = getBadgeConfig(item.href || "");
-              return (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.href || "")}
-                    tooltip={item.tooltip}
-                  >
-                    <Link href={item.href || ""}>
-                      {item.icon ? (
-                        <item.icon
-                          className={cn(
-                            isActive(item.href || "")
-                              ? "text-primary dark:text-blue-500"
-                              : null
-                          )}
-                        />
-                      ) : null}
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                  {badgeConfig?.label && (
-                    <SidebarMenuBadge>
-                      <Badge variant={badgeConfig.variant}>
-                        {badgeConfig.label}
-                      </Badge>
-                    </SidebarMenuBadge>
-                  )}
-                </SidebarMenuItem>
-              );
-            })}
+            {navItems.map((item) => (
+              <SidebarNavMenuItem
+                key={item.title}
+                item={item}
+                isActive={isActive}
+                badgeConfig={getBadgeConfig(item.href || "")}
+              />
+            ))}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>

@@ -59,7 +59,7 @@ export default function Notification() {
           </Suspense>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0">
+      <PopoverContent className="w-dvw p-0 sm:w-80">
         <Suspense fallback={<NotificationSkeleton />}>
           <NotificationContent />
         </Suspense>

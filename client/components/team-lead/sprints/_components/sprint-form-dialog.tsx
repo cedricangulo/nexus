@@ -49,6 +49,45 @@ type SprintFormDialogProps = {
   sprint?: Sprint; // If provided, we are in edit mode
 };
 
+/**
+ * Helper: Initialize form values based on sprint (edit) or defaults (create)
+ */
+function getInitialFormValues(
+  sprint?: Sprint
+): z.infer<typeof createSprintSchema> {
+  if (!sprint) {
+    return {
+      goal: "",
+      startDate: "",
+      endDate: "",
+    };
+  }
+
+  return {
+    goal: sprint.goal || "",
+    startDate: sprint.startDate.split("T")[0],
+    endDate: sprint.endDate.split("T")[0],
+  };
+}
+
+/**
+ * Helper: Initialize date range from sprint
+ */
+function getInitialDateRange(
+  sprint?: Sprint
+): RangeValue<DateValue> | null {
+  if (!sprint) return null;
+
+  try {
+    return {
+      start: parseDate(sprint.startDate.split("T")[0]),
+      end: parseDate(sprint.endDate.split("T")[0]),
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function SprintFormDialog({
   open,
   onOpenChange,
@@ -64,65 +103,40 @@ export function SprintFormDialog({
 
   const form = useForm<z.infer<typeof createSprintSchema>>({
     resolver: zodResolver(createSprintSchema),
-    defaultValues: {
-      goal: "",
-      startDate: "",
-      endDate: "",
-    },
+    defaultValues: getInitialFormValues(),
   });
 
   useEffect(() => {
-    if (open && sprint) {
-      form.reset({
-        goal: sprint.goal || "",
-        startDate: sprint.startDate.split("T")[0],
-        endDate: sprint.endDate.split("T")[0],
-      });
-      // Initialize dateRange state for existing sprint
-      try {
-        setDateRange({
-          start: parseDate(sprint.startDate.split("T")[0]),
-          end: parseDate(sprint.endDate.split("T")[0]),
-        });
-      } catch {
-        setDateRange(null);
-      }
-    } else if (open && !sprint) {
-      form.reset({
-        goal: "",
-        startDate: "",
-        endDate: "",
-      });
-      setDateRange(null);
+    if (open) {
+      form.reset(getInitialFormValues(sprint));
+      setDateRange(getInitialDateRange(sprint));
     }
   }, [open, sprint, form]);
 
+  /**
+   * Handle sprint creation or update
+   */
+  const handleSprintSubmit = async (values: z.infer<typeof createSprintSchema>) => {
+    const result = isEditing && sprint
+      ? await updateSprintAction({ id: sprint.id, ...values })
+      : await createSprintAction(values);
+
+    if (result.success) {
+      toast.success(isEditing ? "Sprint updated" : "Sprint created");
+      onOpenChange(false);
+      router.refresh();
+      if (!isEditing) {
+        form.reset();
+      }
+    } else {
+      toast.error(
+        result.error || `Failed to ${isEditing ? "update" : "create"} sprint`
+      );
+    }
+  };
+
   const onSubmit = (values: z.infer<typeof createSprintSchema>) => {
-    startTransition(async () => {
-      let result;
-
-      if (isEditing && sprint) {
-        result = await updateSprintAction({
-          id: sprint.id,
-          ...values,
-        });
-      } else {
-        result = await createSprintAction(values);
-      }
-
-      if (result.success) {
-        toast.success(isEditing ? "Sprint updated" : "Sprint created");
-        onOpenChange(false);
-        router.refresh();
-        if (!isEditing) {
-          form.reset();
-        }
-      } else {
-        toast.error(
-          result.error || `Failed to ${isEditing ? "update" : "create"} sprint`
-        );
-      }
-    });
+    startTransition(() => handleSprintSubmit(values));
   };
 
   const formContent = (

@@ -145,59 +145,75 @@ export function TaskDetailDialog({
     (o) => !selectedAssigneeIds.includes(o.value)
   );
 
-  const onSubmit = (values: z.infer<typeof taskDetailSchema>) => {
-    startTransition(async () => {
-      const statusChanged = values.status !== task.status;
-      const currentAssigneeIds = task.assignees?.map((a) => a.id) || [];
-      const assigneesChanged =
-        JSON.stringify(values.assigneeIds?.sort()) !==
-        JSON.stringify(currentAssigneeIds.sort());
-      const dataChanged =
-        values.title !== task.title ||
-        values.description !== (task.description || "") ||
-        assigneesChanged;
+  /**
+   * Detect what fields have changed compared to original task
+   */
+  const detectChanges = (values: z.infer<typeof taskDetailSchema>) => {
+    const statusChanged = values.status !== task.status;
+    const currentAssigneeIds = task.assignees?.map((a) => a.id) || [];
+    const assigneesChanged =
+      JSON.stringify(values.assigneeIds?.sort()) !==
+      JSON.stringify(currentAssigneeIds.sort());
+    const dataChanged =
+      values.title !== task.title ||
+      values.description !== (task.description || "") ||
+      assigneesChanged;
 
-      const previousBlockReason =
-        task.status === "BLOCKED" ? task.lastComment?.content || "" : "";
-      const blockReasonChanged = values.blockReason !== previousBlockReason;
+    const previousBlockReason =
+      task.status === "BLOCKED" ? task.lastComment?.content || "" : "";
+    const blockReasonChanged = values.blockReason !== previousBlockReason;
 
-      const results: Array<{ success: boolean; error?: string }> = [];
+    return { statusChanged, assigneesChanged, dataChanged, blockReasonChanged };
+  };
 
-      if (statusChanged) {
-        const result = await updateTaskStatusAction({
+  /**
+   * Build list of API calls needed based on detected changes
+   */
+  const buildUpdateCalls = (values: z.infer<typeof taskDetailSchema>) => {
+    const { statusChanged, dataChanged, blockReasonChanged } = detectChanges(values);
+    const calls: Array<Promise<{ success: boolean; error?: string }>> = [];
+
+    // Update status or block reason
+    if (statusChanged || (blockReasonChanged && values.status === "BLOCKED")) {
+      calls.push(
+        updateTaskStatusAction({
           taskId: values.taskId,
           sprintId: values.sprintId,
           status: values.status,
           comment: values.blockReason || "",
-        });
-        results.push(result);
-      } else if (blockReasonChanged && values.status === "BLOCKED") {
-        // If status didn't change but block reason did, update the block reason
-        const result = await updateTaskStatusAction({
-          taskId: values.taskId,
-          sprintId: values.sprintId,
-          status: values.status,
-          comment: values.blockReason || "",
-        });
-        results.push(result);
-      }
+        })
+      );
+    }
 
-      if (dataChanged) {
-        const result = await updateTaskAction({
+    // Update task data (title, description, assignees)
+    if (dataChanged) {
+      calls.push(
+        updateTaskAction({
           taskId: values.taskId,
           sprintId: values.sprintId,
           title: values.title,
           description: values.description,
           assigneeIds: values.assigneeIds,
-        });
-        results.push(result);
-      }
+        })
+      );
+    }
 
-      if (results.length === 0 && !blockReasonChanged) {
+    return calls;
+  };
+
+  const onSubmit = (values: z.infer<typeof taskDetailSchema>) => {
+    startTransition(async () => {
+      const { blockReasonChanged } = detectChanges(values);
+      const updateCalls = buildUpdateCalls(values);
+
+      // No changes detected
+      if (updateCalls.length === 0 && !blockReasonChanged) {
         toast.info("No changes to save");
         onOpenChange(false);
         return;
       }
+
+      const results = await Promise.all(updateCalls);
 
       const allSucceeded = results.every((r) => r.success);
       if (allSucceeded) {

@@ -122,75 +122,34 @@ export function UploadMinutesDialog({
 
   return (
     <AutoUploadDialog
-      accept=".pdf"
-      description="Fill in the meeting details below, then select a PDF file. Click Upload to confirm."
-      maxFiles={1}
-      maxSize={maxSize}
-      onOpenChange={handleOpenChange}
-      onUpload={handleUpload}
-      open={open}
-      renderMetadataForm={({ file, isUploading }) => (
-        <FieldGroup>
-          <Controller
-            control={form.control}
-            name="title"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Meeting Title</FieldLabel>
-                <Input
-                  {...field}
-                  aria-invalid={fieldState.invalid}
-                  disabled={isUploading}
-                  id={field.name}
-                  placeholder="e.g., Sprint Planning Meeting"
-                />
-                {fieldState.invalid ? (
-                  <FieldError errors={[fieldState.error]} />
-                ) : null}
-              </Field>
-            )}
-          />
-
-          <Controller
-            control={form.control}
-            name="date"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Meeting Date</FieldLabel>
-                <NaturalDateInput
-                  disabled={isUploading}
-                  id={field.name}
-                  onChange={field.onChange}
-                  placeholder="Today, yesterday, or YYYY-MM-DD"
-                  value={field.value}
-                />
-                {fieldState.invalid ? (
-                  <FieldError errors={[fieldState.error]} />
-                ) : null}
-              </Field>
-            )}
-          />
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      config={{
+        accept: ".pdf",
+        maxSize,
+        maxFiles: 1,
+        requiresConfirmation: true,
+      }}
+      content={{
+        title: "Upload Meeting Minutes",
+        description:
+          "Fill in the meeting details below, then select a PDF file. Click Upload to confirm.",
+      }}
+      control={{ open, onOpenChange: handleOpenChange }}
+      features={{
+        renderMetadataForm: ({ file, isUploading }) => (
+          <FieldGroup>
             <Controller
               control={form.control}
-              name="scope"
+              name="title"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="scope">Scope</FieldLabel>
-                  <Select
+                  <FieldLabel htmlFor={field.name}>Meeting Title</FieldLabel>
+                  <Input
+                    {...field}
+                    aria-invalid={fieldState.invalid}
                     disabled={isUploading}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                  >
-                    <SelectTrigger aria-invalid={fieldState.invalid} id="scope">
-                      <SelectValue placeholder="Select scope" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="sprint">Sprint</SelectItem>
-                      <SelectItem value="phase">Phase</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    id={field.name}
+                    placeholder="e.g., Sprint Planning Meeting"
+                  />
                   {fieldState.invalid ? (
                     <FieldError errors={[fieldState.error]} />
                   ) : null}
@@ -200,46 +159,98 @@ export function UploadMinutesDialog({
 
             <Controller
               control={form.control}
-              name="entityId"
+              name="date"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="entityId">
-                    {scope === "sprint" ? "Sprint" : "Phase"}
-                  </FieldLabel>
-                  <Select
+                  <FieldLabel htmlFor={field.name}>Meeting Date</FieldLabel>
+                  <NaturalDateInput
                     disabled={isUploading}
-                    onValueChange={field.onChange}
+                    id={field.name}
+                    onChange={field.onChange}
+                    placeholder="Today, yesterday, or YYYY-MM-DD"
                     value={field.value}
-                  >
-                    <SelectTrigger
-                      aria-invalid={fieldState.invalid}
-                      id="entityId"
+                  />
+                  {fieldState.invalid ? (
+                    <FieldError errors={[fieldState.error]} />
+                  ) : null}
+                </Field>
+              )}
+            />
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <Controller
+                control={form.control}
+                name="scope"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="scope">Scope</FieldLabel>
+                    <Select
+                      disabled={isUploading}
+                      onValueChange={field.onChange}
+                      value={field.value}
                     >
-                      <SelectValue
-                        placeholder={`Select ${scope === "sprint" ? "sprint" : "phase"}`}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {selectedEntities.map((entity) => (
-                        <SelectItem key={entity.id} value={entity.id}>
-                          {scope === "sprint"
-                            ? `Sprint ${(entity as Sprint).number}`
-                            : (entity as Phase).name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {fieldState.invalid ? (
-                    <FieldError errors={[fieldState.error]} />
-                  ) : null}
-                </Field>
-              )}
-            />
-          </div>
-        </FieldGroup>
-      )}
-      requiresConfirmation={true}
-      title="Upload Meeting Minutes"
+                      <SelectTrigger
+                        aria-invalid={fieldState.invalid}
+                        id="scope"
+                      >
+                        <SelectValue placeholder="Select scope" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sprint">Sprint</SelectItem>
+                        <SelectItem value="phase">Phase</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {fieldState.invalid ? (
+                      <FieldError errors={[fieldState.error]} />
+                    ) : null}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                control={form.control}
+                name="entityId"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="entityId">
+                      {scope === "sprint" ? "Sprint" : "Phase"}
+                    </FieldLabel>
+                    <Select
+                      disabled={isUploading}
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
+                      <SelectTrigger
+                        aria-invalid={fieldState.invalid}
+                        id="entityId"
+                      >
+                        <SelectValue
+                          placeholder={`Select ${scope === "sprint" ? "sprint" : "phase"}`}
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {selectedEntities.map((entity) => (
+                          <SelectItem key={entity.id} value={entity.id}>
+                            {scope === "sprint"
+                              ? `Sprint ${(entity as Sprint).number}`
+                              : (entity as Phase).name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {fieldState.invalid ? (
+                      <FieldError errors={[fieldState.error]} />
+                    ) : null}
+                  </Field>
+                )}
+              />
+            </div>
+          </FieldGroup>
+        ),
+      }}
+      handlers={{
+        onUpload: handleUpload,
+      }}
     />
   );
 }
