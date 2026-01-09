@@ -1,8 +1,11 @@
 "use client";
 
-import { useCallback, useTransition } from "react";
+import { useCallback } from "react";
 import { toast } from "sonner";
-import { uploadEvidenceAction } from "@/actions/evidence";
+import {
+  uploadEvidenceAction,
+  uploadEvidenceLinkAction,
+} from "@/actions/evidence";
 import { AutoUploadDialog } from "@/components/shared/dialogs/auto-upload-dialog";
 
 type UploadEvidenceDialogProps = {
@@ -18,7 +21,6 @@ export function UploadEvidenceDialog({
   onOpenChange,
   onSuccess,
 }: UploadEvidenceDialogProps) {
-  const [_isPending, startTransition] = useTransition();
   const maxSize = 10 * 1024 * 1024; // 10MB
 
   const handleUpload = useCallback(
@@ -34,38 +36,77 @@ export function UploadEvidenceDialog({
 
       const loadingToast = toast.loading("Uploading evidence...");
 
-      startTransition(async () => {
-        const result = await uploadEvidenceAction({ success: false }, formData);
+      const result = await uploadEvidenceAction({ success: false }, formData);
 
-        toast.dismiss(loadingToast);
+      toast.dismiss(loadingToast);
 
-        if (result.success) {
-          toast.success("Evidence uploaded successfully", {
-            description:
-              "Deliverable status changed to Review. Add comments below if needed.",
-          });
-          onSuccess?.();
-        } else {
-          toast.error(result.error || "Failed to upload evidence");
-          throw new Error(result.error);
-        }
-      });
+      if (result.success) {
+        toast.success("Evidence uploaded successfully", {
+          description:
+            "Deliverable status changed to Review. Add comments below if needed.",
+        });
+        onSuccess?.();
+      } else {
+        throw new Error(result.error || "Failed to upload evidence");
+      }
+    },
+    [deliverableId, onSuccess]
+  );
+
+  const handleLinkSubmit = useCallback(
+    async (link: string, fileName?: string) => {
+      const formData = new FormData();
+      formData.append("deliverableId", deliverableId);
+      formData.append("link", link);
+      // Only append fileName if provided and not empty after trim
+      if (fileName?.trim()) {
+        formData.append("fileName", fileName.trim());
+      }
+
+      const loadingToast = toast.loading("Submitting evidence link...");
+
+      const result = await uploadEvidenceLinkAction(
+        { success: false },
+        formData
+      );
+
+      toast.dismiss(loadingToast);
+
+      if (result.success) {
+        toast.success("Evidence link submitted successfully", {
+          description:
+            "Deliverable status changed to Review. Add comments below if needed.",
+        });
+        onSuccess?.();
+      } else {
+        throw new Error(result.error || "Failed to submit evidence link");
+      }
     },
     [deliverableId, onSuccess]
   );
 
   return (
     <AutoUploadDialog
-      accept=".pdf,.jpg,.jpeg,.png,.gif,.webp"
-      description="Select a file to fulfill this deliverable. Click Upload to confirm. The status will change to Review after upload."
-      maxFiles={1}
-      maxSize={maxSize}
-      onOpenChange={onOpenChange}
-      onSuccess={onSuccess}
-      onUpload={handleUpload}
-      open={open}
-      requiresConfirmation={true}
-      title="Upload Evidence"
+      config={{
+        accept: ".pdf,.jpg,.jpeg,.png,.gif,.webp",
+        maxSize,
+        maxFiles: 1,
+        requiresConfirmation: true,
+      }}
+      content={{
+        title: "Upload Evidence",
+        description:
+          "Select a file or submit a link to fulfill this deliverable. The status will change to Review after submission.",
+      }}
+      control={{ open, onOpenChange }}
+      features={{
+        showLinkTab: true,
+        onLinkSubmit: handleLinkSubmit,
+      }}
+      handlers={{
+        onUpload: handleUpload,
+        onSuccess,
+      }}
     />
   );
 }

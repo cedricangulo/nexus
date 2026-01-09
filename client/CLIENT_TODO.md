@@ -16,15 +16,15 @@ Modify the steps as needed as the AI has not checked the frontend structure
 ## 2. Flexible Deliverables (Evidence)
 **Goal**: Support both file uploads (PDF) and links (Figma, etc.) for deliverables.
 
-- [ ] **New Upload Modal**:
+- [X] **New Upload Modal**:
     - Update the "Submit Evidence" modal to have two tabs or a toggle: **"Upload File"** and **"Submit Link"**.
     - **Upload File**: Keep the current file upload logic (`POST /evidence`).
     - **Submit Link**: Add a form with fields for `link` (required, URL) and `fileName` (optional display name). This should hit the new `POST /evidence/link` endpoint.
-- [ ] **Evidence List**:
+- [X] **Evidence List**:
     - Update the evidence list to distinguish between `FILE` and `LINK` types.
     - Show an appropriate icon (e.g., a paperclip/file icon for files, an external link icon for links).
     - For links, change the action from "Download" to "Open Link" (opens in a new tab).
-- [ ] **Types Update**:
+- [X] **Types Update**:
     - Update the `Evidence` type/interface to include the new `type` field (`'FILE' | 'LINK'`).
     - Ensure `fileName` and `fileType` are treated as optional/nullable.
 
