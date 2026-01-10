@@ -18,6 +18,9 @@ export async function registerDeviceTokenAction(
   token: string,
   platform: "web" | "android" | "ios" = "web"
 ): Promise<DeviceTokenActionResponse> {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  console.log(`[Server Action] Registering token at ${API_URL}`);
+
   try {
     const client = await createApiClient();
     const response = await client.post(API_ENDPOINTS.DEVICE_TOKENS.REGISTER, {
@@ -29,11 +32,17 @@ export async function registerDeviceTokenAction(
       success: true,
       data: response.data?.data,
     };
-  } catch (error) {
-    console.error("Failed to register device token via server action:", error);
+  } catch (error: any) {
+    const errorMsg = error.response?.data?.error || error.message || "Unknown error";
+    console.error(`[Server Action] Registration failed: ${errorMsg}`, {
+      status: error.response?.status,
+      url: error.config?.url,
+      stack: error.stack
+    });
+
     return {
       success: false,
-      error: "Failed to register push notification token",
+      error: `Failed to register push notification token: ${errorMsg} (URL: ${API_URL})`,
     };
   }
 }
