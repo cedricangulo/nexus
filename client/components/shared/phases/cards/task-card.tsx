@@ -8,23 +8,15 @@ type TaskCardProps = {
   onClick?: () => void;
   onEdit?: (task: Task) => void;
   onDelete?: (task: Task) => void;
-  isTeamLead?: boolean;
 };
 
-export function TaskCard({
-  task,
-  onClick,
-  onEdit,
-  onDelete,
-  isTeamLead = false,
-}: TaskCardProps) {
+export function TaskCard({ task, onClick, onEdit, onDelete }: TaskCardProps) {
   const assignees = task.assignees || [];
 
   return (
     <PhaseItemCard
       description={task.description}
       footer={<AvatarGroup assignees={assignees} />}
-      isTeamLead={isTeamLead}
       onClick={onClick}
       onDelete={onDelete ? () => onDelete(task) : undefined}
       onEdit={onEdit ? () => onEdit(task) : undefined}

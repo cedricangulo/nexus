@@ -20,17 +20,17 @@ import { uploadSchema } from "@/lib/validation";
 
 type UploadInput = z.infer<typeof uploadSchema>;
 
-type UploadPhaseMinutesDialogProps = {
+type UploadMeetingDialogProps = {
   phaseId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
 
-export function UploadPhaseMinutesDialog({
+export function UploadMeetingDialog({
   phaseId,
   open,
   onOpenChange,
-}: UploadPhaseMinutesDialogProps) {
+}: UploadMeetingDialogProps) {
   const [_isPending, startTransition] = useTransition();
   const maxSize = 10 * 1024 * 1024; // 10MB
 
@@ -113,58 +113,66 @@ export function UploadPhaseMinutesDialog({
 
   return (
     <AutoUploadDialog
-      accept=".pdf"
-      description="Fill in the meeting details below, then select a PDF file. Click Upload to confirm."
-      maxFiles={1}
-      maxSize={maxSize}
-      onOpenChange={handleOpenChange}
-      onUpload={handleUpload}
-      open={open}
-      renderMetadataForm={({ file, isUploading }) => (
-        <FieldGroup>
-          <Controller
-            control={form.control}
-            name="title"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Meeting Title</FieldLabel>
-                <Input
-                  {...field}
-                  aria-invalid={fieldState.invalid}
-                  disabled={isUploading}
-                  id={field.name}
-                  placeholder="e.g., Phase Kickoff Meeting"
-                />
-                {fieldState.invalid ? (
-                  <FieldError errors={[fieldState.error]} />
-                ) : null}
-              </Field>
-            )}
-          />
+      config={{
+        accept: ".pdf",
+        maxSize,
+        maxFiles: 1,
+        requiresConfirmation: true,
+      }}
+      content={{
+        title: "Upload Phase Meeting Minutes",
+        description:
+          "Fill in the meeting details below, then select a PDF file. Click Upload to confirm.",
+      }}
+      control={{ open, onOpenChange: handleOpenChange }}
+      features={{
+        renderMetadataForm: ({ file, isUploading }) => (
+          <FieldGroup>
+            <Controller
+              control={form.control}
+              name="title"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Meeting Title</FieldLabel>
+                  <Input
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    disabled={isUploading}
+                    id={field.name}
+                    placeholder="e.g., Phase Kickoff Meeting"
+                  />
+                  {fieldState.invalid ? (
+                    <FieldError errors={[fieldState.error]} />
+                  ) : null}
+                </Field>
+              )}
+            />
 
-          <Controller
-            control={form.control}
-            name="date"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Meeting Date</FieldLabel>
-                <NaturalDateInput
-                  disabled={isUploading}
-                  id={field.name}
-                  onChange={field.onChange}
-                  placeholder="Today, yesterday, or YYYY-MM-DD"
-                  value={field.value}
-                />
-                {fieldState.invalid ? (
-                  <FieldError errors={[fieldState.error]} />
-                ) : null}
-              </Field>
-            )}
-          />
-        </FieldGroup>
-      )}
-      requiresConfirmation={true}
-      title="Upload Phase Meeting Minutes"
+            <Controller
+              control={form.control}
+              name="date"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Meeting Date</FieldLabel>
+                  <NaturalDateInput
+                    disabled={isUploading}
+                    id={field.name}
+                    onChange={field.onChange}
+                    placeholder="Today, yesterday, or YYYY-MM-DD"
+                    value={field.value}
+                  />
+                  {fieldState.invalid ? (
+                    <FieldError errors={[fieldState.error]} />
+                  ) : null}
+                </Field>
+              )}
+            />
+          </FieldGroup>
+        ),
+      }}
+      handlers={{
+        onUpload: handleUpload,
+      }}
     />
   );
 }

@@ -1,7 +1,8 @@
 import { forbidden, unauthorized } from "next/navigation";
 import { Suspense } from "react";
-import { auth } from "@/auth";
 import { AuthLoadingFallback } from "@/components/layouts/loading";
+import { getAuthContext } from "@/lib/helpers/auth-token";
+import { AuthContextProvider } from "@/providers/auth-context-provider";
 import { PushNotificationProvider } from "@/providers/push-notification-provider";
 
 export default function AuthLayout({
@@ -32,24 +33,31 @@ export default function AuthLayout({
  * Inner component that handles the dynamic auth check.
  * This component is deferred to request time.
  */
-async function RoleBasedSlot({ member, teamLead, adviser }: any) {
-  const session = await auth(); // Accesses cookies()
 
-  if (!session?.user) {
+async function RoleBasedSlot({ member, teamLead, adviser }: any) {
+  const { user, token } = await getAuthContext();
+
+  if (!user) {
     return unauthorized();
   }
 
-  const role = session.user.role;
+  const role = user.role; // "MEMBER" | "TEAM_LEAD" | "ADVISER"
+  const slot =
+    role === "TEAM_LEAD"
+      ? teamLead
+      : role === "MEMBER"
+        ? member
+        : role === "ADVISER"
+          ? adviser
+          : null;
 
-  if (role === "teamLead") {
-    return teamLead;
-  }
-  if (role === "member") {
-    return member;
-  }
-  if (role === "adviser") {
-    return adviser;
+  if (!slot) {
+    return forbidden();
   }
 
-  return forbidden();
+  return (
+    <AuthContextProvider token={token} user={user}>
+      {slot}
+    </AuthContextProvider>
+  );
 }

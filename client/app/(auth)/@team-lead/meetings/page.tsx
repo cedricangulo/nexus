@@ -14,22 +14,28 @@ import { getAuthContext } from "@/lib/helpers/auth-token";
  *
  * Role validation is handled by RoleBasedSlot in (auth)/layout.tsx
  */
-export default async function TeamLeadMeetingsPage() {
-  const { token } = await getAuthContext();
 
+async function MeetingsContent() {
+  const { token } = await getAuthContext();
   const { logs, sprints, phases } = await getMeetingsData(token);
 
   return (
+    <div className="space-y-8 pb-16">
+      <SummaryCardsRow logs={logs} phases={phases} sprints={sprints} />
+      <MeetingsTable
+        currentUserRole="teamLead"
+        initialLogs={logs}
+        phases={phases}
+        sprints={sprints}
+      />
+    </div>
+  );
+}
+
+export default function TeamLeadMeetingsPage() {
+  return (
     <Suspense fallback={<MeetingListSkeleton />}>
-      <div className="space-y-8 pb-16">
-        <SummaryCardsRow logs={logs} phases={phases} sprints={sprints} />
-        <MeetingsTable
-          currentUserRole="teamLead"
-          initialLogs={logs}
-          phases={phases}
-          sprints={sprints}
-        />
-      </div>
+      <MeetingsContent />
     </Suspense>
   );
 }

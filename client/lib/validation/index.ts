@@ -13,6 +13,7 @@ export {
   type SignupInput,
   signupSchema,
 } from "./auth";
+export { type LinkEvidenceInput, linkEvidenceSchema } from "./evidence";
 export { uploadSchema } from "./meeting";
 export {
   type CreateDeliverableInput,

@@ -13,6 +13,7 @@ import {
 import { StatusBadge } from "@/components/ui/status";
 import type { DeliverableStatus, TaskStatus } from "@/lib/types";
 import { cn, getInitials } from "@/lib/utils";
+import { useIsTeamLead } from "@/providers/auth-context-provider";
 
 type PhaseItemCardContent = {
   title: string;
@@ -20,6 +21,7 @@ type PhaseItemCardContent = {
   description?: string | null;
   children?: React.ReactNode;
   footer?: React.ReactNode;
+  className?: string;
 };
 
 type PhaseItemCardHandlers = {
@@ -28,14 +30,7 @@ type PhaseItemCardHandlers = {
   onDelete?: () => void;
 };
 
-type PhaseItemCardConfig = {
-  isTeamLead?: boolean;
-  className?: string;
-};
-
-type PhaseItemCardProps = PhaseItemCardContent &
-  PhaseItemCardHandlers &
-  PhaseItemCardConfig;
+type PhaseItemCardProps = PhaseItemCardContent & PhaseItemCardHandlers;
 
 export function PhaseItemCard({
   title,
@@ -44,11 +39,12 @@ export function PhaseItemCard({
   onClick,
   onEdit,
   onDelete,
-  isTeamLead = false,
   className,
   children,
   footer,
 }: PhaseItemCardProps) {
+  const isTeamLead = useIsTeamLead();
+
   const isClickable = !!onClick;
 
   return (

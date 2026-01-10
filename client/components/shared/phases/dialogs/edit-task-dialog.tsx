@@ -1,14 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, PlusIcon, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 
-import { createPhaseTaskAction, updatePhaseTaskAction } from "@/actions/tasks";
+import { updatePhaseTaskAction } from "@/actions/tasks";
 import {
   Dialog,
   DialogClose,
@@ -17,7 +17,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/animate-ui/components/radix/dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,8 +27,8 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
+import { FieldError } from "@/components/ui/field";
 import {
   Form,
   FormControl,
@@ -52,62 +51,51 @@ import { StatusBadge } from "@/components/ui/status";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { type Task, TaskStatus, type User } from "@/lib/types";
-import { createPhaseTaskSchema, updatePhaseTaskSchema } from "@/lib/validation";
+import { updatePhaseTaskSchema } from "@/lib/validation";
+import { useAuthContext } from "@/providers/auth-context-provider";
 
-type TaskDialogProps = {
+type EditTaskDialogProps = {
   phaseId: string;
+  task: Task;
   users: User[];
-  userRole?: "teamLead" | "member";
-  initialData?: Task | null;
+  userRole: "teamLead" | "member";
   dialogControl?: {
     open: boolean;
     onOpenChange: (open: boolean) => void;
   };
-  trigger?: React.ReactNode;
 };
 
-// Helper to get button label based on state
-function getButtonLabel(
-  isPending: boolean,
-  isEditMode: boolean
-): React.ReactNode {
-  if (isPending) {
-    return (
-      <>
-        <Spinner /> {isEditMode ? "Saving" : "Creating"}
-      </>
-    );
+function canUpdateTaskStatus(
+  currentUserId: string,
+  originalAssigneeIds: string[] | undefined,
+  userRole: "teamLead" | "member"
+) {
+  if (userRole === "teamLead") {
+    return true;
   }
-  return isEditMode ? (
-    <>
-      <Save /> Save Changes
-    </>
-  ) : (
-    <>
-      <Plus /> Create Task
-    </>
-  );
+
+  // Members can only update if they are assigned to the original task
+  if (currentUserId && originalAssigneeIds?.includes(currentUserId)) {
+    return true;
+  }
+
+  return false;
 }
 
-export function TaskDialog({
+export function EditTaskDialog({
   phaseId,
+  task,
   users,
-  userRole = "teamLead",
-  initialData = null,
+  userRole,
   dialogControl,
-  trigger,
-}: TaskDialogProps) {
+}: EditTaskDialogProps) {
+  const { user } = useAuthContext();
   const isControlled = !!dialogControl;
-  const isEditMode = !!initialData;
-  const isMember = userRole === "member";
 
-  const [internalOpen, setInternalOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const isMobile = useIsMobile();
-
-  const open = isControlled ? dialogControl.open : internalOpen;
-  const setOpen = isControlled ? dialogControl.onOpenChange : setInternalOpen;
+  const isMember = userRole === "member";
 
   const assigneeOptions: Option[] = useMemo(
     () =>
@@ -118,50 +106,46 @@ export function TaskDialog({
     [users]
   );
 
-  // Use the appropriate schema based on mode to ensure proper typing
-  const schema = isEditMode ? updatePhaseTaskSchema : createPhaseTaskSchema;
-  type FormValues = z.infer<typeof schema>;
+  type FormValues = z.infer<typeof updatePhaseTaskSchema>;
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(updatePhaseTaskSchema),
     defaultValues: {
-      phaseId,
-      title: "",
-      description: "",
-      status: "TODO" as const,
-      assigneeIds: [],
-    } as FormValues,
+      taskId: task.id,
+      phaseId: phaseId || "",
+      title: task.title,
+      description: task.description || "",
+      status: task.status,
+      assigneeIds: task.assignees?.map((a) => a.id) || [],
+    },
   });
 
+  const originalAssigneeIds = task.assignees?.map((a) => a.id) || [];
+  const canUpdate = canUpdateTaskStatus(user.id, originalAssigneeIds, userRole);
+
   const [selectedAssignees, setSelectedAssignees] = useState<Option[]>([]);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = isControlled ? dialogControl.open : internalOpen;
+  const setOpen = isControlled ? dialogControl.onOpenChange : setInternalOpen;
 
   useEffect(() => {
-    if (open && initialData) {
-      const assignees = initialData.assignees || [];
+    if (open) {
+      const assignees = task.assignees || [];
       const assigneeOpts = assignees
         .map((a) => assigneeOptions.find((opt) => opt.value === a.id))
         .filter((opt): opt is Option => opt !== undefined);
 
       form.reset({
-        ...(isEditMode && { taskId: initialData.id }),
-        phaseId: initialData.phaseId || phaseId,
-        title: initialData.title,
-        description: initialData.description || "",
-        status: initialData.status,
+        taskId: task.id,
+        phaseId: task.phaseId || "",
+        title: task.title,
+        description: task.description || "",
+        status: task.status,
         assigneeIds: assignees.map((a) => a.id),
       });
       setSelectedAssignees(assigneeOpts);
-    } else if (open && !initialData) {
-      form.reset({
-        phaseId,
-        title: "",
-        description: "",
-        status: "TODO" as const,
-        assigneeIds: [],
-      });
-      setSelectedAssignees([]);
     }
-  }, [open, initialData, phaseId, assigneeOptions, form, isEditMode]);
+  }, [open, task, assigneeOptions, form]);
 
   const handleAssigneeChange = (options: Option[]) => {
     setSelectedAssignees(options);
@@ -172,28 +156,20 @@ export function TaskDialog({
   };
 
   const onSubmit = (values: FormValues) => {
+    if (!canUpdate) {
+      toast.error("You don't have permission to update this task");
+      return;
+    }
+
     startTransition(async () => {
-      const result = isEditMode
-        ? await updatePhaseTaskAction(
-            values as z.infer<typeof updatePhaseTaskSchema>,
-            phaseId
-          )
-        : await createPhaseTaskAction(
-            values as z.infer<typeof createPhaseTaskSchema>
-          );
+      const result = await updatePhaseTaskAction(values, task.phaseId || "");
 
       if (result.success) {
-        toast.success(isEditMode ? "Task updated" : "Task created");
+        toast.success("Task updated");
         setOpen(false);
         router.refresh();
-        if (!isEditMode) {
-          form.reset();
-          setSelectedAssignees([]);
-        }
       } else {
-        toast.error(
-          result.error || `Failed to ${isEditMode ? "update" : "create"} task`
-        );
+        toast.error(result.error || "Failed to update task");
       }
     });
   };
@@ -201,45 +177,48 @@ export function TaskDialog({
   const formContent = (
     <Form {...form}>
       <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  disabled={isPending}
-                  placeholder="Task title"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Show title and description fields only if the user is not a member or cannot update */}
+        {isMember ? null : (
+          <>
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      disabled={isPending}
+                      placeholder="Task title"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Description {isEditMode ? "(optional)" : ""}
-              </FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  disabled={isPending}
-                  placeholder="Task description"
-                  rows={4}
-                  value={field.value || ""}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description (optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      disabled={isPending}
+                      placeholder="Task description"
+                      rows={4}
+                      value={field.value || ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </>
+        )}
 
         <FormField
           control={form.control}
@@ -248,7 +227,7 @@ export function TaskDialog({
             <FormItem>
               <FormLabel>Status</FormLabel>
               <Select
-                disabled={isPending}
+                disabled={isPending || !canUpdate}
                 onValueChange={field.onChange}
                 value={field.value}
               >
@@ -272,12 +251,19 @@ export function TaskDialog({
                   </SelectItem>
                 </SelectContent>
               </Select>
+              {canUpdate ? null : (
+                <FieldError
+                  errors={[
+                    { message: "Only assigned members can change task status" },
+                  ]}
+                />
+              )}
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {!isMember && (
+        {isMember ? null : (
           <FormField
             control={form.control}
             name="assigneeIds"
@@ -310,17 +296,14 @@ export function TaskDialog({
     </Form>
   );
 
-  const dialogTitle = isEditMode ? "Edit Task" : "Create Task";
-  const dialogDescription = isEditMode
-    ? "Update the details for this phase task."
-    : "Add a new task to this phase.";
+  const dialogTitle = "Edit Task";
+  const dialogDescription = isMember
+    ? "Update the status for this phase task."
+    : "Update the details for this phase task.";
 
   if (isMobile) {
     return (
       <Drawer onOpenChange={setOpen} open={open}>
-        {trigger && !isControlled && (
-          <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-        )}
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>{dialogTitle}</DrawerTitle>
@@ -331,11 +314,19 @@ export function TaskDialog({
 
           <DrawerFooter>
             <Button
-              disabled={isPending}
+              disabled={isPending || !canUpdate}
               onClick={form.handleSubmit(onSubmit)}
               type="button"
             >
-              {getButtonLabel(isPending, isEditMode)}
+              {isPending ? (
+                <>
+                  <Spinner /> Saving
+                </>
+              ) : (
+                <>
+                  <Save /> Save Changes
+                </>
+              )}
             </Button>
             <DrawerClose asChild>
               <Button disabled={isPending} variant="outline">
@@ -350,9 +341,6 @@ export function TaskDialog({
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      {trigger && !isControlled && (
-        <DialogTrigger asChild>{trigger}</DialogTrigger>
-      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{dialogTitle}</DialogTitle>
@@ -368,39 +356,22 @@ export function TaskDialog({
             </Button>
           </DialogClose>
           <Button
-            disabled={isPending}
+            disabled={isPending || !canUpdate}
             onClick={form.handleSubmit(onSubmit)}
             type="button"
           >
-            {getButtonLabel(isPending, isEditMode)}
+            {isPending ? (
+              <>
+                <Spinner /> Saving
+              </>
+            ) : (
+              <>
+                <Save /> Save Changes
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-}
-
-// Convenience wrapper for create mode with trigger button
-export function CreateTaskButton({
-  phaseId,
-  users,
-  userRole = "teamLead",
-}: {
-  phaseId: string;
-  users: User[];
-  userRole?: "teamLead" | "member";
-}) {
-  return (
-    <TaskDialog
-      phaseId={phaseId}
-      trigger={
-        <Button size="sm" variant="secondary">
-          <PlusIcon />
-          Add
-        </Button>
-      }
-      userRole={userRole}
-      users={users}
-    />
   );
 }

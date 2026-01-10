@@ -32,6 +32,54 @@ const loginSchema = z.object({
 
 type LoginValues = z.infer<typeof loginSchema>;
 
+/**
+ * Helper: Check if error is a navigation-related error
+ */
+function isNavigationError(error: unknown): boolean {
+  const errorStr = String(error);
+  return (
+    errorStr.includes("NEXT_REDIRECT") ||
+    errorStr.includes("redirect") ||
+    errorStr.includes("navigation")
+  );
+}
+
+/**
+ * Helper: Set field-specific validation errors from response
+ */
+function applyFieldErrors(
+  result: LoginActionResponse,
+  form: ReturnType<typeof useForm<LoginValues>>
+): void {
+  if (!result.fieldErrors) return;
+
+  for (const [field, errors] of Object.entries(result.fieldErrors)) {
+    if (errors?.length) {
+      form.setError(field as keyof LoginValues, {
+        type: "manual",
+        message: errors[0],
+      });
+    }
+  }
+}
+
+/**
+ * Helper: Handle login action result
+ */
+function handleLoginResult(
+  result: LoginActionResponse | null | undefined,
+  form: ReturnType<typeof useForm<LoginValues>>,
+  setLastError: (error: LoginActionResponse) => void
+): void {
+  // Successful redirect happened
+  if (!result) return;
+
+  if (!result.success) {
+    setLastError(result);
+    applyFieldErrors(result, form);
+  }
+}
+
 export function LoginForm({
   className,
   ...props
@@ -62,38 +110,10 @@ export function LoginForm({
     startTransition(async () => {
       try {
         const result = await loginAction(values);
-
-        // If result is undefined/null, a redirect likely happened (successful login)
-        if (result === undefined || result === null) {
-          return;
-        }
-
-        if (!result.success) {
-          // Store the error but don't reset the form
-          setLastError(result as LoginActionResponse);
-
-          // Show field-specific errors if any
-          if (result.fieldErrors) {
-            for (const [field, errors] of Object.entries(result.fieldErrors)) {
-              if (errors && errors.length > 0) {
-                form.setError(field as keyof LoginValues, {
-                  type: "manual",
-                  message: errors[0],
-                });
-              }
-            }
-          }
-        }
+        handleLoginResult(result, form, setLastError);
       } catch (error) {
         // Only show toast for actual errors, not navigation-related ones
-        // Navigation errors typically have these characteristics
-        const errorStr = String(error);
-        const isNavigationError =
-          errorStr.includes("NEXT_REDIRECT") ||
-          errorStr.includes("redirect") ||
-          errorStr.includes("navigation");
-
-        if (!isNavigationError) {
+        if (!isNavigationError(error)) {
           console.error("Unexpected login error:", error);
           toast.error("An unexpected error occurred", {
             description:

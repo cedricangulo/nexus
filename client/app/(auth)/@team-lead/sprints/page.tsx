@@ -4,7 +4,7 @@ import { SprintsView } from "@/components/shared/sprints/sprints-view";
 import { getSprints, getSprintsProgress } from "@/lib/data/sprint";
 import { getAuthContext } from "@/lib/helpers/auth-token";
 
-export default async function Page() {
+async function SprintsContent() {
   const { user, token } = await getAuthContext();
   const sprints = await getSprints(token, user.role);
   const progressById = await getSprintsProgress(
@@ -13,12 +13,18 @@ export default async function Page() {
   );
 
   return (
+    <SprintsView
+      progressById={progressById}
+      sprints={sprints}
+      userRole="teamLead"
+    />
+  );
+}
+
+export default function Page() {
+  return (
     <Suspense fallback={<SprintListSkeleton />}>
-      <SprintsView
-        progressById={progressById}
-        sprints={sprints}
-        userRole="teamLead"
-      />
+      <SprintsContent />
     </Suspense>
   );
 }

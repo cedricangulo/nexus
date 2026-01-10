@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PhaseDetailSkeleton } from "@/components/layouts/loading";
-import { PhaseDetailContent } from "@/components/team-lead/phases/phase-detail-content";
+import { PhaseDetailContent } from "@/components/shared/phases/phase-details";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status";
 import { getPhaseById } from "@/lib/data/phases";
@@ -48,29 +48,29 @@ async function PhaseContent({ phaseId }: { phaseId: string }) {
             <h1 className="font-semibold text-2xl">{phase.name}</h1>
             <StatusBadge status={phase.type} />
           </div>
-          {phase.description && (
+          {phase.description ? (
             <p className="text-muted-foreground">{phase.description}</p>
-          )}
+          ) : null}
         </div>
 
         <div className="flex gap-4 text-sm">
-          {phase.startDate && (
+          {phase.startDate ? (
             <div>
               <p className="text-muted-foreground text-sm">Start Date</p>
               <p className="font-medium">{formatDate(phase.startDate)}</p>
             </div>
-          )}
-          {phase.endDate && (
+          ) : null}
+          {phase.endDate ? (
             <div>
               <p className="text-muted-foreground text-sm">End Date</p>
               <p className="font-medium">{formatDate(phase.endDate)}</p>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
 
       {/* Member view: isTeamLead=false hides action buttons */}
-      <PhaseDetailContent isTeamLead={false} phase={phase} users={users} />
+      <PhaseDetailContent phase={phase} users={users} />
     </div>
   );
 }

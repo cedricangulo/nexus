@@ -24,6 +24,18 @@ export const evidenceApi = {
     return response.data;
   },
 
+  createLink: async (data: {
+    deliverableId: string;
+    link: string;
+    fileName?: string;
+  }): Promise<Evidence> => {
+    const response = await apiClient.post(
+      API_ENDPOINTS.EVIDENCE.CREATE_LINK,
+      data
+    );
+    return response.data;
+  },
+
   getEvidenceByDeliverable: async (
     deliverableId: string
   ): Promise<Evidence[]> => {

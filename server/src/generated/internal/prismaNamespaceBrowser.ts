@@ -185,6 +185,7 @@ export const EvidenceScalarFieldEnum = {
   id: 'id',
   deliverableId: 'deliverableId',
   uploaderId: 'uploaderId',
+  type: 'type',
   fileName: 'fileName',
   fileUrl: 'fileUrl',
   fileType: 'fileType',

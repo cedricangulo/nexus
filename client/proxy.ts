@@ -1,36 +1,79 @@
-import { decodeJwt } from "jose";
+import { jwtVerify } from "jose";
 import { type NextRequest, NextResponse } from "next/server";
 
-export function proxy(request: NextRequest) {
+// Define protected routes that require valid authentication
+const PROTECTED_ROUTES = [
+  "/dashboard",
+  "/phases",
+  "/sprints",
+  "/tasks",
+  "/deliverables",
+  "/analytics",
+  "/team",
+  "/settings",
+];
+
+// Check if path starts with any protected route
+function isProtectedRoute(pathname: string): boolean {
+  return PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
+}
+
+// Validate token: Check expiration AND signature
+async function isTokenValid(token: string): Promise<boolean> {
+  try {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      // FAIL CLOSED: No secret means no validation possible
+      console.error("[Proxy] JWT_SECRET not configured - rejecting all tokens");
+      return false;
+    }
+
+    // Verify signature AND expiration with clock tolerance
+    const encoder = new TextEncoder();
+    await jwtVerify(token, encoder.encode(secret), {
+      clockTolerance: 60, // 60 second tolerance for clock skew
+    });
+    return true;
+  } catch (_e) {
+    // Token is malformed, signature invalid, or expired
+    return false;
+  }
+}
+
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("auth_token")?.value;
 
-  // When your token expired (after 1 hour):
-  // Browser: "I have a token!" (It's an old, expired cookie, but it exists).
-  // Proxy: "I see a token! Go to Dashboard."
-  // Dashboard: Checks token with backend -> 401 Unauthorized (Expired).
-  // App Logic: "401 means you need to login. Go to /login."
-  // Proxy: "I see a token! Go to Dashboard." -> LOOP.
-
-  // 1. Check if user is trying to access /login
+  // 1. User trying to access /login with a token
   if (pathname === "/login" && token) {
-    try {
-      // 2. Decode the token to check expiration
-      const payload = decodeJwt(token);
-
-      // 3. Check if 'exp' (expiration time) is in the past
-      // 'exp' is in seconds, Date.now() is in ms
-      if (payload.exp && payload.exp * 1000 > Date.now()) {
-        // Token is valid and NOT expired -> Redirect to Dashboard
-        return NextResponse.redirect(new URL("/dashboard", request.url));
-      }
-      // If code reaches here, token is expired. Allow access to /login.
-    } catch (_e) {
-      // Token is malformed. Allow access to /login.
+    if (await isTokenValid(token)) {
+      // Valid token -> Redirect to Dashboard
+      return NextResponse.redirect(new URL("/dashboard", request.url));
     }
+    // Expired or invalid token -> Clear cookie and allow login
+    const response = NextResponse.next();
+    response.cookies.delete("auth_token");
+    return response;
   }
 
-  // 4. Standard Proxy Logic
+  // 2. User trying to access protected route
+  if (isProtectedRoute(pathname)) {
+    if (!token) {
+      // No token -> Redirect to login
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    if (!(await isTokenValid(token))) {
+      // Expired, invalid signature, or malformed token -> Clear cookie and redirect to login
+      const response = NextResponse.redirect(new URL("/login", request.url));
+      response.cookies.delete("auth_token");
+      return response;
+    }
+
+    // Valid token -> Allow access
+  }
+
+  // 3. Public routes or valid authenticated access
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-pathname", pathname);
 
@@ -42,5 +85,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.json).*)",
+  ],
 };

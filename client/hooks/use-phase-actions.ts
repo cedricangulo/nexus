@@ -12,7 +12,7 @@ export function usePhaseActions(phaseId: string) {
   const router = useRouter();
 
   // Task state
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
   const [editTaskDialogOpen, setEditTaskDialogOpen] = useState(false);
   const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
 

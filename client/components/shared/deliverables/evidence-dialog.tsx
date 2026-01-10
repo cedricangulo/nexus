@@ -1,5 +1,6 @@
 "use client";
 
+import { ExternalLink, FileIcon } from "lucide-react";
 import Link from "next/link";
 import {
   Dialog,
@@ -45,24 +46,39 @@ export function EvidenceDialog({
       </div>
     ) : (
       <div className="space-y-2">
-        {evidence.map((item) => (
-          <div
-            className="flex flex-wrap items-center justify-between gap-2 rounded-md border px-3 py-2"
-            key={item.id}
-          >
-            <div className="min-w-0">
-              <p className="truncate font-medium text-sm">{item.fileName}</p>
-              <p className="text-muted-foreground text-xs">
-                Uploaded {formatDate(item.createdAt)}
-              </p>
+        {evidence.map((item) => {
+          const isLink = item.type === "LINK";
+          const displayName = item.fileName || item.fileUrl;
+
+          return (
+            <div
+              className="flex flex-wrap items-center justify-between gap-2 rounded-md border px-3 py-2"
+              key={item.id}
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-muted text-muted-foreground">
+                  {isLink ? (
+                    <ExternalLink className="size-4" />
+                  ) : (
+                    <FileIcon className="size-4" />
+                  )}
+                </div>
+                <div className="min-w-0 space-y-0.5">
+                  <p className="truncate font-medium text-sm">{displayName}</p>
+                  <p className="text-muted-foreground text-xs">
+                    {isLink ? "Submitted" : "Uploaded"}{" "}
+                    {formatDate(item.createdAt)}
+                  </p>
+                </div>
+              </div>
+              <Button asChild size="sm" variant="outline">
+                <Link href={item.fileUrl} rel="noreferrer" target="_blank">
+                  {isLink ? "Open Link" : "View"}
+                </Link>
+              </Button>
             </div>
-            <Button asChild variant="outline">
-              <Link href={item.fileUrl} rel="noreferrer" target="_blank">
-                View
-              </Link>
-            </Button>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
 

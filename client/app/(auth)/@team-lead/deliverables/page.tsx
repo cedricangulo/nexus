@@ -1,12 +1,16 @@
 import { Suspense } from "react";
 import { DeliverableListSkeleton } from "@/components/layouts/loading";
-import TeamLeadDeliverablesPage from "@/components/team-lead/deliverables";
+import DeliverablesPage from "@/components/shared/deliverables/deliverables-page";
 
-export default async function Page() {
-  // Auth and role validation handled by parent layout
-  return (
-    <Suspense fallback={<DeliverableListSkeleton />}>
-      <TeamLeadDeliverablesPage />
-    </Suspense>
-  );
+export const metadata = {
+	title: "Deliverables",
+	description: "Review and manage deliverables and evidence",
+};
+
+export default function Page() {
+	return (
+		<Suspense fallback={<DeliverableListSkeleton />}>
+			<DeliverablesPage />
+		</Suspense>
+	);
 }

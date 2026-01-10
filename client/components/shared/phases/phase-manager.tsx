@@ -13,17 +13,20 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import type { Deliverable, PhaseDetail } from "@/lib/types";
-import { DeliverableCreateDialog } from "./dialogs/deliverable-create-dialog";
-import { DeliverableEditDialog } from "./dialogs/deliverable-edit-dialog";
-import { PhaseEditDialog } from "./dialogs/phase-edit-dialog";
-import { PhaseCard } from "./phase-card";
+import { useIsTeamLead } from "@/providers/auth-context-provider";
+import { PhaseCard } from "./cards/phase-card";
+import { DeliverableCreateDialog } from "./dialogs/create-deliverable-dialog";
+import { DeliverableEditDialog } from "./dialogs/edit-deliverable-dialog";
+import { PhaseEditDialog } from "./dialogs/edit-phase-dialog";
 
 type PhaseManagerProps = {
   phases: PhaseDetail[];
-  isTeamLead?: boolean;
 };
 
-export function PhaseManager({ phases, isTeamLead }: PhaseManagerProps) {
+export function PhaseManager({ phases }: PhaseManagerProps) {
+  const isTeamLead = useIsTeamLead();
+  console.log("[PHASE MANAGER]:", isTeamLead);
+
   const [editingPhase, setEditingPhase] = useState<PhaseDetail | null>(null);
   const [addingDeliverablePhaseId, setAddingDeliverablePhaseId] = useState<
     string | null
@@ -37,8 +40,8 @@ export function PhaseManager({ phases, isTeamLead }: PhaseManagerProps) {
     (a, b) => phaseOrder.indexOf(a.type) - phaseOrder.indexOf(b.type)
   );
 
-  // Empty state for team lead
-  if (isTeamLead && sortedPhases.length === 0) {
+  // Empty state
+  if (sortedPhases.length === 0) {
     return (
       <Empty className="border py-12">
         <EmptyHeader>
@@ -46,18 +49,27 @@ export function PhaseManager({ phases, isTeamLead }: PhaseManagerProps) {
             <FolderPlus />
           </EmptyMedia>
           <EmptyTitle>No Phases Created</EmptyTitle>
-          <EmptyDescription>
-            Get started by creating your first project phase in the methodology
-            settings.
-          </EmptyDescription>
+          {isTeamLead ? (
+            <EmptyDescription>
+              No phases have been created yet. Please wait for the team lead to
+              set up the project.
+            </EmptyDescription>
+          ) : (
+            <EmptyDescription>
+              Get started by creating your first project phase in the
+              methodology settings.
+            </EmptyDescription>
+          )}
         </EmptyHeader>
-        <EmptyContent>
-          <Button asChild variant="secondary">
-            <Link href="/settings/project-config#methodology">
-              <FolderPlus /> Create Phase
-            </Link>
-          </Button>
-        </EmptyContent>
+        {isTeamLead ? null : (
+          <EmptyContent>
+            <Button asChild variant="secondary">
+              <Link href="/settings/project-config#methodology">
+                <FolderPlus /> Create Phase
+              </Link>
+            </Button>
+          </EmptyContent>
+        )}
       </Empty>
     );
   }
@@ -65,7 +77,7 @@ export function PhaseManager({ phases, isTeamLead }: PhaseManagerProps) {
   return (
     <div className="flex w-full flex-col gap-6">
       {/* Phases List */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
         {sortedPhases.map((phase) => (
           <PhaseCard
             key={phase.id}

@@ -1,8 +1,7 @@
 import { Suspense } from "react";
 import { getBadgeCounts } from "@/lib/data/badge-counts";
 import type { User } from "@/lib/types";
-import { AppSidebar as MemberSidebar } from "./member/member-sidebar";
-import { AppSidebar as TeamLeadSidebar } from "./team-lead/team-lead-sidebar";
+import { SidebarRenderer } from "./sidebar-badge-client";
 
 /**
  * Async server component that fetches badge counts
@@ -16,28 +15,21 @@ async function SidebarBadgeContent({
   variant: "team-lead" | "member";
 }) {
   if (!user) {
-    // Render sidebar without badges if no user
-    return variant === "team-lead" ? (
-      <TeamLeadSidebar user={user} />
-    ) : (
-      <MemberSidebar user={user} />
-    );
+    return <SidebarRenderer user={user} variant={variant} />;
   }
 
   // Fetch badge counts on the server (streamed via Suspense)
   const badgeCounts = await getBadgeCounts(user);
 
-  // Render the appropriate sidebar with badges
-  return variant === "team-lead" ? (
-    <TeamLeadSidebar badgeCounts={badgeCounts} user={user} />
-  ) : (
-    <MemberSidebar badgeCounts={badgeCounts} user={user} />
+  // Render with SidebarRenderer for hydration-safe display
+  return (
+    <SidebarRenderer badgeCounts={badgeCounts} user={user} variant={variant} />
   );
 }
 
 /**
  * Fallback UI shown while badge counts are loading
- * Renders sidebar without badge data
+ * Uses SidebarRenderer for consistent structure
  */
 function SidebarFallback({
   user,
@@ -46,12 +38,7 @@ function SidebarFallback({
   user: User | null;
   variant: "team-lead" | "member";
 }) {
-  // Render sidebar without badge data as placeholder
-  return variant === "team-lead" ? (
-    <TeamLeadSidebar user={user} />
-  ) : (
-    <MemberSidebar user={user} />
-  );
+  return <SidebarRenderer user={user} variant={variant} />;
 }
 
 /**

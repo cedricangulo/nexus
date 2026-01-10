@@ -4,7 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PhaseDetailSkeleton } from "@/components/layouts/loading";
-import { PhaseDetailContent } from "@/components/team-lead/phases/phase-detail-content";
+import { CreateTaskButton } from "@/components/shared/phases/dialogs/create-task-dialog";
+import { PhaseDetailContent } from "@/components/shared/phases/phase-details";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status";
 import { getPhaseById } from "@/lib/data/phases";
@@ -70,7 +71,11 @@ async function PhaseContent({ phaseId }: { phaseId: string }) {
         </div>
       </div>
 
-      <PhaseDetailContent isTeamLead phase={phase} users={users} />
+      <PhaseDetailContent
+        phase={phase}
+        taskDialogSlot={<CreateTaskButton phaseId={phase.id} users={users} />}
+        users={users}
+      />
     </div>
   );
 }

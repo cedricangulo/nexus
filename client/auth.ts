@@ -1,6 +1,6 @@
 "server-only";
 
-import { decodeJwt } from "jose";
+import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { cache } from "react";
 
@@ -51,9 +51,24 @@ function normalizeRole(rawRole: unknown): AppRole {
   return "member";
 }
 
-function decodeToken(token: string): SessionUser | null {
+/**
+ * Verifies JWT signature and decodes the token
+ * SECURITY: Always validates signature before trusting claims
+ */
+async function verifyToken(token: string): Promise<SessionUser | null> {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    // FAIL CLOSED: No secret means no verification possible
+    console.error("[Auth] JWT_SECRET not configured - rejecting session");
+    return null;
+  }
+
   try {
-    const payload = decodeJwt(token) as Record<string, unknown>;
+    const encoder = new TextEncoder();
+    const { payload } = await jwtVerify(token, encoder.encode(secret), {
+      clockTolerance: 60, // 60 second tolerance for clock skew
+    });
 
     return {
       id: typeof payload.id === "string" ? payload.id : undefined,
@@ -67,13 +82,13 @@ function decodeToken(token: string): SessionUser | null {
 }
 
 /**
- * Instant auth() function using JWT decoding only
+ * Secure auth() function with JWT signature verification
  *
- * This function decodes the JWT token stored in cookies without making
- * any network requests. This allows the page to render the static shell
- * instantly without being blocked by network I/O.
- *
+ * This function verifies the JWT token signature before trusting claims.
  * The JWT contains: id, email, name, role - sufficient for role-based routing.
+ *
+ * SECURITY: Uses jwtVerify to validate signature, not just decode.
+ * This prevents attackers from forging tokens with elevated privileges.
  *
  * If components need fresh/updated user data from the database, they should:
  * 1. Call getAuthContext() to get the token
@@ -88,16 +103,16 @@ export const auth = cache(async (): Promise<Session | null> => {
     return null;
   }
 
-  // Decode the JWT token instantly - no network call
-  const decoded = decodeToken(token);
+  // SECURITY: Verify JWT signature before trusting claims
+  const verified = await verifyToken(token);
 
-  if (!decoded) {
+  if (!verified) {
     return null;
   }
 
   return {
     token,
-    user: decoded,
+    user: verified,
   };
 });
 

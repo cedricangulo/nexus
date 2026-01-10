@@ -86,6 +86,7 @@ export const API_ENDPOINTS = {
   // Evidence Endpoints
   EVIDENCE: {
     CREATE: "/evidence",
+    CREATE_LINK: "/evidence/link",
     BY_DELIVERABLE: (deliverableId: string) =>
       `/evidence/deliverable/${deliverableId}`,
     DELETE: (id: string) => `/evidence/${id}`,
@@ -207,6 +208,7 @@ export const API_ENDPOINTS = {
  *
  * Evidence Routes:
  * - POST   /evidence                    - Upload evidence (multipart/form-data)
+ * - POST   /evidence/link               - Submit evidence link (JSON body)
  * - GET    /evidence/deliverable/:deliverableId - Get evidence by deliverable
  * - DELETE /evidence/:id                - Delete evidence
  *

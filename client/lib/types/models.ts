@@ -158,9 +158,10 @@ export type Evidence = {
   id: string;
   deliverableId: string;
   uploaderId: string;
-  fileName: string;
-  fileUrl: string;
-  fileType: string;
+  type: "FILE" | "LINK";
+  fileName?: string | null;
+  fileUrl: string; // Used for both storage URL and external link
+  fileType?: string | null;
   createdAt: string;
   deletedAt?: string | null;
 };
