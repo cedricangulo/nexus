@@ -59,7 +59,7 @@ export async function sendPushToUser(
 
     const deviceTokens = await getDeviceTokensByUserId(userId);
     if (deviceTokens.length === 0) {
-        logger.debug({ userId }, "No device tokens found for user");
+        logger.info({ userId }, "Push skipped - No device tokens found for user");
         return;
     }
 
