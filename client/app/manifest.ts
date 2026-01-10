@@ -30,20 +30,8 @@ export default function manifest(): MetadataRoute.Manifest {
     icons: [
       {
         src: "/ui-dark.png",
-        sizes: "32x32",
+        sizes: "any",
         type: "image/png",
-      },
-      {
-        src: "/ui-dark.png",
-        sizes: "192x192",
-        type: "image/png",
-        purpose: "any",
-      },
-      {
-        src: "/ui-dark.png",
-        sizes: "512x512",
-        type: "image/png",
-        purpose: "any",
       },
     ],
     shortcuts: [
