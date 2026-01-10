@@ -3,6 +3,9 @@
  *
  * This service worker handles push notifications when the app is in the background.
  * Firebase config is received via postMessage from the main app.
+ *
+ * IMPORTANT: Event handlers for 'push', 'pushsubscriptionchange', and 'notificationclick'
+ * must be registered at the top level (initial evaluation) of the service worker script.
  */
 
 // Import Firebase scripts (using compat versions for service worker)
@@ -14,14 +17,11 @@ importScripts(
 );
 
 let messaging = null;
+let pendingPayloads = [];
 
-// Listen for config message from main app
-self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "FIREBASE_CONFIG") {
-    initializeFirebase(event.data.config);
-  }
-});
-
+/**
+ * Initialize Firebase with the provided config
+ */
 function initializeFirebase(config) {
   if (messaging) {
     return; // Already initialized
@@ -37,33 +37,101 @@ function initializeFirebase(config) {
     messaging = firebase.messaging();
     console.log("[firebase-messaging-sw.js] Firebase initialized");
 
-    // Handle background messages
+    // Process any pending payloads that arrived before initialization
+    pendingPayloads.forEach((payload) => {
+      showNotification(payload);
+    });
+    pendingPayloads = [];
+
+    // Handle background messages via Firebase SDK
     messaging.onBackgroundMessage((payload) => {
       console.log(
         "[firebase-messaging-sw.js] Background message received:",
         payload
       );
-
-      const notificationTitle = payload.notification?.title || "Nexus";
-      const notificationOptions = {
-        body: payload.notification?.body || "You have a new notification",
-        icon: "/ui-dark.png",
-        badge: "/ui-dark.png",
-        tag: payload.data?.tag || "nexus-notification",
-        data: payload.data,
-      };
-
-      self.registration.showNotification(
-        notificationTitle,
-        notificationOptions
-      );
+      showNotification(payload);
     });
   } catch (error) {
     console.error("[firebase-messaging-sw.js] Failed to initialize:", error);
   }
 }
 
-// Handle notification click
+/**
+ * Display a notification from the payload
+ */
+function showNotification(payload) {
+  const notificationTitle = payload.notification?.title || "Nexus";
+  const notificationOptions = {
+    body: payload.notification?.body || "You have a new notification",
+    icon: "/ui-dark.png",
+    badge: "/ui-dark.png",
+    tag: payload.data?.tag || "nexus-notification",
+    data: payload.data,
+  };
+
+  self.registration.showNotification(notificationTitle, notificationOptions);
+}
+
+// Listen for config message from main app
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "FIREBASE_CONFIG") {
+    initializeFirebase(event.data.config);
+  }
+});
+
+/**
+ * Push event handler - MUST be registered at top level
+ * This handles push events when Firebase SDK hasn't initialized yet
+ */
+self.addEventListener("push", (event) => {
+  console.log("[firebase-messaging-sw.js] Push event received:", event);
+
+  // If Firebase messaging is initialized, it will handle the push via onBackgroundMessage
+  // This handler is a fallback for when the push arrives before initialization
+  if (!messaging && event.data) {
+    try {
+      const payload = event.data.json();
+      console.log(
+        "[firebase-messaging-sw.js] Push payload (pre-init):",
+        payload
+      );
+
+      // Queue the payload for later or show immediately
+      if (payload.notification) {
+        event.waitUntil(
+          self.registration.showNotification(
+            payload.notification.title || "Nexus",
+            {
+              body:
+                payload.notification.body || "You have a new notification",
+              icon: "/ui-dark.png",
+              badge: "/ui-dark.png",
+              tag: payload.data?.tag || "nexus-notification",
+              data: payload.data,
+            }
+          )
+        );
+      }
+    } catch (error) {
+      console.error("[firebase-messaging-sw.js] Error parsing push data:", error);
+    }
+  }
+});
+
+/**
+ * Push subscription change handler - MUST be registered at top level
+ */
+self.addEventListener("pushsubscriptionchange", (event) => {
+  console.log(
+    "[firebase-messaging-sw.js] Push subscription changed:",
+    event
+  );
+  // Firebase SDK handles re-subscription automatically when initialized
+});
+
+/**
+ * Notification click handler - MUST be registered at top level
+ */
 self.addEventListener("notificationclick", (event) => {
   console.log(
     "[firebase-messaging-sw.js] Notification click:",
