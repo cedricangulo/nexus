@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { registerDeviceToken } from "@/lib/api/device-token";
+import { registerDeviceTokenAction } from "@/actions/device-token";
 import {
   isFirebaseConfigured,
   onForegroundMessage,
@@ -45,8 +45,8 @@ export function usePushNotifications() {
           return;
         }
 
-        // Register the token with backend
-        await registerDeviceToken(token, "web");
+        // Register the token with backend using server action
+        await registerDeviceTokenAction(token, "web");
         console.log("Push notification token registered");
 
         // Set up foreground message handler
