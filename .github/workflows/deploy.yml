@@ -21,6 +21,9 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            set -e
+            export PATH=$PATH:~/.local/bin:$HOME/.pnpm-state/bin
+            source ~/.bashrc || echo "Could not source .bashrc, continuing..."
             cd ~/nexus/server
             git pull origin main
             pnpm install --frozen-lockfile
