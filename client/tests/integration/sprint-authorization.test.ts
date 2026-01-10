@@ -32,17 +32,17 @@ describe("Sprint Detail Page Authorization", () => {
     email: "member@example.com",
     name: "Team Member",
     role: "MEMBER",
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 
   const mockTeamLead: User = {
     id: "user-2",
     email: "lead@example.com",
     name: "Team Lead",
-    role: "teamLead",
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    role: "TEAM_LEAD",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 
   const mockAssignedTask: Task = {
@@ -52,9 +52,9 @@ describe("Sprint Detail Page Authorization", () => {
     status: "TODO",
     sprintId: "sprint-1",
     phaseId: null,
-    assignees: [mockMember],
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    assignees: [{ id: mockMember.id, name: mockMember.name, email: mockMember.email }],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 
   const mockUnassignedTask: Task = {
@@ -69,13 +69,10 @@ describe("Sprint Detail Page Authorization", () => {
         id: "other-user",
         email: "",
         name: "",
-        role: "MEMBER",
-        createdAt: new Date(),
-        updatedAt: new Date(),
       },
     ],
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 
   describe("Member Authorization", () => {
@@ -140,14 +137,11 @@ describe("Sprint Detail Page Authorization", () => {
       const sharedTask: Task = {
         ...mockAssignedTask,
         assignees: [
-          mockMember,
+          { id: mockMember.id, name: mockMember.name, email: mockMember.email },
           {
             id: "other-user",
             email: "other@example.com",
             name: "Other User",
-            role: "MEMBER",
-            createdAt: new Date(),
-            updatedAt: new Date(),
           },
         ],
       };
@@ -165,17 +159,11 @@ describe("Sprint Detail Page Authorization", () => {
             id: "user-3",
             email: "user3@example.com",
             name: "User 3",
-            role: "MEMBER",
-            createdAt: new Date(),
-            updatedAt: new Date(),
           },
           {
             id: "user-4",
             email: "user4@example.com",
             name: "User 4",
-            role: "MEMBER",
-            createdAt: new Date(),
-            updatedAt: new Date(),
           },
         ],
       };
@@ -188,28 +176,28 @@ describe("Sprint Detail Page Authorization", () => {
 
   describe("Task Status Variations", () => {
     it("should allow access regardless of task status (TODO)", async () => {
-      const todoTask = { ...mockAssignedTask, status: "TODO" };
+      const todoTask = { ...mockAssignedTask, status: "TODO" as const };
       const result = await validateSprintAccess(mockMember, [todoTask]);
 
       expect(result.authorized).toBe(true);
     });
 
     it("should allow access regardless of task status (IN_PROGRESS)", async () => {
-      const inProgressTask = { ...mockAssignedTask, status: "IN_PROGRESS" };
+      const inProgressTask = { ...mockAssignedTask, status: "IN_PROGRESS" as const };
       const result = await validateSprintAccess(mockMember, [inProgressTask]);
 
       expect(result.authorized).toBe(true);
     });
 
     it("should allow access regardless of task status (DONE)", async () => {
-      const doneTask = { ...mockAssignedTask, status: "DONE" };
+      const doneTask = { ...mockAssignedTask, status: "DONE" as const };
       const result = await validateSprintAccess(mockMember, [doneTask]);
 
       expect(result.authorized).toBe(true);
     });
 
     it("should allow access regardless of task status (BLOCKED)", async () => {
-      const blockedTask = { ...mockAssignedTask, status: "BLOCKED" };
+      const blockedTask = { ...mockAssignedTask, status: "BLOCKED" as const };
       const result = await validateSprintAccess(mockMember, [blockedTask]);
 
       expect(result.authorized).toBe(true);
@@ -217,8 +205,8 @@ describe("Sprint Detail Page Authorization", () => {
   });
 
   describe("Edge Cases", () => {
-    it("should handle null assignees", async () => {
-      const taskWithoutAssignees = { ...mockAssignedTask, assignees: null };
+    it("should handle undefined assignees", async () => {
+      const taskWithoutAssignees = { ...mockAssignedTask, assignees: undefined };
       const result = await validateSprintAccess(mockMember, [
         taskWithoutAssignees,
       ]);
