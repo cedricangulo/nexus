@@ -2,7 +2,7 @@
 
 import { type ReactNode, useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { registerDeviceToken } from "@/lib/api/device-token";
+import { registerDeviceTokenAction } from "@/actions/device-token";
 import {
   isFirebaseConfigured,
   onForegroundMessage,
@@ -48,8 +48,8 @@ export function PushNotificationProvider({
           return;
         }
 
-        // Register with backend
-        await registerDeviceToken(token, "web");
+        // Register with backend using server action for proper authentication
+        await registerDeviceTokenAction(token, "web");
 
         // Handle foreground messages
         onForegroundMessage((payload: unknown) => {
