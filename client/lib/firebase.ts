@@ -156,7 +156,7 @@ export function onForegroundMessage(
 }
 
 /**
- * Register the Firebase service worker and send it the config
+ * Register the Firebase service worker
  * Call this once on app initialization
  */
 export async function registerFirebaseServiceWorker(): Promise<ServiceWorkerRegistration | null> {
@@ -171,6 +171,7 @@ export async function registerFirebaseServiceWorker(): Promise<ServiceWorkerRegi
   }
 
   try {
+    // Register from the dynamic route that has config pre-injected
     const registration = await navigator.serviceWorker.register(
       "/firebase-messaging-sw.js"
     );
@@ -178,14 +179,6 @@ export async function registerFirebaseServiceWorker(): Promise<ServiceWorkerRegi
 
     // Wait for the service worker to be ready
     await navigator.serviceWorker.ready;
-
-    // Send the config to the service worker
-    if (registration.active) {
-      registration.active.postMessage({
-        type: "FIREBASE_CONFIG",
-        config: firebaseConfig,
-      });
-    }
 
     return registration;
   } catch (error) {

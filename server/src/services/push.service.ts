@@ -76,7 +76,11 @@ export async function sendPushToUser(
                 link: options.link,
             },
         },
-        data: options.data,
+        // Include link in data for Service Worker access in all states
+        data: {
+            ...options.data,
+            link: options.link || "/dashboard",
+        },
     };
 
     try {
