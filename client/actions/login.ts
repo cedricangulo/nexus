@@ -70,7 +70,9 @@ export async function loginAction(
     redirect("/dashboard");
   } catch (error) {
     // Re-throw Next.js redirect errors so they can be handled properly
-    if (error instanceof Error && error.message === "NEXT_REDIRECT") {
+    // In Next.js 15+, redirect() throws with digest starting with "NEXT_REDIRECT"
+    const errorDigest = (error as { digest?: string })?.digest;
+    if (errorDigest?.startsWith("NEXT_REDIRECT")) {
       throw error;
     }
 
