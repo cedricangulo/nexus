@@ -10,7 +10,7 @@ export default async function ProjectConfigPage() {
   const { token } = await getAuthContext();
   const [project, phases] = await Promise.all([
     getProject(token),
-    getPhasesWithDetails(token),
+    getPhasesWithDetails(),
   ]);
 
   return (

@@ -7,10 +7,10 @@ export const metadata = {
 	description: "Review and manage deliverables and evidence",
 };
 
-export default function Page() {
+export default function Deliverables() {
 	return (
-		<Suspense fallback={<DeliverableListSkeleton />}>
-			<DeliverablesPage />
-		</Suspense>
+		// <Suspense fallback={<DeliverableListSkeleton />}>
+		<DeliverablesPage />
+		// </Suspense>
 	);
 }
