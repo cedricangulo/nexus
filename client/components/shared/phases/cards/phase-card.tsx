@@ -2,7 +2,7 @@
 
 import { Edit } from "lucide-react";
 import Link from "next/link";
-import { DeliverableItem } from "@/components/shared/phases/deliverable-item";
+import { DeliverableItem } from "@/components/adviser/phase-details/deliverable-item";
 import { Button } from "@/components/ui/button";
 import {
   Frame,

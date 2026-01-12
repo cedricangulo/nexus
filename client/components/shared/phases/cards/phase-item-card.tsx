@@ -14,6 +14,7 @@ import { StatusBadge } from "@/components/ui/status";
 import type { DeliverableStatus, TaskStatus } from "@/lib/types";
 import { cn, getInitials } from "@/lib/utils";
 import { useIsTeamLead } from "@/providers/auth-context-provider";
+import { FramePanel } from "@/components/ui/frame";
 
 type PhaseItemCardContent = {
   title: string;
@@ -48,10 +49,9 @@ export function PhaseItemCard({
   const isClickable = !!onClick;
 
   return (
-    <div
+    <FramePanel
       className={cn(
-        "flex flex-col gap-2 rounded-lg border border-border bg-muted/30 p-2",
-        "transition-colors hover:bg-muted/50",
+        "flex flex-col gap-2 p-2",
         isClickable && "cursor-pointer",
         className
       )}
@@ -70,46 +70,48 @@ export function PhaseItemCard({
           {children}
           <h4 className="mt-2 font-medium text-sm leading-tight">{title}</h4>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              className="shrink-0"
-              onClick={(e) => e.stopPropagation()}
-              size="icon"
-              variant="ghost"
-            >
-              <MoreVertical className="size-4" />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit?.();
-              }}
-            >
-              <Pencil className="size-4" />
-              Edit
-            </DropdownMenuItem>
-            {Boolean(isTeamLead && onEdit && onDelete) && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="text-destructive focus:text-destructive"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete?.();
-                  }}
-                  variant="destructive"
-                >
-                  <Trash2 className="size-4" />
-                  Delete
-                </DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {!isClickable ? null : (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                className="shrink-0"
+                onClick={(e) => e.stopPropagation()}
+                size="icon"
+                variant="ghost"
+              >
+                <MoreVertical className="size-4" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit?.();
+                }}
+              >
+                <Pencil className="size-4" />
+                Edit
+              </DropdownMenuItem>
+              {Boolean(isTeamLead && onEdit && onDelete) && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-destructive focus:text-destructive"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete?.();
+                    }}
+                    variant="destructive"
+                  >
+                    <Trash2 className="size-4" />
+                    Delete
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       {description ? (
@@ -119,7 +121,7 @@ export function PhaseItemCard({
       ) : null}
 
       {footer ? <div className="mt-1">{footer}</div> : null}
-    </div>
+    </FramePanel>
   );
 }
 

@@ -1,27 +1,26 @@
 import { getTeamMembersForMentions } from "@/lib/data/team-members";
 import { getAuthContext } from "@/lib/helpers/auth-token";
-import type { Comment, Deliverable } from "@/lib/types";
 import { Comments } from "./comments";
+import { getCommentsByDeliverable } from "@/lib/data/deliverables";
 
 type CommentSectionProps = {
-  deliverable: Deliverable;
-  comments: Comment[];
+  id: string;
 };
 
 export default async function CommentSection({
-  deliverable,
-  comments,
+  id,
 }: CommentSectionProps) {
   const { user, token } = await getAuthContext();
 
-  const [teamMembers] = await Promise.all([
+  const [comments, teamMembers] = await Promise.all([
+    getCommentsByDeliverable(id, token),
     getTeamMembersForMentions(token, user.role),
   ]);
 
   return (
     <Comments
       comments={comments}
-      deliverableId={deliverable.id}
+      deliverableId={id}
       teamMembers={teamMembers}
     />
   );
