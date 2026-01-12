@@ -1,0 +1,43 @@
+"use client"
+
+import { DeliverableCreateDialog } from "@/components/shared/phases/dialogs/create-deliverable-dialog";
+import { Button } from "@/components/ui/button";
+import { usePhaseActions } from "@/hooks/use-phase-actions";
+import { useIsTeamLead } from "@/providers/auth-context-provider";
+import { Plus } from "lucide-react";
+
+export default function AddDeliverableButton({ phaseId }: { phaseId: string }) {
+  const isTeamLead = useIsTeamLead();
+
+  if (!isTeamLead) {
+    return null;
+  }
+
+  const {
+    handleCreateDeliverable,
+    createDeliverableOpen,
+    setCreateDeliverableOpen,
+  } = usePhaseActions(phaseId);
+
+  return (
+    <>
+      <Button
+        onClick={handleCreateDeliverable}
+        size="sm"
+        variant="secondary"
+      >
+        <Plus />
+        Add
+      </Button>
+
+      {/* DIALOG HERE */}
+      {createDeliverableOpen ? (
+        <DeliverableCreateDialog
+          onOpenChange={setCreateDeliverableOpen}
+          open={createDeliverableOpen}
+          phaseId={phaseId}
+        />
+      ) : null}
+    </>
+  );
+}
