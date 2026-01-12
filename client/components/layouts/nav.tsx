@@ -1,55 +1,10 @@
 "use client";
 
-import {
-  CalendarDays,
-  Home,
-  IterationCcw,
-  Layers,
-  Package,
-} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { NAV_CONFIG, type Role } from "@/lib/config/nav";
+import { useAuthContext } from "@/providers/auth-context-provider";
 import { cn } from "@/lib/utils";
-
-type NavItem = {
-  href: string;
-  label: string;
-  icon: React.ReactNode;
-  ariaLabel: string;
-};
-
-const navItems: NavItem[] = [
-  {
-    href: "/dashboard",
-    label: "Home",
-    icon: <Home className="size-5" />,
-    ariaLabel: "Go to home",
-  },
-  {
-    href: "/phases",
-    label: "Phases",
-    icon: <Layers className="size-5" />,
-    ariaLabel: "View phases",
-  },
-  {
-    href: "/deliverables",
-    label: "Deliverables",
-    icon: <Package className="size-5" />,
-    ariaLabel: "View deliverables",
-  },
-  {
-    href: "/sprints",
-    label: "Sprints",
-    icon: <IterationCcw className="size-5" />,
-    ariaLabel: "View sprints",
-  },
-  {
-    href: "/meetings",
-    label: "Meetings",
-    icon: <CalendarDays className="size-5" />,
-    ariaLabel: "View meetings",
-  },
-];
 
 /**
  * Detects if the current pathname is a detail page
@@ -64,32 +19,44 @@ function isDetailPage(pathname: string): boolean {
   return segments.length > 1;
 }
 
-export function MemberMobileNav() {
+/**
+ * Mobile bottom navigation bar
+ * Uses NAV_CONFIG as single source of truth for navigation items
+ * Shows only the first 5 items to fit mobile layout
+ */
+export default function MobileNav() {
   const pathname = usePathname();
+  const { user } = useAuthContext();
 
   // Hide nav on detail pages like /sprints/[id], /deliverables/[id], etc.
   if (isDetailPage(pathname)) {
     return null;
   }
 
+  // Get nav items from config based on user role
+  const userRole = (user?.role || "MEMBER") as Role;
+  const navGroups = NAV_CONFIG[userRole] || NAV_CONFIG.MEMBER;
+
+  // Flatten all groups and take first 5 items for mobile nav
+  const navItems = navGroups.flatMap((group) => group.items).slice(0, 5);
+
   return (
     <nav
       aria-label="Mobile navigation"
       className="fixed right-0 bottom-0 left-0 z-40 border-t bg-sidebar md:hidden"
     >
-      <div
-        className="grid h-16 grid-cols-5 gap-1"
-        // style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-      >
+      <div className="grid h-16 grid-cols-5 gap-1">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
             (item.href !== "/dashboard" && pathname.startsWith(item.href));
 
+          const Icon = item.icon;
+
           return (
             <Link
               aria-current={isActive ? "page" : undefined}
-              aria-label={item.ariaLabel}
+              aria-label={`Go to ${item.title}`}
               className={cn(
                 "relative flex flex-col items-center justify-center gap-1 transition-all duration-200 ease-in-out active:scale-95",
                 isActive
@@ -105,9 +72,9 @@ export function MemberMobileNav() {
                   isActive && "scale-110 bg-sidebar-accent drop-shadow-sm"
                 )}
               >
-                {item.icon}
+                <Icon className="size-5" />
               </div>
-              <span className="font-medium text-[10px]">{item.label}</span>
+              <span className="font-medium text-[10px]">{item.title}</span>
             </Link>
           );
         })}

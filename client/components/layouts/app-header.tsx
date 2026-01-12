@@ -6,9 +6,14 @@ import { GlobalSearch } from "@/components/search/global-search";
 import { SearchTrigger } from "@/components/search/search-trigger";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { Project, User } from "@/lib/types";
+import { UserMenu } from "./user-menu";
 
-// Centralized route-to-title mapping (excludes /dashboard which gets project name)
+/**
+ * Centralized route-to-title mapping
+ * Dashboard uses project name; other routes use this mapping
+ */
 const ROUTE_TITLES: Record<string, string> = {
   "/phases": "Project Phases",
   "/sprints": "Sprints",
@@ -41,24 +46,32 @@ function getPageTitle(pathname: string): string | undefined {
     return "Phase Details";
   }
 
-  return;
+  return undefined;
 }
 
+type AppHeaderProps = {
+  project: Project | null;
+  notificationComponent: React.ReactNode;
+  user: User | null;
+};
+
 /**
- * App Header Component
- * Provides main navigation header with sidebar toggle, search, notifications, and user avatar
- * Title updates dynamically based on current route - shows project name on dashboard
+ * Unified App Header Component
+ *
+ * Provides main navigation header with:
+ * - Sidebar toggle (desktop)
+ * - Dynamic page title based on route
+ * - Global search with Cmd/Ctrl+K shortcut
+ * - Notification component slot
+ * - Mobile sidebar trigger
  */
 export function AppHeader({
   project,
   notificationComponent,
   user,
-}: {
-  project: Project | null;
-  notificationComponent: React.ReactNode;
-  user?: User | null;
-}) {
+}: AppHeaderProps) {
   const pathname = usePathname();
+  const isMobile = useIsMobile();
   const [searchOpen, setSearchOpen] = useState(false);
 
   // Keyboard shortcut for search (Cmd/Ctrl + K)
@@ -75,25 +88,25 @@ export function AppHeader({
   }, []);
 
   // For dashboard, show project name; for other routes, use mapping
-  let title: string | undefined;
-  if (pathname === "/dashboard") {
-    title = project?.name;
-  } else {
-    title = getPageTitle(pathname);
-  }
+  const title =
+    pathname === "/dashboard" ? project?.name : getPageTitle(pathname);
+
   return (
     <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-3 border-b bg-sidebar">
       <div className="flex items-center gap-2 px-3">
-        <SidebarTrigger
-          aria-label="Toggle sidebar navigation"
-          className="hidden rounded-md transition-colors hover:bg-accent sm:flex"
-        />
-        <Separator aria-hidden="true" className="h-4" orientation="vertical" />
-        {title ? (
-          <h1 className="font-medium text-muted-foreground text-sm md:text-lg">
-            {title}
-          </h1>
+        {/* Show SidebarTrigger only for TEAM_LEAD on mobile */}
+        {user?.role === "TEAM_LEAD" && isMobile ? (
+          <SidebarTrigger
+            aria-label="Toggle sidebar navigation"
+            className="rounded-md transition-colors hover:bg-accent"
+          />
         ) : null}
+        <Separator aria-hidden="true" className="h-4" orientation="vertical" />
+        <h1 className="font-medium text-muted-foreground text-sm md:text-lg">
+        {!title ? <>NEXUS</> : (
+          <>{title}</>
+          )}
+        </h1>
       </div>
 
       <div className="flex flex-1 items-center justify-end gap-3 px-4 md:gap-6">
@@ -101,10 +114,10 @@ export function AppHeader({
           <SearchTrigger onOpenSearch={() => setSearchOpen(true)} />
         </div>
         {notificationComponent}
-        <SidebarTrigger
-          aria-label="Toggle sidebar navigation"
-          className="flex rounded-md transition-colors hover:bg-accent sm:hidden"
-        />
+        {/* Show UserMenu only if user is NOT TEAM_LEAD */}
+        {user && user.role !== "TEAM_LEAD" ? (
+          <UserMenu user={user} />
+        ) : null}
       </div>
 
       <GlobalSearch
