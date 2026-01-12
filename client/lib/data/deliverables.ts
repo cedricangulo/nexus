@@ -2,96 +2,79 @@
  * Deliverable Data Fetching Layer - Cache Components Compatible
  */
 
-import { cacheLife, cacheTag } from "next/cache";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
-import { createAuthHeaders, serverClient } from "@/lib/api/server-client";
+import { getApiClient } from "@/lib/api/server-client";
 import type { Comment, Deliverable, Evidence, Phase } from "@/lib/types";
+import { cache } from "react";
 
-export async function getDeliverableById(
+export const getDeliverableById = cache(async (
   id: string,
   token: string
-): Promise<Deliverable | null> {
-  "use cache";
-  cacheLife("weeks");
-  cacheTag("deliverables", `deliverable-${id}`);
-
+): Promise<Deliverable | null> => {
   try {
-    const response = await serverClient.get<Deliverable>(
-      API_ENDPOINTS.DELIVERABLES.GET(id),
-      { headers: createAuthHeaders(token) }
+    const api = await getApiClient(token);
+    const response = await api.get<Deliverable>(
+      API_ENDPOINTS.DELIVERABLES.GET(id)
     );
     return response.data;
   } catch (error) {
     console.error(`Failed to fetch deliverable ${id}:`, error);
     return null;
   }
-}
+})
 
-export async function getDeliverables(token: string): Promise<Deliverable[]> {
-  "use cache";
-  cacheLife("weeks");
-  cacheTag("deliverables");
-
+export const getDeliverables = cache(async (token: string): Promise<Deliverable[]> => {
   try {
-    const response = await serverClient.get<Deliverable[]>(
-      API_ENDPOINTS.DELIVERABLES.LIST,
-      { headers: createAuthHeaders(token) }
+    const api = await getApiClient(token);
+    const response = await api.get<Deliverable[]>(
+      API_ENDPOINTS.DELIVERABLES.LIST
     );
     return response.data;
   } catch (error) {
     console.error("Failed to fetch deliverables:", error);
     return [];
   }
-}
+})
 
-export async function getPhases(token: string): Promise<Phase[]> {
-  "use cache";
-  cacheLife("weeks");
-  cacheTag("phases");
-
+export const getPhases = cache(async (token: string): Promise<Phase[]> => {
   try {
-    const response = await serverClient.get<Phase[]>(
-      API_ENDPOINTS.PHASES.LIST,
-      { headers: createAuthHeaders(token) }
-    );
+    const api = await getApiClient(token);
+    const response = await api.get<Phase[]>(API_ENDPOINTS.PHASES.LIST);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch phases:", error);
     return [];
   }
-}
+})
 
-export async function getEvidenceByDeliverable(
+export const getEvidenceByDeliverable = cache(async (
   deliverableId: string,
   token: string
-): Promise<Evidence[]> {
-  "use cache";
-  cacheLife("weeks");
-  cacheTag("evidence", `deliverable-${deliverableId}`);
+): Promise<Evidence[]> => {
 
   try {
-    const response = await serverClient.get<Evidence[]>(
-      API_ENDPOINTS.EVIDENCE.BY_DELIVERABLE(deliverableId),
-      { headers: createAuthHeaders(token) }
+    const api = await getApiClient(token);
+    const response = await api.get<Evidence[]>(
+      API_ENDPOINTS.EVIDENCE.BY_DELIVERABLE(deliverableId)
     );
     return response.data;
   } catch (error) {
     console.error(
-      `Failed to fetch evidence for deliverable ${deliverableId}:`,
+      `Failed to fetch evidence for deliverable ${deliverableId}`,
       error
     );
     return [];
   }
-}
+})
 
-export async function getCommentsByDeliverable(
+export const getCommentsByDeliverable = cache(async (
   deliverableId: string,
   token: string
-): Promise<Comment[]> {
+): Promise<Comment[]> => {
   try {
-    const response = await serverClient.get<Comment[]>(
-      `${API_ENDPOINTS.COMMENTS.LIST}?deliverableId=${deliverableId}`,
-      { headers: createAuthHeaders(token) }
+    const api = await getApiClient(token);
+    const response = await api.get<Comment[]>(
+      `${API_ENDPOINTS.COMMENTS.LIST}?deliverableId=${deliverableId}`
     );
     return response.data;
   } catch (error) {
@@ -101,12 +84,12 @@ export async function getCommentsByDeliverable(
     );
     return [];
   }
-}
+})
 
-export async function getDeliverableDetail(
+export const getDeliverableDetail = cache(async (
   deliverableId: string,
   token: string
-) {
+) => {
   const [deliverable, phases, evidence, comments] = await Promise.all([
     getDeliverableById(deliverableId, token),
     getPhases(token),
@@ -121,4 +104,4 @@ export async function getDeliverableDetail(
     comments,
     phase: phases.find((p) => p.id === deliverable?.phaseId),
   };
-}
+})

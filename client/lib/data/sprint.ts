@@ -1,7 +1,7 @@
 import axios from "axios";
 import { cacheLife, cacheTag } from "next/cache";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
-import { createAuthHeaders, serverClient } from "@/lib/api/server-client";
+import { getApiClient } from "@/lib/api/server-client";
 import type { Sprint, SprintProgress, Task } from "@/lib/types";
 
 export async function getSprints(
@@ -13,15 +13,14 @@ export async function getSprints(
   cacheTag("sprints");
 
   try {
+    const api = await getApiClient(token);
     // Members see only their assigned sprints
     const endpoint =
       role === "MEMBER"
         ? API_ENDPOINTS.SPRINTS.LIST_MINE
         : API_ENDPOINTS.SPRINTS.LIST;
 
-    const response = await serverClient.get<Sprint[]>(endpoint, {
-      headers: createAuthHeaders(token),
-    });
+    const response = await api.get<Sprint[]>(endpoint);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch sprints:", error);
@@ -38,9 +37,9 @@ export async function getSprintProgress(
   cacheTag("sprints", `sprint-${id}`);
 
   try {
-    const response = await serverClient.get<SprintProgress>(
-      API_ENDPOINTS.SPRINTS.PROGRESS(id),
-      { headers: createAuthHeaders(token) }
+    const api = await getApiClient(token);
+    const response = await api.get<SprintProgress>(
+      API_ENDPOINTS.SPRINTS.PROGRESS(id)
     );
     return response.data;
   } catch {
@@ -71,10 +70,8 @@ export async function getSprintById(
   cacheTag("sprints", `sprint-${id}`);
 
   try {
-    const response = await serverClient.get<Sprint>(
-      API_ENDPOINTS.SPRINTS.GET(id),
-      { headers: createAuthHeaders(token) }
-    );
+    const api = await getApiClient(token);
+    const response = await api.get<Sprint>(API_ENDPOINTS.SPRINTS.GET(id));
     return response.data;
   } catch (error) {
     // Re-throw 403 Forbidden errors to be handled at page level
@@ -95,9 +92,9 @@ export async function getSprintTasks(
   cacheTag("sprints", `sprint-${sprintId}`, "tasks");
 
   try {
-    const response = await serverClient.get<Task[]>(API_ENDPOINTS.TASKS.LIST, {
+    const api = await getApiClient(token);
+    const response = await api.get<Task[]>(API_ENDPOINTS.TASKS.LIST, {
       params: { sprintId },
-      headers: createAuthHeaders(token),
     });
     return response.data;
   } catch (error) {

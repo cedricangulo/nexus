@@ -14,7 +14,7 @@ import { meetingLogApi } from "@/lib/api/meeting-log";
 import { phaseApi } from "@/lib/api/phase";
 import { taskApi } from "@/lib/api/task";
 import { requireUser } from "@/lib/helpers/rbac";
-import { DeliverableStatus, TaskStatus, type User } from "@/lib/types";
+import { DeliverableStatus, TaskStatus } from "@/lib/types";
 
 export type BadgeCounts = {
   deliverablesInReview: number;
@@ -34,12 +34,12 @@ export type BadgeCounts = {
  * For TEAM_LEAD: Shows all counts
  * For MEMBER: Shows only counts for items assigned to the member
  *
- * @param user - The current user (used to filter counts for members)
+ * @param _token - Auth token (reserved for future API header usage)
  * @returns Object containing all badge counts
  */
 export const getBadgeCounts = cache(
-  async (user?: User | null): Promise<BadgeCounts> => {
-    await requireUser();
+  async (_token: string): Promise<BadgeCounts> => {
+    const user = await requireUser();
 
     try {
       const [deliverables, tasks, phases, activityLogs] = await Promise.all([
@@ -74,7 +74,7 @@ export const getBadgeCounts = cache(
       ]);
 
       // For TEAM_LEAD: show all counts; for MEMBER: show only assigned items
-      const isMember = user?.role === "MEMBER";
+      const isMember = user?.role === "member";
       const userId = user?.id;
 
       // Count deliverables in REVIEW status (not deleted)

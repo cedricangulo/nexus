@@ -4,7 +4,7 @@
  * Uses "Pass-Through Authentication" pattern:
  * 1. Page extracts token (dynamic boundary)
  * 2. Token passed as string to cached function
- * 3. Clean serverClient makes API call with manual auth header
+ * 3. getApiClient creates authenticated instance
  *
  * Server-side data fetching for meeting logs
  * Aggregates meeting data from sprints and phases
@@ -12,7 +12,7 @@
 
 import { cacheLife, cacheTag } from "next/cache";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
-import { createAuthHeaders, serverClient } from "@/lib/api/server-client";
+import { getApiClient } from "@/lib/api/server-client";
 import type { MeetingLog, Phase, Sprint } from "@/lib/types";
 
 export type MeetingsPageData = {
@@ -40,16 +40,12 @@ export async function getMeetingsData(
   cacheTag("meetings", "sprints", "phases");
 
   try {
-    const authHeaders = createAuthHeaders(token);
+    const api = await getApiClient(token);
 
     // Fetch sprints and phases in parallel
     const [sprintsResponse, phasesResponse] = await Promise.all([
-      serverClient.get<Sprint[]>(API_ENDPOINTS.SPRINTS.LIST, {
-        headers: authHeaders,
-      }),
-      serverClient.get<Phase[]>(API_ENDPOINTS.PHASES.LIST, {
-        headers: authHeaders,
-      }),
+      api.get<Sprint[]>(API_ENDPOINTS.SPRINTS.LIST),
+      api.get<Phase[]>(API_ENDPOINTS.PHASES.LIST),
     ]);
 
     const sprints = sprintsResponse.data;
@@ -58,18 +54,14 @@ export async function getMeetingsData(
     // Collect all meeting logs from sprints and phases in parallel
     const allLogsPromises = await Promise.all([
       ...sprints.map((sprint) =>
-        serverClient
-          .get<MeetingLog[]>(API_ENDPOINTS.MEETING_LOGS.BY_SPRINT(sprint.id), {
-            headers: authHeaders,
-          })
+        api
+          .get<MeetingLog[]>(API_ENDPOINTS.MEETING_LOGS.BY_SPRINT(sprint.id))
           .then((res) => res.data)
           .catch(() => [])
       ),
       ...phases.map((phase) =>
-        serverClient
-          .get<MeetingLog[]>(API_ENDPOINTS.MEETING_LOGS.BY_PHASE(phase.id), {
-            headers: authHeaders,
-          })
+        api
+          .get<MeetingLog[]>(API_ENDPOINTS.MEETING_LOGS.BY_PHASE(phase.id))
           .then((res) => res.data)
           .catch(() => [])
       ),
