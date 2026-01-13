@@ -1,9 +1,10 @@
-import { DeliverableItem } from "./deliverable-item";
+import { DeliverableItem } from "./items/deliverable-item";
 import { Frame, FrameHeader, FrameTitle } from "@/components/ui/frame";
 import { getPhaseDeliverablesList } from "@/lib/data/phases";
 import type { Deliverable } from "@/lib/types";
-import AddDeliverableButton from "./add-deliverable";
-import { DeliverableActions } from "./deliverable-item-client";
+import AddDeliverableButton from "../card-actions/add-deliverable";
+import { DeliverableActions } from "./items/deliverable-item-client";
+import Boundary from "@/components/internal/Boundary";
 
 type Props = {
 	phaseId: string;
@@ -36,18 +37,20 @@ async function CachedDeliverablesListUI({ deliverables, phaseId }: { deliverable
 	"use cache";
 
 	return (
-		<Frame stackedPanels>
-			<FrameHeader className="p-4">
-				<div className="flex items-center justify-between gap-2">
-					<FrameTitle>Deliverables</FrameTitle>
-					<AddDeliverableButton phaseId={phaseId} />
-				</div>
-			</FrameHeader>
-			{deliverables.map((deliverable) => (
-				<DeliverableItem key={deliverable.id} deliverable={deliverable}>
-					<DeliverableActions deliverable={deliverable} />
-				</DeliverableItem>
-			))}
-		</Frame>
+		<Boundary rendering="static" hydration="server" cached>
+			<Frame stackedPanels>
+				<FrameHeader className="p-4">
+					<div className="flex items-center justify-between gap-2">
+						<FrameTitle>Deliverables</FrameTitle>
+						<AddDeliverableButton phaseId={phaseId} />
+					</div>
+				</FrameHeader>
+					{deliverables.map((deliverable) => (
+						<DeliverableItem key={deliverable.id} deliverable={deliverable}>
+							<DeliverableActions deliverable={deliverable} />
+						</DeliverableItem>
+					))}
+			</Frame>
+		</Boundary>
 	);
 }

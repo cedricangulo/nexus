@@ -1,10 +1,11 @@
-import { TaskCard } from "@/components/shared/phases/cards/task-card";
+import { TaskCard } from "@/components/shared/phase-details/task-card";
 import { Frame, FrameHeader, FramePanel, FrameTitle } from "@/components/ui/frame";
 import { getPhaseTasksList } from "@/lib/data/phases";
 import { getUsers } from "@/lib/data/users";
 import { getAuthContext } from "@/lib/helpers/auth-token";
 import type { Task, User } from "@/lib/types";
-import AddTaskButton from "./add-task";
+import AddTaskButton from "../card-actions/add-task";
+import Boundary from "@/components/internal/Boundary";
 
 type Props = {
 	phaseId: string;
@@ -36,14 +37,14 @@ async function TasksListUI({ phaseId, tasks, users }: TasksListUIProps) {
   );
 
   return (
-    <Frame stackedPanels>
-      <FrameHeader className="p-4">
-        <div className="flex items-center justify-between gap-2">
-          <FrameTitle>Tasks</FrameTitle>
-          <AddTaskButton phaseId={phaseId} users={users} />
-        </div>
-      </FrameHeader>
-      {/* <FramePanel className="space-y-2 p-2"> */}
+    <Boundary rendering="static" hydration="server" cached>
+      <Frame stackedPanels>
+        <FrameHeader className="p-4">
+          <div className="flex items-center justify-between gap-2">
+            <FrameTitle>Tasks</FrameTitle>
+            <AddTaskButton phaseId={phaseId} users={users} />
+          </div>
+        </FrameHeader>
         {sortedTasks.length === 0 ? (
           <p className="py-4 text-center text-muted-foreground text-sm">
             No tasks yet
@@ -56,7 +57,7 @@ async function TasksListUI({ phaseId, tasks, users }: TasksListUIProps) {
             />
           ))
         )}
-      {/* </FramePanel> */}
-    </Frame>
+      </Frame>
+    </Boundary>
   );
 }

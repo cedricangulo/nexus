@@ -5,6 +5,7 @@ import { CreateTaskDialog } from "@/components/shared/phases/dialogs/create-task
 import { Button } from "@/components/ui/button";
 import type { User } from "@/lib/types";
 import { useIsTeamLead } from "@/providers/auth-context-provider";
+import Boundary from "@/components/internal/Boundary";
 
 type Props = {
   phaseId: string;
@@ -21,15 +22,17 @@ export default function AddTaskButton({ phaseId, users }: Props) {
   }
 
   return (
-    <CreateTaskDialog
-      phaseId={phaseId}
-      trigger={
-        <Button size="sm" variant="secondary">
-          <Plus />
-          Add
-        </Button>
-      }
-      users={users}
-    />
+    <Boundary hydration="client">
+      <CreateTaskDialog
+        phaseId={phaseId}
+        trigger={
+          <Button size="sm" variant="secondary">
+            <Plus />
+            Add
+          </Button>
+        }
+        users={users}
+      />
+    </Boundary>
   );
 }

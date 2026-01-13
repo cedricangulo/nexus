@@ -11,7 +11,7 @@ type Props = {
 
 export function DeliverableItem({ deliverable, children }: Props) {
   return (
-    <FramePanel className="flex justify-between items-center">
+    <FramePanel className="flex justify-between items-start">
       <div className="min-w-0 flex-1 space-y-2">
         <div className="flex items-center gap-2">
           <StatusBadge status={deliverable.status} />

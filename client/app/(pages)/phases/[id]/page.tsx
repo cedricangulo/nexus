@@ -1,8 +1,8 @@
-import PageHeaderContainer from "@/components/adviser/phase-details/page-header";
-import PhaseDeliverablesList from "@/components/adviser/phase-details/phase-deliverables-list";
-import PhaseMeetingsList from "@/components/adviser/phase-details/phase-meetings-list";
-import PhaseTasksList from "@/components/adviser/phase-details/phase-tasks-list";
 import Boundary from "@/components/internal/Boundary";
+import PhaseDeliverablesList from "@/components/shared/phase-details/cards/phase-deliverables-list";
+import PhaseMeetingsList from "@/components/shared/phase-details/cards/phase-meetings-list";
+import PhaseTasksList from "@/components/shared/phase-details/cards/phase-tasks-list";
+import PageHeaderContainer from "@/components/shared/phase-details/page-header";
 import { Button } from "@/components/ui/button";
 import { Frame, FrameHeader, FramePanel, FrameTitle } from "@/components/ui/frame";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,8 +19,8 @@ export default async function PhaseDetailPage({
 
   return (
 		<Boundary
-			rendering="dynamic"
-			hydration="server"
+			rendering="static"
+			hydration="client"
 		>
       <div className="space-y-8">
         <Button asChild variant="ghost">

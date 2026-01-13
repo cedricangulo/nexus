@@ -7,6 +7,7 @@ import { useState } from "react";
 import { UploadMeetingDialog } from "@/components/shared/phases/dialogs/upload-meeting-dialog";
 import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/providers/auth-context-provider";
+import Boundary from "@/components/internal/Boundary";
 
 type Props = {
   phaseId: string;
@@ -23,10 +24,12 @@ export default function AddMeetingButton({ phaseId }: Props) {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)} size="sm" variant="secondary">
-        <Upload size={16} />
-        Upload
-      </Button>
+      <Boundary hydration="client">
+        <Button onClick={() => setOpen(true)} size="sm" variant="secondary">
+          <Upload size={16} />
+          Upload
+        </Button>
+      </Boundary>
 
       {open && (
         <UploadMeetingDialog
