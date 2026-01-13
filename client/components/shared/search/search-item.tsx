@@ -15,7 +15,7 @@ import type {
   SearchMeetingLog,
   SearchTask,
 } from "@/lib/types/search";
-import { StatusBadge } from "../ui/status";
+import { StatusBadge } from "@/components/ui/status";
 
 /**
  * Configuration for rendering each search result type
