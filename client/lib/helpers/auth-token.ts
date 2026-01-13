@@ -21,12 +21,10 @@ export const getAuthContext = cache(async (): Promise<{
     return { user, token };
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
-      console.warn("[Auth] Invalid token signature detected. Redirecting.");
-      try {
-        cookieStore.delete("auth_token");
-      } finally {
-        redirect("/login");
-      }
+      console.warn("[Auth] Invalid token detected. Redirecting to login.");
+      // NOTE: Cookie deletion in Server Components during render is ineffective.
+      // The proxy middleware handles cookie cleanup when user reaches /login.
+      redirect("/login");
     }
 
     if (isRedirectError(error)) {

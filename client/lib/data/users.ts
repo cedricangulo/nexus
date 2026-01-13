@@ -10,16 +10,16 @@ import { API_ENDPOINTS } from "@/lib/api/endpoints";
 import { getApiClient } from "@/lib/api/server-client";
 import type { User, UserContribution } from "@/lib/types";
 
-/**
- * Fetch the currently logged-in user.
- * * [FIX] No try/catch. We let 401 errors bubble up so getAuthContext
- * can catch them and trigger the redirect to /login.
- */
-export async function getCurrentUser(token: string): Promise<User> {
-  const api = await getApiClient(token);
-  const response = await api.get<User>(API_ENDPOINTS.AUTH.ME);
-  return response.data;
-}
+// /**
+//  * Fetch the currently logged-in user.
+//  * * [FIX] No try/catch. We let 401 errors bubble up so getAuthContext
+//  * can catch them and trigger the redirect to /login.
+//  */
+// export async function getCurrentUser(token: string): Promise<User> {
+//   const api = await getApiClient(token);
+//   const response = await api.get<User>(API_ENDPOINTS.AUTH.ME);
+//   return response.data;
+// }
 
 /**
  * Fetch all users.

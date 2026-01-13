@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
+    staleTimes: {
+      dynamic: 300, // Keep dynamic pages in Client Cache for 5 minutes (300s)
+      static: 300,
+    },
     authInterrupts: true,
     serverActions: {
       bodySizeLimit: "10mb",
