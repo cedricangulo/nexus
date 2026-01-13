@@ -1,6 +1,4 @@
-"use client";
-
-import { Calendar, Paperclip } from "lucide-react";
+import { Calendar } from "lucide-react";
 import Link from "next/link";
 import {
   FrameDescription,
@@ -12,18 +10,17 @@ import { formatDate } from "@/lib/helpers/format-date";
 import type { Deliverable, Phase } from "@/lib/types";
 import { isDeliverableOverdue } from "@/lib/types/deliverables-utils";
 import { cn } from "@/lib/utils";
+import { EvidenceCount } from "./evidence-count";
 
-export type DeliverableCardProps = {
+export type DeliverableItemProps = {
   deliverable: Deliverable;
   phase?: Phase;
-  evidenceCount: number;
 };
 
-export function DeliverableCard({
+export function DeliverableItem({
   deliverable,
   phase,
-  evidenceCount,
-}: DeliverableCardProps) {
+}: DeliverableItemProps) {
   const overdue = isDeliverableOverdue(deliverable);
 
   return (
@@ -65,10 +62,7 @@ export function DeliverableCard({
                 </span>
               </div>
             ) : null}
-            <div className="flex items-center gap-1 text-muted-foreground text-sm">
-              <Paperclip className="h-3.5 w-3.5" />
-              <span>{evidenceCount}</span>
-            </div>
+            <EvidenceCount deliverableId={deliverable.id} />
           </div>
         </div>
       </FramePanel>

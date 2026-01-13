@@ -1,16 +1,19 @@
-import { Suspense } from "react";
-import { DeliverableListSkeleton } from "@/components/layouts/loading";
 import DeliverablesPage from "@/components/shared/deliverables/deliverables-page";
+import Boundary from "@/components/internal/Boundary";
 
 export const metadata = {
 	title: "Deliverables",
 	description: "Review and manage deliverables and evidence",
 };
 
-export default function Deliverables() {
+type PageProps = {
+	searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default function Deliverables({ searchParams }: PageProps) {
 	return (
-		// <Suspense fallback={<DeliverableListSkeleton />}>
-		<DeliverablesPage />
-		// </Suspense>
+		<Boundary hydration="server" rendering="dynamic">
+			<DeliverablesPage searchParams={searchParams} />
+		</Boundary>
 	);
 }
