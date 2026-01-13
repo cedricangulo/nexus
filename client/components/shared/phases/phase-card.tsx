@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import Boundary from "@/components/internal/Boundary";
 import { Button } from "@/components/ui/button";
 import { Frame, FrameDescription, FrameFooter, FrameHeader, FrameTitle } from "@/components/ui/frame";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,7 +26,9 @@ export default function PhaseCard({ phase, children }: Props) {
             </Suspense>
           </div>
           {/* STATIC CLIENT */}
-          <PhaseEditButton phase={phase} />
+          <Boundary hydration="client">
+            <PhaseEditButton phase={phase} />
+          </Boundary>
         </div>
       </FrameHeader>
       {children}

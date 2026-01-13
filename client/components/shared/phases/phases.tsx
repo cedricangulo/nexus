@@ -37,7 +37,7 @@ async function CachedPhasesView({ userId, token }: { userId: string; token: stri
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
       {sortedPhases.map((phase) => (
-        <Boundary hydration="server" key={phase.id} rendering="dynamic">
+        <Boundary cached hydration="server" key={phase.id} rendering="dynamic">
           <PhaseCard phase={phase}>
             {/* The analytics inside still stream in independently! */}
             <Suspense fallback={<ProgressSkeleton />}>

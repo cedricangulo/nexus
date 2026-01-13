@@ -1,3 +1,4 @@
+import Boundary from "@/components/internal/Boundary";
 import { FramePanel } from "@/components/ui/frame";
 import { getPhaseAnalytics } from "@/lib/data/phases";
 import { cn } from "@/lib/utils";
