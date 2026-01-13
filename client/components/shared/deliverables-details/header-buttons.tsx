@@ -2,7 +2,7 @@
 
 import { approveDeliverableAction, requestChangesDeliverableAction } from "@/actions/deliverables";
 import { showPendingActionToast } from "@/components/shared/pending-action-toast";
-import { RequestChangesDialog } from "@/components/team-lead/deliverables/request-changes-dialog";
+import { RequestChangesDialog } from "@/components/shared/deliverables-details/request-changes-dialog";
 import {
 	AlertDialog,
 	AlertDialogAction,

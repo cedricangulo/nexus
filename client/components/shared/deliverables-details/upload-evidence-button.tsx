@@ -1,6 +1,6 @@
 "use client"
 
-import { UploadEvidenceDialog } from "@/components/member/deliverables/upload-evidence-dialog";
+import { UploadEvidenceDialog } from "@/components/shared/deliverables-details/upload-evidence-dialog";
 import { Button } from "@/components/ui/button";
 import { DeliverableStatus } from "@/lib/types/models";
 import { UploadIcon } from "lucide-react";
