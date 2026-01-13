@@ -1,3 +1,4 @@
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { Suspense } from "react";
 import { forbidden, unauthorized } from "next/navigation";
 import { AppHeader } from "@/components/layouts/app-header";
@@ -42,7 +43,9 @@ async function AuthenticatedLayoutContent({ children }: { children: React.ReactN
           user={user}
         />
         <main className="p-4 pb-32 sm:p-8 sm:pb-8" suppressHydrationWarning>
-          {children}
+          <NuqsAdapter>
+            {children}
+          </NuqsAdapter>
         </main>
       </SidebarInset>
     </AuthContextProvider>

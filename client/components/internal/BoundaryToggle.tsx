@@ -10,8 +10,14 @@ const modes: { icon: React.ReactNode; label: string; mode: BoundaryMode }[] = [
   { icon: <Layers className="size-4" />, label: 'Rendering', mode: 'rendering' },
 ];
 
+const SHOW_BOUNDARIES = process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_SHOW_BOUNDARIES === 'true';
+
 export default function BoundaryToggle() {
   const { mode, setMode } = useBoundaryMode();
+  
+  if (!SHOW_BOUNDARIES) {
+    return null;
+  }
 
   return (
     <div className="fixed right-8 bottom-4 z-50">

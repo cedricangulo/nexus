@@ -2,8 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { GlobalSearch } from "@/components/search/global-search";
-import { SearchTrigger } from "@/components/search/search-trigger";
+import { GlobalSearch } from "@/components/shared/search/global-search";
+import { SearchTrigger } from "@/components/shared/search/search-trigger";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";

@@ -14,8 +14,10 @@ const BoundaryContext = createContext<BoundaryContextType | null>(null);
 
 const BOUNDARY_MODE_KEY = 'boundaryMode';
 
+const SHOW_BOUNDARIES = process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_SHOW_BOUNDARIES === 'true';
+
 export function BoundaryProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setMode] = useState<BoundaryMode>('off');
+  const [mode, setMode] = useState<BoundaryMode>(!SHOW_BOUNDARIES ? 'off' : 'off');
 
   useEffect(() => {
     const savedMode = localStorage.getItem(BOUNDARY_MODE_KEY) as BoundaryMode;
