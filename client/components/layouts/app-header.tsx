@@ -94,22 +94,21 @@ export function AppHeader({
   return (
     <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-3 border-b bg-sidebar">
       <div className="flex items-center gap-2 px-3">
-        {/* Show SidebarTrigger only for TEAM_LEAD on mobile */}
-        {user?.role === "TEAM_LEAD" && isMobile ? (
+        {!isMobile ? (
           <SidebarTrigger
             aria-label="Toggle sidebar navigation"
             className="rounded-md transition-colors hover:bg-accent"
           />
         ) : null}
         <Separator aria-hidden="true" className="h-4" orientation="vertical" />
-        <h1 className="font-medium text-muted-foreground text-sm md:text-lg">
+        <h1 className="font-medium md:text-lg">
         {!title ? <>NEXUS</> : (
           <>{title}</>
           )}
         </h1>
       </div>
 
-      <div className="flex flex-1 items-center justify-end gap-3 px-4 md:gap-6">
+      <div className="flex flex-1 items-center justify-end gap-2 px-4 md:gap-4">
         <div className="w-fit max-w-xs items-center gap-2 sm:w-full md:flex">
           <SearchTrigger onOpenSearch={() => setSearchOpen(true)} />
         </div>
@@ -117,6 +116,12 @@ export function AppHeader({
         {/* Show UserMenu only if user is NOT TEAM_LEAD */}
         {user && user.role !== "TEAM_LEAD" ? (
           <UserMenu user={user} />
+        ) : null}
+        {user?.role === "TEAM_LEAD" && isMobile ? (
+          <SidebarTrigger
+            aria-label="Toggle sidebar navigation"
+            className="rounded-md transition-colors hover:bg-accent"
+          />
         ) : null}
       </div>
 

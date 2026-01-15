@@ -38,3 +38,8 @@ export function useIsTeamLead() {
   const { user } = useAuthContext();
   return user?.role === "TEAM_LEAD";
 }
+
+export function useIsMember() {
+  const { user } = useAuthContext();
+  return user?.role === "MEMBER";
+}
