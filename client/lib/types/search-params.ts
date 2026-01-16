@@ -1,5 +1,6 @@
 import { 
   createSearchParamsCache, 
+  parseAsArrayOf,
   parseAsString, 
   parseAsStringEnum 
 } from "nuqs/server";
@@ -45,6 +46,17 @@ export const sprintParsers = {
 };
 
 export const sprintSearchParamsCache = createSearchParamsCache(sprintParsers);
+
+// Meeting filters
+export const meetingParsers = {
+  // Search query (e.g. ?query=planning)
+  query: parseAsString.withDefault(""),
+  
+  // Scope filter - multiple selections (e.g. ?scope=Sprint&scope=Phase)
+  scope: parseAsArrayOf(parseAsString).withDefault([]),
+};
+
+export const meetingSearchParamsCache = createSearchParamsCache(meetingParsers);
 
 // Task sort options for adviser view
 export type TaskSortBy = "createdAt" | "title" | "assigneeCount";
