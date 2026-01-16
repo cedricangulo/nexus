@@ -33,9 +33,6 @@ async function AuthenticatedLayoutContent({ children }: { children: React.ReactN
   return (
     <AuthContextProvider token={token} user={user}>
       <SidebarBadgeLoader token={token} user={user} />
-
-      {user.role !== "TEAM_LEAD" && <MobileNav />}
-
       <SidebarInset suppressHydrationWarning>
         <AppHeader
           notificationComponent={<Notification />}
@@ -48,6 +45,7 @@ async function AuthenticatedLayoutContent({ children }: { children: React.ReactN
           </NuqsAdapter>
         </main>
       </SidebarInset>
+      {user.role !== "TEAM_LEAD" ? <MobileNav /> : null}
     </AuthContextProvider>
   );
 }

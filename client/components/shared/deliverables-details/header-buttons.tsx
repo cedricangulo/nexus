@@ -110,48 +110,36 @@ export default function HeaderButtons({ id, title, status }: Props) {
 
   return (
 		<>
-			<div className="flex md:items-center justify-between gap-4">
-				<Button
-					asChild
-					variant="ghost"
-					className="w-fit"
-				>
-					<Link href="/deliverables">
-						<ChevronLeftIcon />
-						Back to Deliverables
-					</Link>
-				</Button>
-        {!canReview ? null : (
-          <div className="flex flex-col gap-4 sm:flex-row">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  className="gap-2 w-fit"
-                  disabled={isPending}
-                >
-                  {isPending ? (
-                    <>
-                      <Spinner />
-                      Review
-                    </>
-                  ) : (
-                    <>
-                      <Check />
-                      Review
-                    </>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setRequestChangesOpen(true)}>
-                  Request Changes
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setApproveOpen(true)}>Approve</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )}
-      </div>
+      {!canReview ? null : (
+        <div className="flex flex-col gap-4 sm:flex-row">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                className="gap-2 w-fit"
+                disabled={isPending}
+              >
+                {isPending ? (
+                  <>
+                    <Spinner />
+                    Review
+                  </>
+                ) : (
+                  <>
+                    <Check />
+                    Review
+                  </>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setRequestChangesOpen(true)}>
+                Request Changes
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setApproveOpen(true)}>Approve</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
 
 			<RequestChangesDialog
 				comment={requestComment}

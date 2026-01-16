@@ -1,5 +1,4 @@
 import { Deliverable } from "@/lib/types";
-import UploadEvidenceButton from "./upload-evidence-button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { FileIcon } from "lucide-react";
 import { formatRelativeTime } from "@/lib/helpers/format-date";
@@ -20,13 +19,7 @@ export default async function Evidence({ deliverable, token }: Props) {
   return (
     <>
       <div className="space-y-2 lg:col-span-5">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-foreground text-sm">Evidence Files</h3>
-          <UploadEvidenceButton
-            id={deliverable.id}
-            status={deliverable.status}
-          />
-        </div>
+        <h3 className="font-semibold text-foreground text-sm">Evidence Files</h3>
         {evidence.length === 0 ? (
           <EmptyState
             description=""
