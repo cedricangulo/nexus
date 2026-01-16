@@ -45,7 +45,7 @@ async function PageHeaderUI({ sprint, users }: PageHeaderUIProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-4">
           <Button asChild size="icon" variant="outline">
             <Link href="/sprints">
               <ChevronLeftIcon />

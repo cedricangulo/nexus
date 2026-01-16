@@ -63,7 +63,7 @@ export async function MobileSummary({
         </div>
         <FrameTitle>Sprint Summary</FrameTitle>
       </FrameHeader>
-      <FramePanel className="divide grid grid-cols-3 gap-4 divide-x divide-dashed text-center">
+      <FramePanel className="divide grid grid-cols-3 divide-x divide-dashed text-center p-2">
         {children}
       </FramePanel>
     </Frame>
