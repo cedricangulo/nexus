@@ -10,11 +10,11 @@ import "server-only";
 import { cache } from "react";
 import { activityLogApi } from "@/lib/api/activity-log";
 import { deliverableApi } from "@/lib/api/deliverable";
-import { meetingLogApi } from "@/lib/api/meeting-log";
-import { phaseApi } from "@/lib/api/phase";
+import { sprintApi } from "@/lib/api/sprint";
 import { taskApi } from "@/lib/api/task";
 import { requireUser } from "@/lib/helpers/rbac";
 import { DeliverableStatus, TaskStatus } from "@/lib/types";
+import { getMeetingsData } from "./meetings";
 
 export type BadgeCounts = {
   deliverablesInReview: number;
@@ -29,7 +29,7 @@ export type BadgeCounts = {
  * Fetches counts for:
  * - Deliverables in REVIEW status (pending Team Lead review)
  * - Tasks with BLOCKED status (team members needing help)
- * - Phases missing MeetingLog entries in the last 7 days (documentation gaps)
+ * - Sprints/Phases missing MeetingLog entries (documentation gaps)
  *
  * For TEAM_LEAD: Shows all counts
  * For MEMBER: Shows only counts for items assigned to the member
@@ -42,36 +42,19 @@ export const getBadgeCounts = cache(
     const user = await requireUser();
 
     try {
-      const [deliverables, tasks, phases, activityLogs] = await Promise.all([
-        deliverableApi.listDeliverables().catch((error) => {
-          if (error.status === 403) {
-            return [];
-          }
-          console.error("Error fetching deliverables:", error);
-          return [];
-        }),
-        taskApi.listTasks().catch((error) => {
-          if (error.status === 403) {
-            return [];
-          }
-          console.error("Error fetching tasks:", error);
-          return [];
-        }),
-        phaseApi.listPhases().catch((error) => {
-          if (error.status === 403) {
-            return [];
-          }
-          console.error("Error fetching phases:", error);
-          return [];
-        }),
-        activityLogApi.listActivityLogs().catch((error) => {
-          if (error.status === 403) {
-            return [];
-          }
-          console.error("Error fetching activity logs:", error);
-          return [];
-        }),
-      ]);
+      const [deliverables, tasks, activityLogs, meetingsData, sprints] =
+        await Promise.all([
+          deliverableApi.listDeliverables().catch(() => []),
+          taskApi.listTasks().catch(() => []),
+          activityLogApi.listActivityLogs().catch(() => []),
+          getMeetingsData(_token).catch(() => ({
+            logs: [],
+            sprints: [],
+            phases: [],
+            totalExpected: 0,
+          })),
+          sprintApi.listSprints().catch(() => []),
+        ]);
 
       // For TEAM_LEAD: show all counts; for MEMBER: show only assigned items
       const isMember = user?.role === "member";
@@ -98,33 +81,34 @@ export const getBadgeCounts = cache(
         return true;
       }).length;
 
-      // Check for phases missing meeting logs in the last 7 days
-      // For members: only check phases they're involved in (have deliverables in)
-      const oneWeekAgo = new Date();
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      // Count sprints/phases without ANY meetings (same logic as summary cards)
+      const { logs, phases } = meetingsData;
 
-      const phasesToCheck = isMember
-        ? phases.filter((phase) =>
-            deliverables.some((d) => d.phaseId === phase.id)
-          )
-        : phases;
-
-      const phaseChecks = await Promise.all(
-        phasesToCheck.map(async (phase) => {
-          try {
-            const logs = await meetingLogApi.getMeetingLogsByPhase(phase.id);
-            const recentLogs = logs.filter(
-              (log) => new Date(log.date) >= oneWeekAgo
-            );
-            return recentLogs.length === 0;
-          } catch {
-            // Consider it missing if we can't fetch logs
-            return true;
-          }
-        })
+      // Valid sprints: not deleted and have start/end dates
+      const validSprints = sprints.filter(
+        (s) => !s.deletedAt && s.startDate && s.endDate
       );
 
-      const phasesWithoutMeetings = phaseChecks.filter(Boolean).length;
+      // Valid phases: have start/end dates
+      const validPhases = phases.filter((p) => p.startDate && p.endDate);
+
+      // Find which have meetings
+      const sprintsWithMeetings = new Set(
+        logs.map((log) => log.sprintId).filter(Boolean)
+      );
+      const phasesWithMeetings = new Set(
+        logs.map((log) => log.phaseId).filter(Boolean)
+      );
+
+      // Count missing (sprints + phases without meetings)
+      const missingSprintsCount = validSprints.filter(
+        (s) => !sprintsWithMeetings.has(s.id)
+      ).length;
+      const missingPhasesCount = validPhases.filter(
+        (p) => !phasesWithMeetings.has(p.id)
+      ).length;
+
+      const phasesWithoutMeetings = missingSprintsCount + missingPhasesCount;
 
       // Count today's activity logs
       const today = new Date();
