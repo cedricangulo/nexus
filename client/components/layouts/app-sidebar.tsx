@@ -3,7 +3,7 @@
 import { Atom } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -51,11 +51,17 @@ type AppSidebarProps = {
 
 export function AppSidebar({ user, badges = {} }: AppSidebarProps) {
   const pathname = usePathname();
+  const [clientPathname, setClientPathname] = useState("");
+
+  useEffect(() => {
+    setClientPathname(pathname);
+  }, [pathname]);
 
   // Strip the (auth) route group from pathname for matching
-  const cleanPathname = pathname.replace(AUTH_ROUTE_REGEX, "") || "/";
+  const cleanPathname = clientPathname.replace(AUTH_ROUTE_REGEX, "") || "/";
 
   const isActive = (href: string) => {
+    if (!clientPathname) return false;
     if (href === "#") return false;
     // Exact match for dashboard, startsWith for other routes
     if (href === "/dashboard") return cleanPathname === href;

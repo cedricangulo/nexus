@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAV_CONFIG, type Role } from "@/lib/config/nav";
@@ -26,10 +27,15 @@ function isDetailPage(pathname: string): boolean {
  */
 export default function MobileNav() {
   const pathname = usePathname();
+  const [clientPathname, setClientPathname] = useState("");
   const { user } = useAuthContext();
 
+  useEffect(() => {
+    setClientPathname(pathname);
+  }, [pathname]);
+
   // Hide nav on detail pages like /sprints/[id], /deliverables/[id], etc.
-  if (isDetailPage(pathname)) {
+  if (!clientPathname || isDetailPage(clientPathname)) {
     return null;
   }
 
@@ -48,8 +54,8 @@ export default function MobileNav() {
       <div className="grid h-16 grid-cols-5 gap-1">
         {navItems.map((item) => {
           const isActive =
-            pathname === item.href ||
-            (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            clientPathname === item.href ||
+            (item.href !== "/dashboard" && clientPathname.startsWith(item.href));
 
           const Icon = item.icon;
 
