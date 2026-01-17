@@ -23,12 +23,6 @@ export default async function PhaseDetailPage({
 			hydration="client"
 		>
       <div className="space-y-8">
-        <Button asChild variant="ghost">
-          <Link href="/phases">
-            <ChevronLeftIcon />
-            Back to Phases
-          </Link>
-        </Button>
         <Boundary
           rendering="static"
           hydration="server"

@@ -1,11 +1,11 @@
 "use client";
 
 import { Plus } from "lucide-react";
+import Boundary from "@/components/internal/Boundary";
 import { CreateTaskDialog } from "@/components/shared/phases/dialogs/create-task-dialog";
 import { Button } from "@/components/ui/button";
 import type { User } from "@/lib/types";
 import { useIsTeamLead } from "@/providers/auth-context-provider";
-import Boundary from "@/components/internal/Boundary";
 
 type Props = {
   phaseId: string;
@@ -13,7 +13,6 @@ type Props = {
 };
 
 export default function AddTaskButton({ phaseId, users }: Props) {
-
   const isTeamLead = useIsTeamLead();
 
   // Only TEAM_LEAD and MEMBER can create tasks

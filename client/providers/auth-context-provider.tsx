@@ -44,6 +44,11 @@ export function useIsMember() {
   return user?.role === "MEMBER";
 }
 
+export function useIsAdviser() {
+  const { user } = useAuthContext();
+  return user?.role === "ADVISER";
+}
+
 export function useIsContributor() {
   const { user } = useAuthContext();
   return user?.role === "TEAM_LEAD" || user?.role === "MEMBER";

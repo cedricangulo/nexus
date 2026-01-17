@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { Eye, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,11 +10,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { StatusBadge } from "@/components/ui/status";
-import type { DeliverableStatus, TaskStatus } from "@/lib/types";
-import { cn, getInitials } from "@/lib/utils";
-import { useIsTeamLead } from "@/providers/auth-context-provider";
 import { FramePanel } from "@/components/ui/frame";
+import { StatusBadge } from "@/components/ui/status";
+import type { DeliverableStatus, Task, TaskStatus } from "@/lib/types";
+import { cn, getInitials } from "@/lib/utils";
+import {
+  useAuthContext,
+  useIsAdviser,
+  useIsTeamLead,
+} from "@/providers/auth-context-provider";
 
 type TaskItemActionsContent = {
   title: string;
@@ -25,28 +29,50 @@ type TaskItemActionsContent = {
   className?: string;
 };
 
-type TaskItemActionsHandlers = {
+type TaskActionHandlers = {
   onClick?: () => void;
   onEdit?: () => void;
+  onEditStatus?: () => void;
+  onViewDetails?: () => void;
   onDelete?: () => void;
 };
 
-type TaskItemActionsProps = TaskItemActionsContent & TaskItemActionsHandlers;
+type TaskItemActionsProps = TaskItemActionsContent & {
+  actions?: TaskActionHandlers;
+  task?: Task;
+};
 
 export function TaskItemActions({
   title,
   status,
   description,
-  onClick,
-  onEdit,
-  onDelete,
+  actions,
+  task,
   className,
   children,
   footer,
 }: TaskItemActionsProps) {
   const isTeamLead = useIsTeamLead();
+  const isAdviser = useIsAdviser();
+  const { user } = useAuthContext();
 
+  // Check if user is assigned to the task
+  const isAssigned = task?.assignees?.some(
+    (assignee) => assignee.id === user.id
+  );
+
+  // Extract handlers from grouped actions
+  const onClick = actions?.onClick;
+  const onEdit = actions?.onEdit;
+  const onEditStatus = actions?.onEditStatus;
+  const onViewDetails = actions?.onViewDetails;
+  const onDelete = actions?.onDelete;
+
+  // Determine if the card should be clickable
   const isClickable = !!onClick && isTeamLead;
+
+  // Show dropdown for all authenticated users
+  const showDropdown = !!(onEdit || onEditStatus || onViewDetails || onDelete);
 
   return (
     <FramePanel
@@ -70,7 +96,7 @@ export function TaskItemActions({
           {children}
           <h4 className="mt-2 font-medium text-sm leading-tight">{title}</h4>
         </div>
-        {!isClickable ? null : (
+        {showDropdown ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -79,39 +105,70 @@ export function TaskItemActions({
                 size="icon"
                 variant="ghost"
               >
-                <MoreVertical className="size-4" />
+                <MoreVertical size={16} />
                 <span className="sr-only">Open menu</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit?.();
-                }}
-              >
-                <Pencil className="size-4" />
-                Edit
-              </DropdownMenuItem>
-              {Boolean(isTeamLead && onEdit && onDelete) && (
+              {/* View Details - for advisers and unassigned members */}
+              {(isAdviser || !isTeamLead) && onViewDetails && (
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onViewDetails();
+                  }}
+                >
+                  <Eye size={16} />
+                  View Details
+                </DropdownMenuItem>
+              )}
+
+              {/* Edit Status - for assigned members only (not team leads or advisers) */}
+              {!(isTeamLead || isAdviser) && isAssigned && onEditStatus ? (
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEditStatus();
+                  }}
+                >
+                  <Pencil size={16} />
+                  Edit Status
+                </DropdownMenuItem>
+              ) : null}
+
+              {/* Edit - for team leads and assigned members (not advisers) */}
+              {!isAdviser && (isTeamLead || isAssigned) && onEdit ? (
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit();
+                  }}
+                >
+                  <Pencil size={16} />
+                  {isTeamLead ? "Edit" : "Edit Status"}
+                </DropdownMenuItem>
+              ) : null}
+
+              {/* Delete - team leads only */}
+              {isTeamLead && onDelete ? (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="text-destructive focus:text-destructive"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onDelete?.();
+                      onDelete();
                     }}
                     variant="destructive"
                   >
-                    <Trash2 className="size-4" />
+                    <Trash2 size={16} />
                     Delete
                   </DropdownMenuItem>
                 </>
-              )}
+              ) : null}
             </DropdownMenuContent>
           </DropdownMenu>
-        )}
+        ) : null}
       </div>
 
       {description ? (

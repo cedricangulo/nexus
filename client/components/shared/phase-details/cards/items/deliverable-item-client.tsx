@@ -1,12 +1,19 @@
 "use client";
 
-import { ExternalLink, MoreVertical, Pencil, Trash, Trash2 } from "lucide-react";
+import {
+  ExternalLink,
+  MoreVertical,
+  Pencil,
+  Trash,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { deleteDeliverableAction } from "@/actions/phases";
 import { showPendingActionToast } from "@/components/shared/pending-action-toast";
+import { DeliverableEditDialog } from "@/components/shared/phases/dialogs/edit-deliverable-dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,7 +32,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DeliverableEditDialog } from "@/components/shared/phases/dialogs/edit-deliverable-dialog";
 import type { Deliverable } from "@/lib/types";
 import { useIsTeamLead } from "@/providers/auth-context-provider";
 
@@ -39,7 +45,8 @@ export function DeliverableActions({ deliverable }: Props) {
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
-  const [selectedDeliverable, setSelectedDeliverable] = useState<Deliverable | null>(null);
+  const [selectedDeliverable, setSelectedDeliverable] =
+    useState<Deliverable | null>(null);
   const [editDeliverableOpen, setEditDeliverableOpen] = useState(false);
 
   const handleDelete = () => {
@@ -58,7 +65,8 @@ export function DeliverableActions({ deliverable }: Props) {
             router.refresh();
           } else {
             toast.error(
-              result.error || "Could not delete the deliverable. Please try again."
+              result.error ||
+                "Could not delete the deliverable. Please try again."
             );
           }
         } catch (error) {
@@ -96,15 +104,20 @@ export function DeliverableActions({ deliverable }: Props) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem asChild>
-            <Link href={`/deliverables/${deliverable.id}`} rel="noopener noreferrer">
+            <Link
+              href={`/deliverables/${deliverable.id}`}
+              rel="noopener noreferrer"
+            >
               <ExternalLink size={16} />
               View Details
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => {
-            setSelectedDeliverable(deliverable);
-            setEditDeliverableOpen(true);
-          }}>
+          <DropdownMenuItem
+            onClick={() => {
+              setSelectedDeliverable(deliverable);
+              setEditDeliverableOpen(true);
+            }}
+          >
             <Pencil size={16} />
             Edit
           </DropdownMenuItem>
@@ -121,7 +134,7 @@ export function DeliverableActions({ deliverable }: Props) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <AlertDialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+      <AlertDialog onOpenChange={setConfirmDeleteOpen} open={confirmDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete deliverable</AlertDialogTitle>
@@ -149,8 +162,8 @@ export function DeliverableActions({ deliverable }: Props) {
       {selectedDeliverable?.id === deliverable.id && (
         <DeliverableEditDialog
           deliverable={selectedDeliverable}
-          open={editDeliverableOpen}
           onOpenChange={setEditDeliverableOpen}
+          open={editDeliverableOpen}
         />
       )}
     </>

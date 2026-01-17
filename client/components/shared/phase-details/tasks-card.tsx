@@ -20,8 +20,8 @@ import {
 import { usePhaseActions } from "@/hooks/use-phase-actions";
 import type { PhaseDetail, User } from "@/lib/types";
 import { useIsTeamLead } from "@/providers/auth-context-provider";
-import { TaskCard } from "./task-card";
 import { EditTaskDialog } from "../phases/dialogs/edit-task-dialog";
+import { TaskCard } from "./task-card";
 
 type TasksCardProp = {
   phase: PhaseDetail;

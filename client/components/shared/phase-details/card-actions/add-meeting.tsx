@@ -4,10 +4,10 @@
 
 import { Upload } from "lucide-react";
 import { useState } from "react";
+import Boundary from "@/components/internal/Boundary";
 import { UploadMeetingDialog } from "@/components/shared/phases/dialogs/upload-meeting-dialog";
 import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/providers/auth-context-provider";
-import Boundary from "@/components/internal/Boundary";
 
 type Props = {
   phaseId: string;
