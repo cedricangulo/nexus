@@ -7,7 +7,10 @@ export type SprintStatus = "ACTIVE" | "PLANNED" | "COMPLETED";
  * Determine sprint status based on current date and sprint dates
  */
 export function getSprintStatus(
-  sprint: Sprint,
+  sprint: {
+    startDate: string;
+    endDate: string;
+  },
   now: Date = new Date()
 ): SprintStatus {
   const start = new Date(sprint.startDate);
@@ -16,9 +19,11 @@ export function getSprintStatus(
   if (now < start) {
     return "PLANNED";
   }
+
   if (now > end) {
     return "COMPLETED";
   }
+
   return "ACTIVE";
 }
 

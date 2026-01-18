@@ -1,12 +1,8 @@
 "use client";
 
 import type { useReactTable } from "@tanstack/react-table";
-import {
-  CircleXIcon,
-  Columns3Icon,
-  FilterIcon,
-  ListFilterIcon,
-} from "lucide-react";
+import { CircleXIcon, Columns3Icon, FilterIcon, Search } from "lucide-react";
+import { useQueryStates } from "nuqs";
 import { useId, useRef } from "react";
 import type { MeetingsTableRow } from "@/components/shared/meetings/table";
 import { Button } from "@/components/ui/button";
@@ -25,42 +21,50 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import type { ScopeCounts } from "@/lib/data/meetings";
 import type { Phase, Sprint } from "@/lib/types";
+import { meetingParsers } from "@/lib/types/search-params";
 import { cn } from "@/lib/utils";
-import { UploadMinutesButton } from "../../../team-lead/meetings/upload-button";
+import { useIsContributor } from "@/providers/auth-context-provider";
+import { UploadMinutesButton } from "../upload-button";
 
 /**
  * Inline Meetings Table Filters
- * Handles search, scope filtering, and column visibility
+ * Handles search, scope filtering (via nuqs), and column visibility
  */
 export function MeetingsFilters({
   table,
   scopeCounts,
-  uniqueScopeValues,
   sprints,
   phases,
 }: {
-  table: ReturnType<typeof useReactTable<MeetingsTableRow>>;
-  scopeCounts: Map<string, number>;
-  uniqueScopeValues: string[];
+  table?: ReturnType<typeof useReactTable<MeetingsTableRow>>;
+  scopeCounts: ScopeCounts;
   sprints: Sprint[];
   phases: Phase[];
 }) {
   const filterId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const isContributor = useIsContributor();
 
-  const searchValue = (table.getColumn("title")?.getFilterValue() ??
-    "") as string;
-  const selectedScopes = (table.getColumn("scope")?.getFilterValue() ??
-    []) as string[];
+  // URL state management with nuqs
+  const [filters, setFilters] = useQueryStates(meetingParsers, {
+    shallow: false,
+    throttleMs: 300,
+  });
+
+  const searchValue = filters.query;
+  const selectedScopes = filters.scope;
 
   const handleScopeChange = (checked: boolean, value: string) => {
     const newScopes = checked
       ? [...selectedScopes, value]
       : selectedScopes.filter((s) => s !== value);
-    table
-      .getColumn("scope")
-      ?.setFilterValue(newScopes.length ? newScopes : undefined);
+    setFilters({ scope: newScopes.length ? newScopes : [] });
+  };
+
+  const handleResetFilters = () => {
+    setFilters({ query: "", scope: [] });
   };
 
   return (
@@ -75,23 +79,21 @@ export function MeetingsFilters({
               searchValue && "pe-9"
             )}
             id={`${filterId}-search`}
-            onChange={(e) =>
-              table.getColumn("title")?.setFilterValue(e.target.value)
-            }
+            onChange={(e) => setFilters({ query: e.target.value })}
             placeholder="Search by title, uploader, sprint, phase..."
             ref={inputRef}
             type="text"
             value={searchValue}
           />
           <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
-            <ListFilterIcon aria-hidden="true" size={16} />
+            <Search aria-hidden="true" size={16} />
           </div>
           {searchValue ? (
             <button
               aria-label="Clear search filter"
               className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md text-muted-foreground/80 outline-none transition-[color,box-shadow] hover:text-foreground focus:z-10 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
               onClick={() => {
-                table.getColumn("title")?.setFilterValue("");
+                setFilters({ query: "" });
                 inputRef.current?.focus();
               }}
               type="button"
@@ -124,67 +126,90 @@ export function MeetingsFilters({
                 Scope
               </div>
               <div className="space-y-3">
-                {uniqueScopeValues.map((value, i) => (
-                  <div className="flex items-center gap-2" key={value}>
-                    <Checkbox
-                      checked={selectedScopes.includes(value)}
-                      id={`${filterId}-scope-${i}`}
-                      onCheckedChange={(checked: boolean) =>
-                        handleScopeChange(checked, value)
-                      }
-                    />
-                    <Label
-                      className="flex grow cursor-pointer justify-between gap-2 font-normal"
-                      htmlFor={`${filterId}-scope-${i}`}
-                    >
-                      {value}
-                      {scopeCounts.get(value) !== undefined && (
+                {["Sprint", "Phase"].map((value, i) => {
+                  const count = scopeCounts[value as keyof ScopeCounts] ?? 0;
+                  return (
+                    <div className="flex items-center gap-2" key={value}>
+                      <Checkbox
+                        checked={selectedScopes.includes(value)}
+                        id={`${filterId}-scope-${i}`}
+                        onCheckedChange={(checked: boolean) =>
+                          handleScopeChange(checked, value)
+                        }
+                      />
+                      <Label
+                        className="flex grow cursor-pointer justify-between gap-2 font-normal"
+                        htmlFor={`${filterId}-scope-${i}`}
+                      >
+                        {value}
                         <span className="ms-2 text-muted-foreground text-xs">
-                          ({scopeCounts.get(value)})
+                          ({count})
                         </span>
-                      )}
-                    </Label>
-                  </div>
-                ))}
+                      </Label>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </PopoverContent>
         </Popover>
 
         {/* Column Visibility Toggle */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button className="w-full md:w-fit" variant="outline">
-              <Columns3Icon
-                aria-hidden="true"
-                className="-ms-1 opacity-60"
-                size={16}
-              />
-              View
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="center">
-            <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => (
-                <DropdownMenuCheckboxItem
-                  checked={column.getIsVisible()}
-                  className="capitalize"
-                  key={column.id}
-                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                  onSelect={(event) => event.preventDefault()}
-                >
-                  {column.id}
-                </DropdownMenuCheckboxItem>
-              ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {table ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="w-full md:w-fit" variant="outline">
+                <Columns3Icon
+                  aria-hidden="true"
+                  className="-ms-1 opacity-60"
+                  size={16}
+                />
+                View
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center">
+              <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => (
+                  <DropdownMenuCheckboxItem
+                    checked={column.getIsVisible()}
+                    className="capitalize"
+                    key={column.id}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                    onSelect={(event) => event.preventDefault()}
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : null}
+
+        {/* Reset Filters Button */}
+        {(searchValue || selectedScopes.length > 0) && (
+          <Button
+            className="w-full md:w-fit"
+            onClick={handleResetFilters}
+            variant="outline"
+          >
+            <CircleXIcon
+              aria-hidden="true"
+              className="-ms-1 opacity-60"
+              size={16}
+            />
+            Reset filters
+          </Button>
+        )}
       </div>
 
       {/* Upload Minutes Button */}
-      <UploadMinutesButton phases={phases} sprints={sprints} />
+      {isContributor ? (
+        <UploadMinutesButton phases={phases} sprints={sprints} />
+      ) : null}
     </div>
   );
 }

@@ -38,13 +38,13 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
-import type { PhaseDetail } from "@/lib/types";
+import type { Phase } from "@/lib/types";
 import { phaseSchema } from "@/lib/validation";
 
 type PhaseEditDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  phase: PhaseDetail;
+  phase: Phase;
 };
 
 type FormValues = z.infer<typeof phaseSchema>;

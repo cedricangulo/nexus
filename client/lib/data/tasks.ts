@@ -9,7 +9,7 @@ import "server-only";
 
 import { cacheLife, cacheTag } from "next/cache";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
-import { createAuthHeaders, serverClient } from "@/lib/api/server-client";
+import { getApiClient } from "@/lib/api/server-client";
 import type { Task } from "@/lib/types";
 
 /**
@@ -24,9 +24,8 @@ export async function getTasks(token: string): Promise<Task[]> {
   cacheTag("tasks");
 
   try {
-    const response = await serverClient.get<Task[]>(API_ENDPOINTS.TASKS.LIST, {
-      headers: createAuthHeaders(token),
-    });
+    const api = await getApiClient(token);
+    const response = await api.get<Task[]>(API_ENDPOINTS.TASKS.LIST);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch tasks:", error);
@@ -50,9 +49,8 @@ export async function getTaskById(
   cacheTag("tasks", `task-${id}`);
 
   try {
-    const response = await serverClient.get<Task>(API_ENDPOINTS.TASKS.GET(id), {
-      headers: createAuthHeaders(token),
-    });
+    const api = await getApiClient(token);
+    const response = await api.get<Task>(API_ENDPOINTS.TASKS.GET(id));
     return response.data;
   } catch (error) {
     console.error(`Failed to fetch task ${id}:`, error);

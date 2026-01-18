@@ -91,10 +91,14 @@ export function DeliverableEditDialog({
     onOpenChange(false);
 
     startTransition(async () => {
+      const isLoading = toast.loading("Updating deliverable...");
+      
       const result = await updateDeliverableAction({
         id: deliverable.id,
         ...values,
       });
+
+      toast.dismiss(isLoading);
 
       if (result.success) {
         toast.success("Deliverable updated successfully");

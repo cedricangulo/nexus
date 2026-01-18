@@ -4,7 +4,7 @@
 
 import { cacheLife, cacheTag } from "next/cache";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
-import { createAuthHeaders, serverClient } from "@/lib/api/server-client";
+import { getApiClient } from "@/lib/api/server-client";
 import type { User } from "@/lib/types/models";
 
 /**
@@ -23,9 +23,8 @@ export async function getTeamUsers(token: string): Promise<User[]> {
   cacheTag("users");
 
   try {
-    const response = await serverClient.get<User[]>(API_ENDPOINTS.USERS.LIST, {
-      headers: createAuthHeaders(token),
-    });
+    const api = await getApiClient(token);
+    const response = await api.get<User[]>(API_ENDPOINTS.USERS.LIST);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch team users:", error);
@@ -51,9 +50,8 @@ export async function getAllUsersForDisplay(token: string): Promise<User[]> {
   cacheTag("users");
 
   try {
-    const response = await serverClient.get<User[]>(API_ENDPOINTS.USERS.LIST, {
-      headers: createAuthHeaders(token),
-    });
+    const api = await getApiClient(token);
+    const response = await api.get<User[]>(API_ENDPOINTS.USERS.LIST);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch users for display:", error);
