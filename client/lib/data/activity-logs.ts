@@ -9,7 +9,7 @@ import "server-only";
 
 import { cacheLife, cacheTag } from "next/cache";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
-import { createAuthHeaders, serverClient } from "@/lib/api/server-client";
+import { getApiClient } from "@/lib/api/server-client";
 import type { ActivityLog } from "@/lib/types";
 
 /**
@@ -24,9 +24,9 @@ export async function getActivityLogs(token: string): Promise<ActivityLog[]> {
   cacheTag("activity-logs");
 
   try {
-    const response = await serverClient.get<ActivityLog[]>(
-      API_ENDPOINTS.ACTIVITY_LOGS.LIST,
-      { headers: createAuthHeaders(token) }
+    const api = await getApiClient(token);
+    const response = await api.get<ActivityLog[]>(
+      API_ENDPOINTS.ACTIVITY_LOGS.LIST
     );
 
     // Sort by most recent first
@@ -58,9 +58,9 @@ export async function getActivityLogsByEntity(
   cacheTag("activity-logs", `entity-${entityType}-${entityId}`);
 
   try {
-    const response = await serverClient.get<ActivityLog[]>(
-      API_ENDPOINTS.ACTIVITY_LOGS.BY_ENTITY(entityType, entityId),
-      { headers: createAuthHeaders(token) }
+    const api = await getApiClient(token);
+    const response = await api.get<ActivityLog[]>(
+      API_ENDPOINTS.ACTIVITY_LOGS.BY_ENTITY(entityType, entityId)
     );
 
     // Sort by most recent first

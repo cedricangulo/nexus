@@ -79,6 +79,9 @@ export function CreateTaskDialog({
     [users]
   );
 
+  console.debug("CreateTaskDialog users prop:", users.map(u => ({ id: u.id, role: u.role, name: u.name })));
+  console.debug("CreateTaskDialog assigneeOptions:", assigneeOptions);
+
   type FormValues = z.infer<typeof createPhaseTaskSchema>;
 
   const form = useForm<FormValues>({
@@ -200,13 +203,13 @@ export function CreateTaskDialog({
           name="assigneeIds"
           render={() => (
             <FormItem>
-              <FormLabel>Assignees (Optional)</FormLabel>
+              <FormLabel>Assignees</FormLabel>
               <FormControl>
                 <MultipleSelector
                   commandProps={{
                     label: "Select assignees",
                   }}
-                  defaultOptions={assigneeOptions}
+                  options={assigneeOptions}
                   disabled={isPending}
                   emptyIndicator={
                     <p className="text-center text-sm">No members found</p>

@@ -1,6 +1,6 @@
 "use client";
 
-import type { ColumnDef, FilterFn } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import type { AppRole } from "@/auth";
 import { MeetingRowActions } from "@/components/shared/meetings/table/row-actions";
 import { formatDate } from "@/lib/helpers/format-date";
@@ -8,46 +8,6 @@ import type { MeetingLog, Phase, Sprint } from "@/lib/types";
 
 export type MeetingsTableRow = MeetingLog & {
   contextLabel: string;
-};
-
-export const multiColumnFilterFn: FilterFn<MeetingsTableRow> = (
-  row,
-  _columnId,
-  filterValue
-) => {
-  const searchTerm = (filterValue ?? "").toString().toLowerCase().trim();
-  if (!searchTerm) {
-    return true;
-  }
-
-  const uploader = row.original.uploader;
-  const searchableRowContent = [
-    row.original.title,
-    row.original.contextLabel,
-    uploader?.name,
-    uploader?.email,
-    row.getValue("scope") as string,
-    formatDate(row.getValue("date") as string),
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-
-  return searchableRowContent.includes(searchTerm);
-};
-
-const scopeFilterFn: FilterFn<MeetingsTableRow> = (
-  row,
-  _columnId,
-  filterValue
-) => {
-  const selected = (filterValue ?? []) as string[];
-  if (!selected.length) {
-    return true;
-  }
-
-  const scope = row.original.sprintId ? "Sprint" : "Phase";
-  return selected.includes(scope);
 };
 
 function buildContextLabel(
@@ -89,7 +49,6 @@ export function createMeetingColumns(context: ColumnsContext): {
       accessorKey: "title",
       size: 220,
       enableHiding: false,
-      filterFn: multiColumnFilterFn,
       header: "Title",
       cell: ({ row }) => (
         <div className="max-w-md truncate font-medium">
@@ -109,7 +68,6 @@ export function createMeetingColumns(context: ColumnsContext): {
         }
         return "Unassigned";
       },
-      filterFn: scopeFilterFn,
       header: "Scope",
       cell: ({ row }) => <div className="text-sm">{row.getValue("scope")}</div>,
     },

@@ -172,7 +172,7 @@ export async function PhaseProgressCardsDisplay() {
     const { token } = await getAuthContext();
     const [deliverables, phases] = await Promise.all([
       getDeliverables(token),
-      getPhases(token),
+      getPhases(),
     ]);
 
     if (phases.length === 0) {

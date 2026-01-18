@@ -164,7 +164,7 @@ export async function ProjectHealthCard() {
     const { token } = await getAuthContext();
     const [deliverables, phases] = await Promise.all([
       getDeliverables(token),
-      getPhases(token),
+      getPhases(),
     ]);
     const completion = computeProjectCompletion(deliverables, phases);
     const hasContent = completion.totalDeliverables > 0;

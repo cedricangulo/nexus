@@ -14,6 +14,7 @@ export function usePhaseActions(phaseId: string) {
   // Task state
   const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
   const [editTaskDialogOpen, setEditTaskDialogOpen] = useState(false);
+  const [viewTaskDialogOpen, setViewTaskDialogOpen] = useState(false);
   const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
 
   // Deliverable state
@@ -32,6 +33,11 @@ export function usePhaseActions(phaseId: string) {
   const handleEditTask = (task: Task) => {
     setSelectedTask(task);
     setEditTaskDialogOpen(true);
+  };
+
+  const handleViewTask = (task: Task) => {
+    setSelectedTask(task);
+    setViewTaskDialogOpen(true);
   };
 
   const handleDeleteTask = (task: Task) => {
@@ -120,9 +126,12 @@ export function usePhaseActions(phaseId: string) {
     selectedTask,
     editTaskDialogOpen,
     setEditTaskDialogOpen,
+    viewTaskDialogOpen,
+    setViewTaskDialogOpen,
     deleteTaskId,
     setDeleteTaskId,
     handleEditTask,
+    handleViewTask,
     handleDeleteTask,
     confirmDeleteTask,
 

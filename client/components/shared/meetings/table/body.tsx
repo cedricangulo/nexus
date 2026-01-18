@@ -1,16 +1,10 @@
 "use client";
 
 import {
-  type ColumnFiltersState,
   getCoreRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  type PaginationState,
-  type SortingState,
   useReactTable,
-  type VisibilityState,
 } from "@tanstack/react-table";
 import {
   ChevronFirstIcon,
@@ -18,9 +12,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "lucide-react";
-import { useCallback, useId, useMemo, useState } from "react";
-import { toast } from "sonner";
-import { deleteMeetingLog } from "@/actions/meetings";
+import { useId, useMemo } from "react";
 import type { AppRole } from "@/auth";
 import {
   GenericTableBody,
@@ -41,15 +33,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Table } from "@/components/ui/table";
+import { useMeetingsTable } from "@/hooks/use-meetings-table";
+import type { ScopeCounts } from "@/lib/data/meetings";
 import type { MeetingLog, Phase, Sprint } from "@/lib/types";
 import { createMeetingColumns, type MeetingsTableRow } from ".";
-import { MeetingsFilters } from "./filter";
 
 type MeetingsTableProps = {
   initialLogs: MeetingLog[];
   sprints: Sprint[];
   phases: Phase[];
   currentUserRole: AppRole;
+  scopeCounts: ScopeCounts;
 };
 
 export function MeetingsTable({
@@ -57,60 +51,24 @@ export function MeetingsTable({
   phases,
   sprints,
   currentUserRole,
+  scopeCounts,
 }: MeetingsTableProps) {
   const id = useId();
-  const [data, setData] = useState<MeetingLog[]>(initialLogs);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: "date", desc: true },
-  ]);
-  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
 
-  const withLoading = useCallback(
-    async (ids: string[], callback: () => Promise<void>) => {
-      setDeletingIds((prev) => {
-        const next = new Set(prev);
-        for (const meetingId of ids) {
-          next.add(meetingId);
-        }
-        return next;
-      });
-      try {
-        await callback();
-      } finally {
-        setDeletingIds((prev) => {
-          const next = new Set(prev);
-          for (const meetingId of ids) {
-            next.delete(meetingId);
-          }
-          return next;
-        });
-      }
-    },
-    []
-  );
-
-  const handleAction = useCallback(
-    async (actionId: string, row: MeetingLog) => {
-      if (actionId === "delete") {
-        try {
-          await withLoading([row.id], async () => {
-            await deleteMeetingLog(row.id);
-          });
-          toast.success("Meeting minutes deleted");
-          setData((prev) => prev.filter((l) => l.id !== row.id));
-        } catch {
-          toast.error("Failed to delete meeting minutes");
-        }
-      }
-    },
-    [withLoading]
-  );
+  // Use custom hook for state management
+  const {
+    data,
+    columnFilters,
+    setColumnFilters,
+    columnVisibility,
+    setColumnVisibility,
+    pagination,
+    setPagination,
+    sorting,
+    setSorting,
+    handleAction,
+    deletingIds,
+  } = useMeetingsTable(initialLogs);
 
   const { columns, toRows } = useMemo(
     () =>
@@ -134,8 +92,6 @@ export function MeetingsTable({
     data: tableData,
     enableSortingRemoval: false,
     getCoreRowModel: getCoreRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
@@ -150,34 +106,8 @@ export function MeetingsTable({
     },
   });
 
-  // Use TanStack Table's faceting feature for automatic count computation
-  const scopeCounts = useMemo(() => {
-    const scopeColumn = table.getColumn("scope");
-    if (!scopeColumn) {
-      return new Map<string, number>();
-    }
-    return scopeColumn.getFacetedUniqueValues();
-  }, [table]);
-
-  const uniqueScopeValues = useMemo(() => {
-    const scopeColumn = table.getColumn("scope");
-    if (!scopeColumn) {
-      return [];
-    }
-    const values = Array.from(scopeColumn.getFacetedUniqueValues().keys());
-    return values.sort();
-  }, [table]);
-
   return (
-    <div className="space-y-8">
-      <MeetingsFilters
-        phases={phases}
-        scopeCounts={scopeCounts}
-        sprints={sprints}
-        table={table}
-        uniqueScopeValues={uniqueScopeValues}
-      />
-
+    <div className="space-y-4">
       <div className="overflow-hidden rounded-md border bg-background">
         <Table className="table-fixed">
           <GenericTableHeader table={table} />

@@ -1,6 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
-import { createAuthHeaders, serverClient } from "@/lib/api/server-client";
+import { getApiClient } from "@/lib/api/server-client";
 import type { PhaseDetail, Project } from "@/lib/types";
 
 export async function getProject(token: string): Promise<Project | null> {
@@ -9,10 +9,8 @@ export async function getProject(token: string): Promise<Project | null> {
   cacheTag("project");
 
   try {
-    const response = await serverClient.get<Project>(
-      API_ENDPOINTS.PROJECT.GET,
-      { headers: createAuthHeaders(token) }
-    );
+    const api = await getApiClient(token);
+    const response = await api.get<Project>(API_ENDPOINTS.PROJECT.GET);
     return response.data;
   } catch (error: unknown) {
     const axiosError = error as { response?: { status: number } };
@@ -32,16 +30,15 @@ export async function getProjectPhases(
   cacheTag("phases", "project");
 
   try {
-    const phasesResponse = await serverClient.get<{ id: string }[]>(
-      API_ENDPOINTS.PHASES.LIST,
-      { headers: createAuthHeaders(token) }
+    const api = await getApiClient(token);
+    const phasesResponse = await api.get<{ id: string }[]>(
+      API_ENDPOINTS.PHASES.LIST
     );
 
     const detailedPhases = await Promise.all(
       phasesResponse.data.map(async (phase) => {
-        const response = await serverClient.get<PhaseDetail>(
-          API_ENDPOINTS.PHASES.GET(phase.id),
-          { headers: createAuthHeaders(token) }
+        const response = await api.get<PhaseDetail>(
+          API_ENDPOINTS.PHASES.GET(phase.id)
         );
         return response.data;
       })

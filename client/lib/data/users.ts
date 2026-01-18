@@ -7,20 +7,19 @@
 
 import "server-only";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
-import { createAuthHeaders, serverClient } from "@/lib/api/server-client";
+import { getApiClient } from "@/lib/api/server-client";
 import type { User, UserContribution } from "@/lib/types";
 
-/**
- * Fetch the currently logged-in user.
- * * [FIX] No try/catch. We let 401 errors bubble up so getAuthContext
- * can catch them and trigger the redirect to /login.
- */
-export async function getCurrentUser(token: string): Promise<User> {
-  const response = await serverClient.get<User>(API_ENDPOINTS.AUTH.ME, {
-    headers: createAuthHeaders(token),
-  });
-  return response.data;
-}
+// /**
+//  * Fetch the currently logged-in user.
+//  * * [FIX] No try/catch. We let 401 errors bubble up so getAuthContext
+//  * can catch them and trigger the redirect to /login.
+//  */
+// export async function getCurrentUser(token: string): Promise<User> {
+//   const api = await getApiClient(token);
+//   const response = await api.get<User>(API_ENDPOINTS.AUTH.ME);
+//   return response.data;
+// }
 
 /**
  * Fetch all users.
@@ -29,9 +28,8 @@ export async function getCurrentUser(token: string): Promise<User> {
  */
 export async function getUsers(token: string): Promise<User[]> {
   try {
-    const response = await serverClient.get<User[]>(API_ENDPOINTS.USERS.LIST, {
-      headers: createAuthHeaders(token),
-    });
+    const api = await getApiClient(token);
+    const response = await api.get<User[]>(API_ENDPOINTS.USERS.LIST);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch users:", error);
@@ -46,9 +44,8 @@ export async function getUserById(
   token: string
 ): Promise<User | null> {
   try {
-    const response = await serverClient.get<User>(API_ENDPOINTS.USERS.GET(id), {
-      headers: createAuthHeaders(token),
-    });
+    const api = await getApiClient(token);
+    const response = await api.get<User>(API_ENDPOINTS.USERS.GET(id));
     return response.data;
   } catch (error) {
     console.error(`Failed to fetch user ${id}:`, error);
@@ -61,9 +58,9 @@ export async function getUserContribution(
   token: string
 ): Promise<UserContribution | null> {
   try {
-    const response = await serverClient.get<UserContribution>(
-      API_ENDPOINTS.USERS.CONTRIBUTIONS(userId),
-      { headers: createAuthHeaders(token) }
+    const api = await getApiClient(token);
+    const response = await api.get<UserContribution>(
+      API_ENDPOINTS.USERS.CONTRIBUTIONS(userId)
     );
     return response.data;
   } catch (error) {

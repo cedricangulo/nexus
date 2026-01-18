@@ -131,6 +131,7 @@ export function EditTaskDialog({
   useEffect(() => {
     if (open) {
       const assignees = task.assignees || [];
+      // Filter to only include assignees that are in assigneeOptions (excludes advisers)
       const assigneeOpts = assignees
         .map((a) => assigneeOptions.find((opt) => opt.value === a.id))
         .filter((opt): opt is Option => opt !== undefined);
@@ -141,7 +142,7 @@ export function EditTaskDialog({
         title: task.title,
         description: task.description || "",
         status: task.status,
-        assigneeIds: assignees.map((a) => a.id),
+        assigneeIds: assigneeOpts.map((opt) => opt.value),
       });
       setSelectedAssignees(assigneeOpts);
     }
@@ -269,13 +270,13 @@ export function EditTaskDialog({
             name="assigneeIds"
             render={() => (
               <FormItem>
-                <FormLabel>Assignees (Optional)</FormLabel>
+                <FormLabel>Assignees</FormLabel>
                 <FormControl>
                   <MultipleSelector
                     commandProps={{
                       label: "Select assignees",
                     }}
-                    defaultOptions={assigneeOptions}
+                    options={assigneeOptions}
                     disabled={isPending}
                     emptyIndicator={
                       <p className="text-center text-sm">No members found</p>
