@@ -1,0 +1,75 @@
+{
+  "folders": [
+    {
+      "path": "client",
+      "name": "Client (Next.js)",
+      "settings": {
+        "biome.enabled": true,
+        "editor.defaultFormatter": "biomejs.biome",
+        "editor.formatOnSave": true
+      }
+    },
+    {
+      "path": "server",
+      "name": "Server (Fastify)",
+      "settings": {
+        "biome.enabled": true,
+        "editor.defaultFormatter": "biomejs.biome",
+        "editor.formatOnSave": true
+      }
+    },
+    {
+      "path": ".",
+      "name": "Root"
+    }
+  ],
+  "settings": {
+    "[javascript]": {
+      "editor.defaultFormatter": "biomejs.biome",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "quickfix.biome": "explicit",
+        "source.organizeImports.biome": "explicit"
+      }
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "biomejs.biome",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "quickfix.biome": "explicit",
+        "source.organizeImports.biome": "explicit"
+      }
+    },
+    "[javascriptreact]": {
+      "editor.defaultFormatter": "biomejs.biome",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "quickfix.biome": "explicit",
+        "source.organizeImports.biome": "explicit"
+      }
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "biomejs.biome",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "quickfix.biome": "explicit",
+        "source.organizeImports.biome": "explicit"
+      }
+    },
+    "[json]": {
+      "editor.defaultFormatter": "biomejs.biome",
+      "editor.formatOnSave": true
+    },
+    "[jsonc]": {
+      "editor.defaultFormatter": "biomejs.biome",
+      "editor.formatOnSave": true
+    },
+    "biome.enabled": true,
+    "editor.formatOnSave": true
+  },
+  "extensions": {
+    "recommendations": [
+      "biomejs.biome"
+    ]
+  }
+}
