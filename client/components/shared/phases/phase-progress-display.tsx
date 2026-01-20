@@ -1,8 +1,7 @@
-import Boundary from "@/components/internal/Boundary";
+import { cacheTag } from "next/cache";
 import { FramePanel } from "@/components/ui/frame";
 import { getPhaseAnalytics } from "@/lib/data/phases";
 import { cn } from "@/lib/utils";
-import { cacheTag } from "next/cache";
 
 type Props = {
 	phaseId: string;
@@ -50,7 +49,11 @@ export default async function PhaseProgressDisplay({ phaseId, token }: Props) {
 	const analytics = await getPhaseAnalytics(phaseId, token);
 
 	if (!analytics) {
-		return <div className="text-muted-foreground text-sm">Unable to load phase analytics</div>;
+		return (
+			<div className="text-muted-foreground text-sm">
+				Unable to load phase analytics
+			</div>
+		);
 	}
 
 	return <CachedProgressUI analytics={analytics} phaseId={phaseId} />;
@@ -60,7 +63,13 @@ export default async function PhaseProgressDisplay({ phaseId, token }: Props) {
  * PRESENTER (Static Shell)
  * Receives analytics as props, safe to cache.
  */
-async function CachedProgressUI({ analytics, phaseId }: { analytics: Analytics; phaseId: string }) {
+async function CachedProgressUI({
+	analytics,
+	phaseId,
+}: {
+	analytics: Analytics;
+	phaseId: string;
+}) {
 	"use cache";
 	cacheTag("phase-analytics", `phase-${phaseId}`);
 
@@ -79,47 +88,48 @@ async function CachedProgressUI({ analytics, phaseId }: { analytics: Analytics; 
 }
 
 function TaskPanel({ analytics }: { analytics: TaskAnalytics }) {
-	if (analytics.totalTasks === 0) {
-		return null;
-	}
 	return (
 		<FramePanel className="space-y-2">
 			<h4 className="font-medium text-sm text-muted-foreground">Tasks</h4>
-			<div className="flex gap-0.5">
-				{[
-					...new Array(analytics.completedTasks).fill({
-						status: "completed",
-						color: "bg-chart-1",
-						title: "Completed",
-					}),
-					...new Array(analytics.inProgressTasks).fill({
-						status: "in-progress",
-						color: "bg-chart-3",
-						title: "In Progress",
-					}),
-					...new Array(analytics.blockedTasks).fill({
-						status: "blocked",
-						color: "bg-chart-4",
-						title: "Blocked",
-					}),
-					...new Array(
-						analytics.totalTasks -
-							analytics.completedTasks -
-							analytics.inProgressTasks -
-							analytics.blockedTasks
-					).fill({
-						status: "pending",
-						color: "bg-muted",
-						title: "Pending",
-					}),
-				].map((block, i) => (
-					<div
-						className={cn("h-2 flex-1 rounded-xs", block.color)}
-						key={i}
-						title={block.title}
-					/>
-				))}
-			</div>
+			{analytics.totalTasks === 0 ? (
+				<div className="w-full h-2 bg-muted rounded-xs" />
+			) : (
+				<div className="flex gap-0.5">
+					{[
+						...new Array(analytics.completedTasks).fill({
+							status: "completed",
+							color: "bg-chart-1",
+							title: "Completed",
+						}),
+						...new Array(analytics.inProgressTasks).fill({
+							status: "in-progress",
+							color: "bg-chart-3",
+							title: "In Progress",
+						}),
+						...new Array(analytics.blockedTasks).fill({
+							status: "blocked",
+							color: "bg-chart-4",
+							title: "Blocked",
+						}),
+						...new Array(
+							analytics.totalTasks -
+								analytics.completedTasks -
+								analytics.inProgressTasks -
+								analytics.blockedTasks,
+						).fill({
+							status: "pending",
+							color: "bg-muted",
+							title: "Pending",
+						}),
+					].map((block, i) => (
+						<div
+							className={cn("h-2 flex-1 rounded-xs", block.color)}
+							key={i}
+							title={block.title}
+						/>
+					))}
+				</div>
+			)}
 		</FramePanel>
 	);
 }
@@ -130,7 +140,9 @@ function DeliverablePanel({ analytics }: { analytics: DeliverableAnalytics }) {
 	}
 	return (
 		<FramePanel className="space-y-2">
-			<h4 className="font-medium text-sm text-muted-foreground">Deliverables</h4>
+			<h4 className="font-medium text-sm text-muted-foreground">
+				Deliverables
+			</h4>
 			<div className="flex gap-0.5">
 				{[
 					...new Array(analytics.completedDeliverables).fill({
@@ -152,7 +164,7 @@ function DeliverablePanel({ analytics }: { analytics: DeliverableAnalytics }) {
 						analytics.totalDeliverables -
 							analytics.completedDeliverables -
 							analytics.inProgressDeliverables -
-							analytics.underReviewDeliverables
+							analytics.underReviewDeliverables,
 					).fill({
 						status: "pending",
 						color: "bg-muted",
@@ -171,9 +183,6 @@ function DeliverablePanel({ analytics }: { analytics: DeliverableAnalytics }) {
 }
 
 function MeetingsPanel({ analytics }: { analytics: MeetingAnalytics }) {
-	if (analytics.totalMeetings === 0) {
-		return null;
-	}
 	return (
 		<FramePanel className="space-y-2 flex items-center justify-between">
 			<h4 className="font-medium text-sm text-muted-foreground">Meetings</h4>

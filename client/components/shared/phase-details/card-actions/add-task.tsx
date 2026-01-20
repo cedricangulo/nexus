@@ -8,30 +8,30 @@ import type { User } from "@/lib/types";
 import { useIsTeamLead } from "@/providers/auth-context-provider";
 
 type Props = {
-  phaseId: string;
-  users: User[];
+	phaseId: string;
+	users: User[];
 };
 
 export default function AddTaskButton({ phaseId, users }: Props) {
-  const isTeamLead = useIsTeamLead();
+	const isTeamLead = useIsTeamLead();
 
-  // Only TEAM_LEAD and MEMBER can create tasks
-  if (!isTeamLead) {
-    return null;
-  }
+	// Only TEAM_LEAD can create tasks
+	if (!isTeamLead) {
+		return null;
+	}
 
-  return (
-    <Boundary hydration="client">
-      <CreateTaskDialog
-        phaseId={phaseId}
-        trigger={
-          <Button size="sm" variant="secondary">
-            <Plus />
-            Add
-          </Button>
-        }
-        users={users}
-      />
-    </Boundary>
-  );
+	return (
+		<Boundary hydration="client">
+			<CreateTaskDialog
+				phaseId={phaseId}
+				trigger={
+					<Button size="sm" variant="secondary">
+						<Plus />
+						Add
+					</Button>
+				}
+				users={users}
+			/>
+		</Boundary>
+	);
 }

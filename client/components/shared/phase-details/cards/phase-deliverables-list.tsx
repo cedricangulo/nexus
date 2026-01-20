@@ -7,7 +7,7 @@ import { DeliverableItem } from "./items/deliverable-item";
 import { DeliverableActions } from "./items/deliverable-item-client";
 
 type Props = {
-  phaseId: string;
+	phaseId: string;
 };
 
 /**
@@ -16,19 +16,19 @@ type Props = {
  * Cannot use "use cache" because getPhaseDeliverablesList accesses dynamic data.
  */
 export default async function PhaseDeliverablesList({ phaseId }: Props) {
-  const deliverables = await getPhaseDeliverablesList(phaseId);
+	const deliverables = await getPhaseDeliverablesList(phaseId);
 
-  if (deliverables.length === 0) {
-    return (
-      <div className="py-8 text-center text-muted-foreground text-sm">
-        No deliverables found for this phase
-      </div>
-    );
-  }
+	if (deliverables.length === 0) {
+		return (
+			<div className="py-8 text-center text-muted-foreground text-sm">
+				No deliverables found for this phase
+			</div>
+		);
+	}
 
-  return (
-    <CachedDeliverablesListUI deliverables={deliverables} phaseId={phaseId} />
-  );
+	return (
+		<CachedDeliverablesListUI deliverables={deliverables} phaseId={phaseId} />
+	);
 }
 
 /**
@@ -36,29 +36,29 @@ export default async function PhaseDeliverablesList({ phaseId }: Props) {
  * Receives deliverables as props, safe to cache.
  */
 async function CachedDeliverablesListUI({
-  deliverables,
-  phaseId,
+	deliverables,
+	phaseId,
 }: {
-  deliverables: Deliverable[];
-  phaseId: string;
+	deliverables: Deliverable[];
+	phaseId: string;
 }) {
-  "use cache";
+	"use cache";
 
-  return (
-    <Boundary cached hydration="server" rendering="static">
-      <Frame stackedPanels>
-        <FrameHeader className="p-4">
-          <div className="flex items-center justify-between gap-2">
-            <FrameTitle>Deliverables</FrameTitle>
-            <AddDeliverableButton phaseId={phaseId} />
-          </div>
-        </FrameHeader>
-        {deliverables.map((deliverable) => (
-          <DeliverableItem deliverable={deliverable} key={deliverable.id}>
-            <DeliverableActions deliverable={deliverable} />
-          </DeliverableItem>
-        ))}
-      </Frame>
-    </Boundary>
-  );
+	return (
+		<Boundary cached hydration="server" rendering="static">
+			<Frame stackedPanels className="h-fit">
+				<FrameHeader className="p-4">
+					<div className="flex items-center justify-between gap-2">
+						<FrameTitle>Deliverables</FrameTitle>
+						<AddDeliverableButton phaseId={phaseId} />
+					</div>
+				</FrameHeader>
+				{deliverables.map((deliverable) => (
+					<DeliverableItem deliverable={deliverable} key={deliverable.id}>
+						<DeliverableActions deliverable={deliverable} />
+					</DeliverableItem>
+				))}
+			</Frame>
+		</Boundary>
+	);
 }
