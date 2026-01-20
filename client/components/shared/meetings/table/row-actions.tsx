@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import type { AppRole } from "@/auth";
 import { showPendingActionToast } from "@/components/shared/pending-action-toast";
 import {
   AlertDialog,
@@ -29,25 +28,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { MeetingLog } from "@/lib/types";
+import { useIsTeamLead } from "@/providers/auth-context-provider";
 
 type MeetingRowActionsProps = {
   meeting: MeetingLog;
   onAction: (actionId: string, meeting: MeetingLog) => Promise<void>;
   isLoading?: boolean;
-  currentUserRole: AppRole;
 };
 
 export function MeetingRowActions({
   meeting,
   onAction,
   isLoading = false,
-  currentUserRole,
 }: MeetingRowActionsProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const isTeamLead = currentUserRole === "teamLead";
+  const isTeamLead = useIsTeamLead();
 
   const handleView = () => {
     setDropdownOpen(false);
@@ -56,7 +54,7 @@ export function MeetingRowActions({
 
   const handleCopy = async () => {
     setDropdownOpen(false);
-    const url = `${window.location.origin}/meetings/${meeting.id}`;
+    const url = meeting.fileUrl;
 
     try {
       await navigator.clipboard.writeText(url);
@@ -116,7 +114,7 @@ export function MeetingRowActions({
             <CopyIcon size={16} />
             Copy link
           </DropdownMenuItem>
-          {isTeamLead && (
+          {isTeamLead ? (
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -132,7 +130,7 @@ export function MeetingRowActions({
                 Delete
               </DropdownMenuItem>
             </>
-          )}
+          ) : null}
         </DropdownMenuContent>
       </DropdownMenu>
 

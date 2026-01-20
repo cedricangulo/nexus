@@ -1,7 +1,6 @@
 import { FileText } from "lucide-react";
 import {
   Frame,
-  FrameDescription,
   FrameHeader,
   FramePanel,
   FrameTitle,
@@ -30,19 +29,23 @@ export async function TotalMeetings({ searchParams }: TotalMeetingsProps) {
  * TotalMeetingsCard Wrapper Component
  * Provides the card UI shell for total meetings data
  */
-export async function TotalMeetingsCard({ children }: { children?: React.ReactNode }) {
+export async function TotalMeetingsCard({
+  children,
+}: {
+  children?: React.ReactNode;
+}) {
   "use cache";
 
   return (
     <Frame>
       <FrameHeader className="flex-row items-center gap-2">
-        <div className="rounded-md bg-info p-2">
-          <FileText className="size-4 text-info-foreground" />
+        <FileText className="size-4 text-muted-foreground" />
+        <FrameTitle className="text-sm">Total</FrameTitle>
+        {/* <div className="rounded-md bg-info p-2">
         </div>
         <div className="space-y-0">
-          <FrameTitle className="text-sm">Total</FrameTitle>
           <FrameDescription className="text-xs">Meetings</FrameDescription>
-        </div>
+        </div> */}
       </FrameHeader>
       <FramePanel>{children}</FramePanel>
     </Frame>

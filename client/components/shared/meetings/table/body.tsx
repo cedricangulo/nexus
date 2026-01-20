@@ -13,7 +13,6 @@ import {
   ChevronRightIcon,
 } from "lucide-react";
 import { useId, useMemo } from "react";
-import type { AppRole } from "@/auth";
 import {
   GenericTableBody,
   GenericTableHeader,
@@ -42,7 +41,6 @@ type MeetingsTableProps = {
   initialLogs: MeetingLog[];
   sprints: Sprint[];
   phases: Phase[];
-  currentUserRole: AppRole;
   scopeCounts: ScopeCounts;
 };
 
@@ -50,7 +48,6 @@ export function MeetingsTable({
   initialLogs,
   phases,
   sprints,
-  currentUserRole,
   scopeCounts,
 }: MeetingsTableProps) {
   const id = useId();
@@ -77,9 +74,8 @@ export function MeetingsTable({
         sprints,
         loadingIds: deletingIds,
         onAction: handleAction,
-        currentUserRole,
       }),
-    [deletingIds, phases, sprints, handleAction, currentUserRole]
+    [deletingIds, phases, sprints, handleAction]
   );
 
   const tableData: MeetingsTableRow[] = useMemo(

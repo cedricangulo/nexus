@@ -47,15 +47,15 @@ export async function OnTimeCard({ children }: { children?: React.ReactNode }) {
   return (
     <Frame>
       <FrameHeader className="flex-row items-center gap-2">
-        <div className="rounded-md bg-scrum p-2">
-          <Clock className="size-4 text-scrum-foreground" />
+        <Clock className="size-4 text-muted-foreground" />
+        <FrameTitle className="text-sm">On-Time</FrameTitle>
+        {/* <div className="rounded-md bg-scrum p-2">
         </div>
         <div className="space-y-0">
-          <FrameTitle className="text-sm">On-Time</FrameTitle>
           <FrameDescription className="line-clamp-1 text-xs">
             documented on time
           </FrameDescription>
-        </div>
+        </div> */}
       </FrameHeader>
       <FramePanel>{children}</FramePanel>
     </Frame>

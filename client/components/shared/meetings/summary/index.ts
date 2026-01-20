@@ -12,8 +12,12 @@
  * - Data component (async, fetches its own data)
  */
 
-export { TotalMeetings, TotalMeetingsCard } from "./total-meetings-card";
 export { Coverage, CoverageCard } from "./coverage-card";
-export { OnTime, OnTimeCard } from "./on-time-card";
 export { MissingMeetings, MissingMeetingsCard } from "./missing-meetings-card";
-export { MobileSummary, SUMMARY_ITEMS, SummaryCardItem } from "./mobile-summary";
+export {
+  MobileSummary,
+  SUMMARY_ITEMS,
+  SummaryCardItem,
+} from "./mobile-summary";
+export { OnTime, OnTimeCard } from "./on-time-card";
+export { TotalMeetings, TotalMeetingsCard } from "./total-meetings-card";

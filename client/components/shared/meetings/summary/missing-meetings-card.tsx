@@ -1,7 +1,6 @@
 import { AlertCircle } from "lucide-react";
 import {
   Frame,
-  FrameDescription,
   FrameHeader,
   FramePanel,
   FrameTitle,
@@ -9,7 +8,6 @@ import {
 import { getMissingMeetingsData } from "@/lib/data/meetings";
 import { getAuthContext } from "@/lib/helpers/auth-token";
 import { meetingSearchParamsCache } from "@/lib/types/search-params";
-import { cn } from "@/lib/utils";
 
 type MissingMeetingsProps = {
   searchParams: Record<string, string | string[] | undefined>;
@@ -25,25 +23,22 @@ export async function MissingMeetings({ searchParams }: MissingMeetingsProps) {
   const missing = await getMissingMeetingsData(token, filters);
 
   return (
-    <div className="flex items-end gap-2">
+    <div className="flex items-center gap-2">
       <p className="font-bold font-sora text-3xl">{missing.count}</p>
       <p className="grid text-muted-foreground text-xs">
-        <>
-          {missing.sprints.length > 0 && (
-            <>
-              {missing.sprints.length} sprint
-              {missing.sprints.length !== 1 ? "s" : ""}
-              {missing.phases.length > 0 && " and "}
-            </>
-          )}
-          {" "}
-          {missing.phases.length > 0 && (
-            <>
-              {missing.phases.length} phase
-              {missing.phases.length !== 1 ? "s" : ""}
-            </>
-          )}
-        </>
+        {missing.sprints.length > 0 && (
+          <>
+            {missing.sprints.length} sprint
+            {missing.sprints.length !== 1 ? "s" : ""}
+            {missing.phases.length > 0 && " and "}
+          </>
+        )}{" "}
+        {missing.phases.length > 0 && (
+          <>
+            {missing.phases.length} phase
+            {missing.phases.length !== 1 ? "s" : ""}
+          </>
+        )}
         <span>{missing.count > 0 && " without meetings"}</span>
       </p>
     </div>
@@ -65,13 +60,13 @@ export async function MissingMeetingsCard({
   return (
     <Frame>
       <FrameHeader className="flex-row items-center gap-2">
-        <div className="rounded-md bg-info p-2">
-          <AlertCircle className="size-4 text-info-foreground" />
+        <AlertCircle className="size-4 text-muted-foreground" />
+        <FrameTitle className="text-sm">Missing</FrameTitle>
+        {/* <div className="rounded-md bg-info p-2">
         </div>
         <div className="space-y-0">
-          <FrameTitle className="text-sm">Missing</FrameTitle>
           <FrameDescription className="text-xs">Meetings</FrameDescription>
-        </div>
+        </div> */}
       </FrameHeader>
       <FramePanel>{children}</FramePanel>
     </Frame>
