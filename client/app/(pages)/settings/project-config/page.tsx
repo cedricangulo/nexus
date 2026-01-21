@@ -1,6 +1,6 @@
 // import ThemePicker from "@/components/shared/settings/theme-picker";
 import ProjectConfig from "@/components/team-lead/settings/project-config";
-import { getPhasesWithDetails } from "@/lib/data/phases";
+import { getPhasesWithDetails } from "@/features/phases/data/phases";
 import { getProject } from "@/lib/data/project";
 import { getAuthContext } from "@/lib/helpers/auth-token";
 

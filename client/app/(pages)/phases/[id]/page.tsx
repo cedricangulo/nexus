@@ -1,33 +1,29 @@
-import Boundary from "@/components/internal/Boundary";
-import PhaseDeliverablesList from "@/components/shared/phase-details/cards/phase-deliverables-list";
-import PhaseMeetingsList from "@/components/shared/phase-details/cards/phase-meetings-list";
-import PhaseTasksList from "@/components/shared/phase-details/cards/phase-tasks-list";
-import PageHeaderContainer from "@/components/shared/phase-details/page-header";
-import { Button } from "@/components/ui/button";
-import { Frame, FrameHeader, FramePanel, FrameTitle } from "@/components/ui/frame";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeftIcon } from "lucide-react";
-import Link from "next/link";
 import { Suspense } from "react";
-
+import Boundary from "@/components/internal/Boundary";
+import {
+  Frame,
+  FrameHeader,
+  FramePanel,
+  FrameTitle,
+} from "@/components/ui/frame";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  PhaseDeliverablesList,
+  PhaseMeetingsList,
+  PhaseTasksList,
+} from "@/features/phases";
+import PageHeaderContainer from "@/features/phases/components/details/page-header";
 export default async function PhaseDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
 
   return (
-		<Boundary
-			rendering="static"
-			hydration="client"
-		>
+    <Boundary hydration="client" rendering="static">
       <div className="space-y-8">
-        <Boundary
-          rendering="static"
-          hydration="server"
-          cached
-        >
+        <Boundary cached hydration="server" rendering="static">
           {/* Page Header */}
           <PageHeaderContainer phaseId={id} />
         </Boundary>
@@ -44,8 +40,8 @@ export default async function PhaseDetailPage({
           </Suspense>
         </div>
       </div>
-		</Boundary>
-	);
+    </Boundary>
+  );
 }
 
 function CardSkeleton() {
@@ -67,5 +63,5 @@ function CardSkeleton() {
     </Frame>
     //   ))}
     // </div>
-  )
+  );
 }

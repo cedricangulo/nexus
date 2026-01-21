@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Sora } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { ThemeProvider } from "@/providers/theme-provider";
-import { BoundaryProvider } from "@/components/internal/BoundaryProvider";
 import Boundary from "@/components/internal/Boundary";
+import { BoundaryProvider } from "@/components/internal/BoundaryProvider";
 import BoundaryToggle from "@/components/internal/BoundaryToggle";
 import { PushNotificationProvider } from "@/providers/push-notification-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -94,8 +94,13 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${sora.variable} antialiased`}>
         <PushNotificationProvider>
           <BoundaryProvider>
-            <Boundary rendering="static" hydration="server">
-              <Toaster closeButton expand={true} position="top-right" richColors />
+            <Boundary hydration="server" rendering="static">
+              <Toaster
+                closeButton
+                expand={true}
+                position="top-right"
+                richColors
+              />
               <ThemeProvider
                 attribute="class"
                 defaultTheme="system"
