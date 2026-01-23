@@ -5,18 +5,18 @@ import { getProject } from "@/lib/data/project";
 import { getAuthContext } from "@/lib/helpers/auth-token";
 
 export default async function ProjectConfigPage() {
-  // Auth and role validation handled by parent layout
-  // Fetch data on the server
-  const { token } = await getAuthContext();
-  const [project, phases] = await Promise.all([
-    getProject(token),
-    getPhasesWithDetails(),
-  ]);
+	// Auth and role validation handled by parent layout
+	// Fetch data on the server
+	const { token } = await getAuthContext();
+	const [project, phases] = await Promise.all([
+		getProject(token),
+		getPhasesWithDetails(),
+	]);
 
-  return (
-    <>
-      <ProjectConfig phases={phases} project={project} />
-      {/* <ThemePicker /> */}
-    </>
-  );
+	return (
+		<>
+			<ProjectConfig phases={phases} project={project} />
+			{/* <ThemePicker /> */}
+		</>
+	);
 }

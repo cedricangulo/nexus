@@ -1,45 +1,25 @@
-import { CircleDot } from "lucide-react";
-import {
-  Frame,
-  FrameHeader,
-  FramePanel,
-  FrameTitle,
-} from "@/components/ui/frame";
-import { getFilteredSprints } from "@/lib/data/sprint";
-import { getAuthContext } from "@/lib/helpers/auth-token";
-import { getSprintStatus } from "@/lib/helpers/sprint";
-import { sprintSearchParamsCache } from "@/lib/types/search-params";
+"use cache";
 
-type ActiveProps = {
-  searchParams: Record<string, string | string[] | undefined>;
+import { getFilteredSprints, SprintFilters } from "@/lib/data/sprint";
+import { getSprintStatus } from "@/lib/helpers/sprint";
+import { User } from "@/lib/types";
+import { cacheLife } from "next/cache";
+
+type Props = {
+	filters: SprintFilters;
+	token: string;
+	user: User;
 };
 
-export async function Active({ searchParams }: ActiveProps) {
-  const { user, token } = await getAuthContext();
-  const filters = sprintSearchParamsCache.parse(searchParams);
+export async function Active({ filters, token, user }: Props) {
+	cacheLife("minutes");
 
-  const sprints = await getFilteredSprints(token, user.role, filters);
-  const now = new Date();
+	const sprints = await getFilteredSprints(token, user.role, filters);
+	const now = new Date();
 
-  const activeCount = sprints.filter(
-    (sprint) => getSprintStatus(sprint, now) === "ACTIVE"
-  ).length;
+	const activeCount = sprints.filter(
+		(sprint) => getSprintStatus(sprint, now) === "ACTIVE",
+	).length;
 
-  return <h4 className="font-bold font-sora text-3xl">{activeCount}</h4>;
-}
-
-export async function ActiveCard({ children }: { children: React.ReactNode }) {
-  "use cache";
-
-  return (
-    <Frame>
-      <FrameHeader className="flex-row items-center gap-2">
-        <div className="rounded-md bg-success p-2">
-          <CircleDot className="size-4 text-success-foreground" />
-        </div>
-        <FrameTitle>Active</FrameTitle>
-      </FrameHeader>
-      <FramePanel>{children}</FramePanel>
-    </Frame>
-  );
+	return <h4 className="font-bold font-sora text-3xl">{activeCount}</h4>;
 }

@@ -5,32 +5,32 @@ import type { Deliverable } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 type Props = {
-  deliverable: Deliverable;
-  children?: React.ReactNode;
+	deliverable: Deliverable;
+	children?: React.ReactNode;
 };
 
 export function DeliverableItem({ deliverable, children }: Props) {
-  return (
-    <FramePanel className="flex items-start justify-between">
-      <div className="min-w-0 flex-1 space-y-2">
-        <div className="flex items-center gap-2">
-          <StatusBadge status={deliverable.status} />
-          {deliverable.dueDate && deliverable.status !== "COMPLETED" ? (
-            <span
-              className={cn(
-                "text-muted-foreground text-xs",
-                isDateInPast(deliverable.dueDate) && "text-destructive"
-              )}
-            >
-              {formatRelativeDueDate(deliverable.dueDate)}
-            </span>
-          ) : null}
-        </div>
-        <p className="truncate font-medium text-foreground text-sm">
-          {deliverable.title}
-        </p>
-      </div>
-      {children}
-    </FramePanel>
-  );
+	return (
+		<FramePanel className="flex items-start justify-between p-2">
+			<div className="min-w-0 flex-1 space-y-2">
+				<div className="flex items-center gap-2">
+					<StatusBadge status={deliverable.status} />
+					{deliverable.dueDate && deliverable.status !== "COMPLETED" ? (
+						<span
+							className={cn(
+								"text-muted-foreground text-xs",
+								isDateInPast(deliverable.dueDate) && "text-destructive",
+							)}
+						>
+							{formatRelativeDueDate(deliverable.dueDate)}
+						</span>
+					) : null}
+				</div>
+				<p className="truncate font-medium text-foreground text-sm">
+					{deliverable.title}
+				</p>
+			</div>
+			{children}
+		</FramePanel>
+	);
 }

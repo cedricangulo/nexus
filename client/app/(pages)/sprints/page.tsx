@@ -1,68 +1,81 @@
 import { Suspense } from "react";
 import { SprintsFilters } from "@/components/shared/sprints/sprints-filters";
 import { SprintsList } from "@/components/shared/sprints/sprints-list";
-import { Active, Total, Upcoming } from "@/components/shared/sprints/summary";
+import {
+	Active,
+	ActiveCard,
+	MobileSummaryCard,
+	SUMMARY_ITEMS,
+	SummaryCardItem,
+	Total,
+	TotalCard,
+	Upcoming,
+	UpcomingCard,
+} from "@/components/shared/sprints/summary";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ActiveCard } from "@/components/shared/sprints/summary/active";
-import { TotalCard } from "@/components/shared/sprints/summary/total";
-import { UpcomingCard } from "@/components/shared/sprints/summary/upcoming";
-import { MobileSummary, SUMMARY_ITEMS, SummaryCardItem } from "@/components/shared/sprints/summary/mobile-summary";
+import { getAuthContext } from "@/lib/helpers/auth-token";
+import { sprintSearchParamsCache } from "@/lib/types/search-params";
 
 type PageProps = {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
+	searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export default async function Page({ searchParams }: PageProps) {
-  const params = await searchParams;
+	const { token, user } = await getAuthContext();
 
-  return (
-    <div className="space-y-8">
-      {/* Summary Cards */}
-      <MobileSummary>
-        {SUMMARY_ITEMS.map(({ label, Component, colorClass }) => (
-          <SummaryCardItem
-            key={label}
-            label={label}
-            Component={Component}
-            colorClass={colorClass}
-            searchParams={params}
-          />
-        ))}
-      </MobileSummary>
-      {/* <SummaryCard searchParams={params} /> */}
-      <div className="hidden sm:grid grid-cols-2 gap-4 sm:grid-cols-3">
-        <TotalCard>
-          <Suspense fallback={<Skeleton className="h-9 w-6" />}>
-            <Total searchParams={params} />
-          </Suspense>
-        </TotalCard>
-        <ActiveCard>
-          <Suspense fallback={<Skeleton className="h-9 w-6" />}>
-            <Active searchParams={params} />
-          </Suspense>
-        </ActiveCard>
-        <UpcomingCard>
-          <Suspense fallback={<Skeleton className="h-9 w-6" />}>
-            <Upcoming searchParams={params} />
-          </Suspense>
-        </UpcomingCard>
-      </div>
+	const filters = sprintSearchParamsCache.parse(await searchParams);
 
-      {/* Filters */}
-      <SprintsFilters />
+	return (
+		<div className="space-y-8">
+			{/* Summary Cards */}
+			<MobileSummaryCard>
+				{SUMMARY_ITEMS.map(({ label, Component, colorClass }) => (
+					<SummaryCardItem
+						key={label}
+						label={label}
+						Component={Component}
+						colorClass={colorClass}
+						filters={filters}
+						token={token}
+						user={user}
+					/>
+				))}
+			</MobileSummaryCard>
+			<div className="hidden sm:grid grid-cols-2 gap-4 sm:grid-cols-3">
+				<TotalCard>
+					<Suspense fallback={<Skeleton className="h-9 w-6" />}>
+						<Total filters={filters} token={token} user={user} />
+					</Suspense>
+				</TotalCard>
+				<ActiveCard>
+					<Suspense fallback={<Skeleton className="h-9 w-6" />}>
+						<Active filters={filters} token={token} user={user} />
+					</Suspense>
+				</ActiveCard>
+				<UpcomingCard>
+					<Suspense fallback={<Skeleton className="h-9 w-6" />}>
+						<Upcoming filters={filters} token={token} user={user} />
+					</Suspense>
+				</UpcomingCard>
+			</div>
 
-      {/* Sprint List */}
-      <Suspense fallback={<SprintListSkeleton />}>
-        <SprintsList searchParams={params} />
-      </Suspense>
-    </div>
-  );
+			{/* Filters */}
+			<SprintsFilters />
+
+			{/* Sprint List */}
+			<Suspense fallback={<SprintListSkeleton />}>
+				<SprintsList filters={filters} token={token} user={user} />
+			</Suspense>
+		</div>
+	);
 }
 
 function SprintListSkeleton() {
-  return (
-    <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-      {[1, 2, 3].map((key) => (<Skeleton key={key} className="h-54.5 w-full" />))}
-    </section>
-  )
+	return (
+		<section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+			{[1, 2, 3].map((key) => (
+				<Skeleton key={key} className="h-54.5 w-full" />
+			))}
+		</section>
+	);
 }

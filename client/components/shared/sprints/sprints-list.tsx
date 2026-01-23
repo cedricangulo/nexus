@@ -1,19 +1,19 @@
 import { FolderXIcon } from "lucide-react";
 import { EmptyState } from "@/components/shared/empty-state";
 import { SprintCard } from "@/components/shared/sprints/sprint-card";
-import { getFilteredSprints, getSprintsProgress } from "@/lib/data/sprint";
-import { getAuthContext } from "@/lib/helpers/auth-token";
-import { sprintSearchParamsCache } from "@/lib/types/search-params";
+import { getFilteredSprints, getSprintsProgress, SprintFilters } from "@/lib/data/sprint";
+import { User } from "@/lib/types";
 
-type SprintsListProps = {
-  searchParams: Record<string, string | string[] | undefined>;
+type Props = {
+  filters: SprintFilters;
+  token: string;
+  user: User;
 };
 
-export async function SprintsList({ searchParams }: SprintsListProps) {
-  const { user, token } = await getAuthContext();
-  const filters = sprintSearchParamsCache.parse(searchParams);
+export async function SprintsList({ filters, token, user }: Props) {
 
   const sprints = await getFilteredSprints(token, user.role, filters);
+
   const progressById = await getSprintsProgress(
     sprints.map((s) => s.id),
     token

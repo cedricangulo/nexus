@@ -6,17 +6,17 @@ import { cache } from "react";
 
 export type AppRole = "member" | "teamLead" | "adviser";
 
-export type SessionUser = {
+export interface SessionUser {
   id?: string;
   email?: string;
   name?: string;
   role: AppRole;
-};
+}
 
-export type Session = {
+export interface Session {
   user: SessionUser;
   token: string;
-};
+}
 
 function normalizeRole(rawRole: unknown): AppRole {
   if (typeof rawRole !== "string") {

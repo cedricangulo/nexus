@@ -1,7 +1,6 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import type { AppRole } from "@/auth";
 import { MeetingRowActions } from "@/components/shared/meetings/table/row-actions";
 import { formatDate } from "@/lib/helpers/format-date";
 import type { MeetingLog, Phase, Sprint } from "@/lib/types";
@@ -31,7 +30,6 @@ type ColumnsContext = {
   sprints: Sprint[];
   onAction?: (actionId: string, row: MeetingsTableRow) => Promise<void>;
   loadingIds?: Set<string>;
-  currentUserRole: AppRole;
 };
 
 export function createMeetingColumns(context: ColumnsContext): {
@@ -117,7 +115,6 @@ export function createMeetingColumns(context: ColumnsContext): {
       header: () => <span className="sr-only">Actions</span>,
       cell: ({ row }) => (
         <MeetingRowActions
-          currentUserRole={context.currentUserRole}
           isLoading={context.loadingIds?.has(row.original.id) ?? false}
           meeting={row.original}
           onAction={async (actionId) => {

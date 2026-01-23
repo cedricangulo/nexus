@@ -21,7 +21,6 @@ export async function MeetingsList({ searchParams }: MeetingsListProps) {
 
   return (
     <MeetingsTable
-      currentUserRole="teamLead"
       initialLogs={logs}
       phases={phases}
       scopeCounts={scopeCounts}

@@ -23,8 +23,9 @@ import { useIsTeamLead } from "@/providers/auth-context-provider";
 const STATUS_OPTIONS = [
   { value: "ALL", label: "All Sprints" },
   { value: "ACTIVE", label: "Active" },
-  { value: "PLANNED", label: "Planned" },
+  { value: "UPCOMING", label: "Upcoming" },
   { value: "COMPLETED", label: "Completed" },
+  { value: "OVERDUE", label: "Overdue" },
 ] as const;
 
 export function SprintsFilters() {
