@@ -32,7 +32,7 @@ import { UploadMinutesButton } from "../upload-button";
  * Inline Meetings Table Filters
  * Handles search, scope filtering (via nuqs), and column visibility
  */
-export function MeetingsFilters({
+export function MeetingsTableFilters({
 	table,
 	scopeCounts,
 	sprints,

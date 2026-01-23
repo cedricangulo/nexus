@@ -1,4 +1,4 @@
-import { Clock } from "lucide-react";
+import { CircleDashed } from "lucide-react";
 import {
 	Frame,
 	FrameHeader,
@@ -6,12 +6,12 @@ import {
 	FrameTitle,
 } from "@/components/ui/frame";
 
-export function OnTimeCard({ children }: { children?: React.ReactNode }) {
+export function UpcomingCard({ children }: { children: React.ReactNode }) {
 	return (
 		<Frame>
 			<FrameHeader className="flex-row items-center gap-2">
-				<Clock className="size-4 text-muted-foreground" />
-				<FrameTitle className="text-sm">On-Time</FrameTitle>
+				<CircleDashed className="size-4 text-muted-foreground" />
+				<FrameTitle>Upcoming</FrameTitle>
 			</FrameHeader>
 			<FramePanel>{children}</FramePanel>
 		</Frame>
