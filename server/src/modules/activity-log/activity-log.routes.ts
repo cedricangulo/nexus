@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
-import { getAllActivityLogsHandler, getActivityLogsByEntityHandler } from "./activity-log.controller.js";
+import { getAllActivityLogsHandler, getActivityLogsByEntityHandler, getMyActivityLogsHandler } from "./activity-log.controller.js";
 import { requireRole } from "../../utils/rbac.js";
 import { Role } from "../../generated/client.js";
 import { z } from "zod";
@@ -32,6 +32,12 @@ export async function activityLogRoutes(app: FastifyInstance) {
         },
       },
       getActivityLogsByEntityHandler
+    );
+
+    protectedServer.get(
+      "/me",
+      {},
+      getMyActivityLogsHandler
     );
   });
 }

@@ -8,6 +8,11 @@ export const activityLogApi = {
     return response.data;
   },
 
+  getMyActivityLogs: async (): Promise<ActivityLog[]> => {
+    const response = await apiClient.get(API_ENDPOINTS.ACTIVITY_LOGS.ME);
+    return response.data;
+  },
+
   getActivityLogsByEntity: async (
     entityType: string,
     entityId: string

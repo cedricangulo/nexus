@@ -6,6 +6,21 @@ import { cookies } from "next/headers";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const API_BASE_URL = `${API_URL}/api/v1`;
 
+// Cache for cookie store to avoid multiple reads per request
+let cachedCookies: Awaited<ReturnType<typeof cookies>> | null = null;
+
+async function getCookieStore() {
+  if (!cachedCookies) {
+    cachedCookies = await cookies();
+  }
+  return cachedCookies;
+}
+
+// Reset cookie cache (called after mutations that change auth state)
+export async function resetCookieCache() {
+  cachedCookies = null;
+}
+
 // Singleton instance
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -19,7 +34,7 @@ export const apiClient = axios.create({
 // Request interceptor: Add auth token if available
 apiClient.interceptors.request.use(
   async (config) => {
-    const cookieStore = await cookies();
+    const cookieStore = await getCookieStore();
     const token = cookieStore.get("auth_token")?.value;
 
     if (token) {
@@ -54,14 +69,20 @@ apiClient.interceptors.request.use(
 // Response interceptor: Handle common errors
 apiClient.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
-    if (error.code === "ECONNABORTED") {
-      console.error("Request timed out. Check API availability.");
+  async (error: AxiosError) => {
+    // Handle 401: Token expired or invalid - clear auth and let client handle redirect
+    if (error.response?.status === 401) {
+      await resetCookieCache();
+      const cookieStore = await cookies();
+      cookieStore.delete("auth_token");
+      // Error will propagate to caller for proper error handling
     }
 
-    if (error.response?.status === 401) {
-      // Token expired or invalid - will be handled in middleware
-      // Client-side logout can be triggered via server action
+    if (error.code === "ECONNABORTED") {
+      const timeout = new Error(
+        "Request timeout. Please check your connection."
+      );
+      return Promise.reject(timeout);
     }
 
     return Promise.reject(error);

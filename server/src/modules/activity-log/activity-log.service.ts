@@ -95,3 +95,20 @@ export async function getActivityLogsByEntity(entityType: string, entityId: stri
         orderBy: { createdAt: "desc" },
     });
 }
+
+export async function getActivityLogsByUser(userId: string) {
+    return prisma.activityLog.findMany({
+        where: {
+            userId,
+        },
+        include: {
+            user: {
+                select: {
+                    name: true,
+                    email: true,
+                },
+            },
+        },
+        orderBy: { createdAt: "desc" },
+    });
+}
