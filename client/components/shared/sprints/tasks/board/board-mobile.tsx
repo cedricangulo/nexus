@@ -6,12 +6,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Task, TaskStatus, User } from "@/lib/types";
 import { TaskCard } from "../task-card";
 
-export type MobileColumnDef = {
+export interface MobileColumnDef {
   status: TaskStatus;
   label: string;
-};
+}
 
-export type TaskBoardMobileProps = {
+export interface TaskBoardMobileProps {
   columns: MobileColumnDef[];
   columnsValue: Record<TaskStatus, Task[]>;
   userMap: Record<string, User>;
@@ -19,7 +19,7 @@ export type TaskBoardMobileProps = {
   onStatusChange: (task: Task, toStatus: TaskStatus) => void;
   onEditReason: (task: Task) => void;
   onTaskClick: (task: Task) => void;
-};
+}
 
 export function TaskBoardMobile({
   columns,

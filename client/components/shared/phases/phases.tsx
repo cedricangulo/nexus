@@ -1,13 +1,19 @@
+import { cacheTag } from "next/cache";
 import { Suspense } from "react";
 import Boundary from "@/components/internal/Boundary";
+import { Button } from "@/components/ui/button";
+import {
+  Frame,
+  FrameFooter,
+  FrameHeader,
+  FramePanel,
+} from "@/components/ui/frame";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getPhases } from "@/lib/data/phases";
+import { getAuthContext } from "@/lib/helpers/auth-token";
 import EmptyPhases from "./empty-phases";
 import PhaseCard, { HeaderSkeleton } from "./phase-card";
 import PhaseProgressDisplay from "./phase-progress-display";
-import { Frame, FrameHeader, FramePanel } from "@/components/ui/frame";
-import { getAuthContext } from "@/lib/helpers/auth-token";
-import { cacheTag } from "next/cache";
 
 export default async function Phases() {
   // Fetch token HERE (Dynamic Layer)
@@ -18,7 +24,13 @@ export default async function Phases() {
 }
 
 // Accepts token as prop so it doesn't need to check cookies()
-async function CachedPhasesView({ userId, token }: { userId: string; token: string }) {
+async function CachedPhasesView({
+  userId,
+  token,
+}: {
+  userId: string;
+  token: string;
+}) {
   "use cache";
   cacheTag("phases-list", `user-${userId}`);
 
@@ -51,22 +63,22 @@ async function CachedPhasesView({ userId, token }: { userId: string; token: stri
 }
 
 function ProgressSkeleton() {
-	return (
-		<>
-			<FramePanel className="space-y-3">
-				<Skeleton className="h-3.5 w-12" />
-				<Skeleton className="h-2 w-full" />
-			</FramePanel>
-			<FramePanel className="space-y-3">
-				<Skeleton className="h-3.5 w-12" />
-				<Skeleton className="h-2 w-full" />
-			</FramePanel>
-			<FramePanel className="flex items-center justify-between">
-				<Skeleton className="h-3.5 w-12" />
-				<Skeleton className="h-7 w-4" />
-			</FramePanel>
-		</>
-	);
+  return (
+    <>
+      <FramePanel className="space-y-3">
+        <Skeleton className="h-4 w-12" />
+        <Skeleton className="h-2 w-full" />
+      </FramePanel>
+      <FramePanel className="space-y-3">
+        <Skeleton className="h-4 w-12" />
+        <Skeleton className="h-2 w-full" />
+      </FramePanel>
+      <FramePanel className="flex items-center justify-between">
+        <Skeleton className="h-3.5 w-12" />
+        <Skeleton className="h-9 w-4" />
+      </FramePanel>
+    </>
+  );
 }
 
 export function PhasesPageSeleton() {
@@ -79,8 +91,13 @@ export function PhasesPageSeleton() {
             <HeaderSkeleton />
           </FrameHeader>
           <ProgressSkeleton />
+          <FrameFooter>
+            <Button disabled variant="secondary">
+              View Details
+            </Button>
+          </FrameFooter>
         </Frame>
       ))}
     </div>
-  )
+  );
 }
