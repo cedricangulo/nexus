@@ -1,11 +1,13 @@
-import { ActivityLogs } from "@/components/team-lead/dashboard/activity-logs";
-import { BlockedItemsList } from "@/components/team-lead/dashboard/blocked-items-list";
-import { PendingApprovalsList } from "@/components/team-lead/dashboard/pending-approvals-list";
-import { PhaseProgressCardsDisplay } from "@/components/team-lead/dashboard/phase-progress-cards";
-import { ProjectHealthCard } from "@/components/team-lead/dashboard/project-health-card";
-import { SprintHealthCard } from "@/components/team-lead/dashboard/sprint-health-card";
-import { TeamContributions } from "@/components/team-lead/dashboard/team-contributions";
-import { Separator } from "@/components/ui/separator";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/animate-ui/components/radix/tabs";
+import ContributionsTab from "@/components/team-lead/dashboard/contributions";
+import Overview from "@/components/team-lead/dashboard/overview";
+import PhasesTab from "@/components/team-lead/dashboard/phases";
+import SprintsTab from "@/components/team-lead/dashboard/sprints";
 import { getAuthContext } from "@/lib/helpers/auth-token";
 
 export const metadata = {
@@ -28,20 +30,31 @@ export default async function DashboardPage() {
   if (user?.role === "TEAM_LEAD") {
     return (
       <div className="mx-auto max-w-screen-2xl space-y-8">
-        <ProjectHealthCard />
-        <PhaseProgressCardsDisplay />
-
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <SprintHealthCard />
-          <ActivityLogs />
-          <BlockedItemsList />
-          <PendingApprovalsList />
-        </div>
-
-        <div className="space-y-8">
-          <Separator />
-          <TeamContributions />
-        </div>
+        <Overview />
+        <Tabs defaultValue="phases">
+          <TabsList>
+            <TabsTrigger value="phases">Phases</TabsTrigger>
+            <TabsTrigger value="sprints">Sprints</TabsTrigger>
+            <TabsTrigger value="deliverables">Deliverables</TabsTrigger>
+            <TabsTrigger value="contributions">Contributions</TabsTrigger>
+            <TabsTrigger value="timeline">Timeline</TabsTrigger>
+          </TabsList>
+          <TabsContent value="phases">
+            <PhasesTab />
+          </TabsContent>
+          <TabsContent value="sprints">
+            <SprintsTab />
+          </TabsContent>
+          <TabsContent value="deliverables">
+            deliverables tab content
+          </TabsContent>
+          <TabsContent value="contributions">
+            <ContributionsTab />
+          </TabsContent>
+          <TabsContent value="timeline">
+            <p />
+          </TabsContent>
+        </Tabs>
       </div>
     );
   }
