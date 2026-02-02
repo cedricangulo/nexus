@@ -5,143 +5,145 @@
  */
 
 export const API_ENDPOINTS = {
-  // Auth Endpoints
-  AUTH: {
-    LOGIN: "/auth/login",
-    LOGOUT: "/auth/logout",
-    ME: "/auth/me",
-    CHANGE_PASSWORD: "/auth/change-password",
-    INVITE: "/auth/invite",
-  },
+	// Auth Endpoints
+	AUTH: {
+		LOGIN: "/auth/login",
+		LOGOUT: "/auth/logout",
+		ME: "/auth/me",
+		CHANGE_PASSWORD: "/auth/change-password",
+		INVITE: "/auth/invite",
+	},
 
-  // Project Endpoints
-  PROJECT: {
-    GET: "/project",
-    CREATE: "/project",
-    UPDATE: "/project",
-    PATCH: "/project",
-  },
+	// Project Endpoints
+	PROJECT: {
+		GET: "/project",
+		CREATE: "/project",
+		UPDATE: "/project",
+		PATCH: "/project",
+	},
 
-  // User Endpoints
-  USERS: {
-    LIST: "/users",
-    GET: (id: string) => `/users/${id}`,
-    UPDATE: (id: string) => `/users/${id}`,
-    DELETE: (id: string) => `/users/${id}`,
-    RESTORE: (id: string) => `/users/${id}/restore`,
-    CONTRIBUTIONS: (id: string) => `/users/${id}/contributions`,
-  },
+	// User Endpoints
+	USERS: {
+		LIST: "/users",
+		GET: (id: string) => `/users/${id}`,
+		UPDATE: (id: string) => `/users/${id}`,
+		DELETE: (id: string) => `/users/${id}`,
+		RESTORE: (id: string) => `/users/${id}/restore`,
+		CONTRIBUTIONS: (id: string) => `/users/${id}/contributions`,
+	},
 
-  // Phase Endpoints
-  PHASES: {
-    LIST: "/phases",
-    GET: (id: string) => `/phases/${id}`,
-    CREATE: "/phases",
-    UPDATE: (id: string) => `/phases/${id}`,
-    DELETE: (id: string) => `/phases/${id}`,
-  },
+	// Phase Endpoints
+	PHASES: {
+		LIST: "/phases",
+		GET: (id: string) => `/phases/${id}`,
+		CREATE: "/phases",
+		UPDATE: (id: string) => `/phases/${id}`,
+		DELETE: (id: string) => `/phases/${id}`,
+	},
 
-  // Deliverable Endpoints
-  DELIVERABLES: {
-    LIST: "/deliverables",
-    GET: (id: string) => `/deliverables/${id}`,
-    CREATE: "/deliverables",
-    UPDATE: (id: string) => `/deliverables/${id}`,
-    DELETE: (id: string) => `/deliverables/${id}`,
-    RESTORE: (id: string) => `/deliverables/${id}/restore`,
-  },
+	// Deliverable Endpoints
+	DELIVERABLES: {
+		LIST: "/deliverables",
+		GET: (id: string) => `/deliverables/${id}`,
+		CREATE: "/deliverables",
+		UPDATE: (id: string) => `/deliverables/${id}`,
+		DELETE: (id: string) => `/deliverables/${id}`,
+		RESTORE: (id: string) => `/deliverables/${id}/restore`,
+	},
 
-  // Sprint Endpoints
-  SPRINTS: {
-    LIST: "/sprints",
-    LIST_MINE: "/sprints/mine",
-    GET: (id: string) => `/sprints/${id}`,
-    CREATE: "/sprints",
-    UPDATE: (id: string) => `/sprints/${id}`,
-    DELETE: (id: string) => `/sprints/${id}`,
-    RESTORE: (id: string) => `/sprints/${id}/restore`,
-    PROGRESS: (id: string) => `/sprints/${id}/progress`,
-  },
+	// Sprint Endpoints
+	SPRINTS: {
+		LIST: "/sprints",
+		LIST_MINE: "/sprints/mine",
+		GET: (id: string) => `/sprints/${id}`,
+		CREATE: "/sprints",
+		UPDATE: (id: string) => `/sprints/${id}`,
+		DELETE: (id: string) => `/sprints/${id}`,
+		RESTORE: (id: string) => `/sprints/${id}/restore`,
+		PROGRESS: (id: string) => `/sprints/${id}/progress`,
+	},
 
-  // Task Endpoints
-  TASKS: {
-    LIST: "/tasks",
-    GET: (id: string) => `/tasks/${id}`,
-    CREATE: "/tasks",
-    UPDATE: (id: string) => `/tasks/${id}`,
-    UPDATE_STATUS: (id: string) => `/tasks/${id}/status`,
-    DELETE: (id: string) => `/tasks/${id}`,
-    RESTORE: (id: string) => `/tasks/${id}/restore`,
-  },
+	// Task Endpoints
+	TASKS: {
+		LIST: "/tasks",
+		GET: (id: string) => `/tasks/${id}`,
+		CREATE: "/tasks",
+		UPDATE: (id: string) => `/tasks/${id}`,
+		UPDATE_STATUS: (id: string) => `/tasks/${id}/status`,
+		DELETE: (id: string) => `/tasks/${id}`,
+		RESTORE: (id: string) => `/tasks/${id}/restore`,
+	},
 
-  // Comment Endpoints
-  COMMENTS: {
-    LIST: "/comments",
-    GET: (id: string) => `/comments/${id}`,
-    CREATE: "/comments",
-    UPDATE: (id: string) => `/comments/${id}`,
-    DELETE: (id: string) => `/comments/${id}`,
-  },
+	// Comment Endpoints
+	COMMENTS: {
+		LIST: "/comments",
+		GET: (id: string) => `/comments/${id}`,
+		CREATE: "/comments",
+		UPDATE: (id: string) => `/comments/${id}`,
+		DELETE: (id: string) => `/comments/${id}`,
+	},
 
-  // Evidence Endpoints
-  EVIDENCE: {
-    CREATE: "/evidence",
-    CREATE_LINK: "/evidence/link",
-    BY_DELIVERABLE: (deliverableId: string) =>
-      `/evidence/deliverable/${deliverableId}`,
-    DELETE: (id: string) => `/evidence/${id}`,
-    RESTORE: (id: string) => `/evidence/${id}/restore`,
-  },
+	// Evidence Endpoints
+	EVIDENCE: {
+		CREATE: "/evidence",
+		CREATE_LINK: "/evidence/link",
+		BY_DELIVERABLE: (deliverableId: string) =>
+			`/evidence/deliverable/${deliverableId}`,
+		DELETE: (id: string) => `/evidence/${id}`,
+		RESTORE: (id: string) => `/evidence/${id}/restore`,
+	},
 
-  // Meeting Log Endpoints
-  MEETING_LOGS: {
-    CREATE: "/meeting-logs",
-    BY_SPRINT: (sprintId: string) => `/meeting-logs/sprint/${sprintId}`,
-    BY_PHASE: (phaseId: string) => `/meeting-logs/phase/${phaseId}`,
-    DELETE: (id: string) => `/meeting-logs/${id}`,
-  },
+	// Meeting Log Endpoints
+	MEETING_LOGS: {
+		CREATE: "/meeting-logs",
+		BY_SPRINT: (sprintId: string) => `/meeting-logs/sprint/${sprintId}`,
+		BY_PHASE: (phaseId: string) => `/meeting-logs/phase/${phaseId}`,
+		DELETE: (id: string) => `/meeting-logs/${id}`,
+	},
 
-  // Activity Log Endpoints
-  ACTIVITY_LOGS: {
-    LIST: "/activity-logs",
-    BY_ENTITY: (entityType: string, entityId: string) =>
-      `/activity-logs/entity/${entityType}/${entityId}`,
-  },
+	// Activity Log Endpoints
+	ACTIVITY_LOGS: {
+		LIST: "/activity-logs",
+		ME: "/activity-logs/me",
+		BY_ENTITY: (entityType: string, entityId: string) =>
+			`/activity-logs/entity/${entityType}/${entityId}`,
+	},
 
-  // Notification Endpoints
-  NOTIFICATIONS: {
-    LIST: "/notifications",
-    CREATE: "/notifications",
-    MARK_READ: (id: string) => `/notifications/${id}/read`,
-    MARK_ALL_READ: "/notifications/read-all",
-    DELETE: (id: string) => `/notifications/${id}`,
-  },
+	// Notification Endpoints
+	NOTIFICATIONS: {
+		LIST: "/notifications",
+		CREATE: "/notifications",
+		MARK_READ: (id: string) => `/notifications/${id}/read`,
+		MARK_ALL_READ: "/notifications/read-all",
+		DELETE: (id: string) => `/notifications/${id}`,
+	},
 
-  // Search Endpoints
-  SEARCH: {
-    GLOBAL: "/search",
-  },
+	// Search Endpoints
+	SEARCH: {
+		GLOBAL: "/search",
+	},
 
-  // Analytics Endpoints
-  ANALYTICS: {
-    OVERVIEW: "/analytics/dashboard/overview",
-    PHASES: "/analytics/dashboard/phases",
-    SPRINTS: "/analytics/dashboard/sprints",
-    CONTRIBUTIONS: "/analytics/dashboard/contributions",
-    TIMELINE: "/analytics/timeline",
-  },
+	// Analytics Endpoints
+	ANALYTICS: {
+		OVERVIEW: "/dashboard/overview",
+		PHASES: "/dashboard/phases",
+		SPRINTS: "/dashboard/sprints",
+		CONTRIBUTIONS: "/dashboard/contributions",
+		TIMELINE: "/timeline",
+		GANTT: "/gantt",
+	},
 
-  // Backup Endpoints
-  BACKUP: {
-    EXPORT: "/backup/export",
-    FILES: "/backup/files",
-  },
+	// Backup Endpoints
+	BACKUP: {
+		EXPORT: "/backup/export",
+		FILES: "/backup/files",
+	},
 
-  // Device Token Endpoints (Push Notifications)
-  DEVICE_TOKENS: {
-    REGISTER: "/device-tokens",
-    UNREGISTER: (token: string) => `/device-tokens/${token}`,
-  },
+	// Device Token Endpoints (Push Notifications)
+	DEVICE_TOKENS: {
+		REGISTER: "/device-tokens",
+		UNREGISTER: (token: string) => `/device-tokens/${token}`,
+	},
 } as const;
 
 /**

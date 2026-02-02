@@ -12,53 +12,56 @@ import { requireRole } from "../../utils/rbac.js";
 import { Role } from "../../generated/client.js";
 
 export async function analyticsRoutes(app: FastifyInstance) {
-  const server = app.withTypeProvider<ZodTypeProvider>();
+  app.register(async (protectedRoutes) => {
+    const protectedServer = protectedRoutes.withTypeProvider<ZodTypeProvider>();
+    protectedRoutes.addHook("onRequest", app.authenticate);
 
-  server.get(
-    "/dashboard/overview",
-    {
-      preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
-    },
-    getDashboardOverviewHandler as any
-  );
+    protectedServer.get(
+      "/dashboard/overview",
+      {
+        preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
+      },
+      getDashboardOverviewHandler as any
+    );
 
-  server.get(
-    "/dashboard/phases",
-    {
-      preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
-    },
-    getPhaseAnalyticsHandler as any
-  );
+    protectedServer.get(
+      "/dashboard/phases",
+      {
+        preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
+      },
+      getPhaseAnalyticsHandler as any
+    );
 
-  server.get(
-    "/dashboard/sprints",
-    {
-      preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
-    },
-    getSprintAnalyticsHandler as any
-  );
+    protectedServer.get(
+      "/dashboard/sprints",
+      {
+        preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
+      },
+      getSprintAnalyticsHandler as any
+    );
 
-  server.get(
-    "/dashboard/contributions",
-    {
-      preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
-    },
-    getTeamContributionsHandler as any
-  );
+    protectedServer.get(
+      "/dashboard/contributions",
+      {
+        preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
+      },
+      getTeamContributionsHandler as any
+    );
 
-  server.get(
-    "/timeline",
-    {
-      preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
-    },
-    getTimelineDataHandler as any
-  );
+    protectedServer.get(
+      "/timeline",
+      {
+        preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
+      },
+      getTimelineDataHandler as any
+    );
 
-  server.get(
-    "/gantt",
-    {
-      preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
-    },
-    getGanttDataHandler as any
-  );
+    protectedServer.get(
+      "/gantt",
+      {
+        preHandler: [requireRole([Role.MEMBER, Role.TEAM_LEAD, Role.ADVISER])],
+      },
+      getGanttDataHandler as any
+    );
+  });
 }
