@@ -24,7 +24,6 @@ async function isTokenValid(token: string): Promise<boolean> {
     const secret = process.env.JWT_SECRET;
     if (!secret) {
       // FAIL CLOSED: No secret means no validation possible
-      console.error("[Proxy] JWT_SECRET not configured - rejecting all tokens");
       return false;
     }
 
@@ -34,7 +33,7 @@ async function isTokenValid(token: string): Promise<boolean> {
       clockTolerance: 60, // 60 second tolerance for clock skew
     });
     return true;
-  } catch (_e) {
+  } catch {
     // Token is malformed, signature invalid, or expired
     return false;
   }

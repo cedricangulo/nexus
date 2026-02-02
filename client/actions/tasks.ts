@@ -37,6 +37,7 @@ export async function createSprintTaskAction(input: unknown) {
     });
 
     updateTag("sprints");
+    updateTag(`sprint-${parsed.sprintId}`);
     revalidatePath(`/sprints/${parsed.sprintId}`);
     return { success: true } as const;
   } catch (error) {
@@ -59,6 +60,7 @@ export async function updateTaskStatusAction(input: unknown) {
     });
 
     updateTag("sprints");
+    updateTag(`sprint-${parsed.sprintId}`);
     revalidatePath(`/sprints/${parsed.sprintId}`);
     return { success: true } as const;
   } catch (error) {
@@ -95,6 +97,7 @@ export async function updateTaskAction(input: unknown) {
     });
 
     updateTag("sprints");
+    updateTag(`sprint-${parsed.sprintId}`);
     revalidatePath(`/sprints/${parsed.sprintId}`);
     return { success: true } as const;
   } catch (error) {

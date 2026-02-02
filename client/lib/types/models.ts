@@ -48,7 +48,7 @@ export type DeliverableStage =
   (typeof DeliverableStage)[keyof typeof DeliverableStage];
 
 // User
-export type User = {
+export interface User {
   id: string;
   email: string;
   name: string;
@@ -56,10 +56,10 @@ export type User = {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
-};
+}
 
 // Project
-export type Project = {
+export interface Project {
   id: string;
   name: string;
   description?: string | null;
@@ -68,10 +68,10 @@ export type Project = {
   endDate?: string | null;
   createdAt: string;
   updatedAt: string;
-};
+}
 
 // Phase
-export type Phase = {
+export interface Phase {
   id: string;
   projectId: string;
   type: PhaseType;
@@ -81,7 +81,7 @@ export type Phase = {
   endDate?: string | null;
   createdAt: string;
   updatedAt: string;
-};
+}
 
 export interface PhaseDetail extends Phase {
   deliverables: Deliverable[];
@@ -90,7 +90,7 @@ export interface PhaseDetail extends Phase {
 }
 
 // Deliverable
-export type Deliverable = {
+export interface Deliverable {
   id: string;
   phaseId: string;
   title: string;
@@ -101,10 +101,10 @@ export type Deliverable = {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
-};
+}
 
 // Sprint
-export type Sprint = {
+export interface Sprint {
   id: string;
   projectId: string;
   number: number;
@@ -114,16 +114,16 @@ export type Sprint = {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
-};
+}
 
-export type SprintProgress = {
+export interface SprintProgress {
   totalTasks: number;
   completedTasks: number;
   percentage: number;
-};
+}
 
 // Task
-export type Task = {
+export interface Task {
   id: string;
   sprintId?: string | null;
   phaseId?: string | null;
@@ -135,10 +135,10 @@ export type Task = {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
-};
+}
 
 // Comment
-export type Comment = {
+export interface Comment {
   id: string;
   content: string;
   authorId: string;
@@ -151,10 +151,10 @@ export type Comment = {
   deliverableId?: string | null;
   createdAt: string;
   updatedAt: string;
-};
+}
 
 // Evidence
-export type Evidence = {
+export interface Evidence {
   id: string;
   deliverableId: string;
   uploaderId: string;
@@ -164,10 +164,10 @@ export type Evidence = {
   fileType?: string | null;
   createdAt: string;
   deletedAt?: string | null;
-};
+}
 
 // Meeting Log
-export type MeetingLog = {
+export interface MeetingLog {
   id: string;
   sprintId?: string | null;
   phaseId?: string | null;
@@ -182,10 +182,10 @@ export type MeetingLog = {
   };
   createdAt: string;
   updatedAt: string;
-};
+}
 
 // Activity Log
-export type ActivityLog = {
+export interface ActivityLog {
   id: string;
   userId: string;
   action: string;
@@ -197,22 +197,22 @@ export type ActivityLog = {
     name: string;
     email: string;
   } | null;
-};
+}
 
 // Notification
-export type Notification = {
+export interface Notification {
   id: string;
   userId: string;
   message: string;
   link?: string | null;
   isRead: boolean;
   createdAt: string;
-};
+}
 
 // Contribution (from getUserContributions)
-export type UserContribution = {
+export interface UserContribution {
   assignedTasksCount: number;
   completedTasksCount: number;
   uploadedEvidenceCount: number;
   commentsCount: number;
-};
+}
