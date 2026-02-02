@@ -10,18 +10,18 @@ const COLOR_VARIANTS = {
   "status-in-progress": "bg-chart-3",
   "status-warning": "bg-chart-2",
   "status-error": "bg-chart-4",
-  "status-info": "bg-accent",
+  "status-info": "bg-muted",
 } as const;
 
 export type ColorVariant = keyof typeof COLOR_VARIANTS;
 
-type CategoryBarProps = {
+interface CategoryBarProps {
   values: number[];
   colors: ColorVariant[];
   showLabels?: boolean;
   className?: string;
   tooltips?: string[];
-};
+}
 
 export function CategoryBar({
   values,
@@ -36,7 +36,7 @@ export function CategoryBar({
     return (
       <div
         className={cn(
-          "flex w-full overflow-hidden rounded-full bg-accent",
+          "flex w-full overflow-hidden rounded-full bg-muted",
           className
         )}
       />
@@ -44,10 +44,10 @@ export function CategoryBar({
   }
 
   return (
-    <div className={cn("flex w-full gap-0 bg-accent overflow-hidden rounded-full", className)}>
+    <div className={cn("flex w-full gap-1 overflow-hidden", className)}>
       {values.map((value, index) => {
         const percentage = (value / total) * 100;
-        const color = colors[index] || "bg-accent";
+        const color = colors[index] || "bg-muted";
 
         if (percentage === 0) {
           return null;
@@ -55,15 +55,15 @@ export function CategoryBar({
 
         return (
           <div
+            className={cn(
+              "h-full rounded-xs transition-all",
+              COLOR_VARIANTS[color as ColorVariant]
+            )}
             key={index}
             style={{
               width: `${percentage}%`,
             }}
             title={tooltips?.[index] || `${value}`}
-            className={cn(
-              "h-full transition-all nth-[3]:rounded-r-full",
-              COLOR_VARIANTS[color as ColorVariant]
-            )}
           />
         );
       })}

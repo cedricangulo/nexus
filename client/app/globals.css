@@ -95,10 +95,10 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
-  --chart-1: var(--color-emerald-600);
-  --chart-2: var(--color-amber-600);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-red-600);
+  --chart-1: #00c94f;
+  --chart-2: #ff6900;
+  --chart-3: #2c71fb;
+  --chart-4: #fb2c36;
   --chart-5: oklch(0.424 0.199 265.638);
   --radius: 0.75rem;
   --sidebar: oklch(97.015% 0.00011 271.152);
