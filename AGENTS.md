@@ -1,6 +1,6 @@
 # AGENTS.md - Repository Guidelines for Agentic Coding
 
-This document provides essential information for agentic coding agents operating in the Nexus monorepo.
+Essential information for agentic coding agents operating in the Nexus monorepo.
 
 ## Project Structure
 
@@ -8,6 +8,8 @@ This document provides essential information for agentic coding agents operating
 nexus/
 ├── client/          # Next.js 16 React 19 frontend (Turbopack)
 ├── server/          # Fastify backend with Prisma ORM
+├── .github/skills/  # GitHub Copilot Skills (invoked via /<skill-name>)
+├── .github/prompts/ # GitHub Copilot Prompts (system-level guidelines)
 └── AGENTS.md        # This file
 ```
 
@@ -80,29 +82,27 @@ pnpm check            # Full check (lint + format)
 
 ### Enforced by Biome/Ultracite (Auto-Fixed)
 
-**Formatting (Client uses Ultracite/core+next presets):**
-- Indentation: 2 spaces
-- Line ending: LF (Unix)
-- Max line width: 100 characters (server), auto (client via Ultracite)
-- Quote style: Single quotes (`'`)
-- Trailing commas: ES5 style (where valid)
+**Formatting:**
+- Indentation: 2 spaces | Line ending: LF (Unix)
+- Max line width: 100 characters (server), auto (client)
+- Quote style: Single quotes (`'`) | Trailing commas: ES5 style
 
 **Imports:**
-- Imports are automatically organized by Biome
+- Organized automatically by Biome
 - Prefer explicit imports over namespace imports (`import { foo } from 'bar'`)
 - Avoid barrel files (index.ts re-exports) for performance
-- Group imports: Node built-ins, external packages, local imports (in that order)
+- Group imports: Node built-ins, external packages, local imports
 
-**Variable Declarations:**
+**Variables:**
 - `const` by default, `let` only for reassignment, never `var`
 - Extract magic numbers/strings into named constants
 
-### Code Organization & Architecture
+### Architecture Patterns
 
-**Functions & Complexity:**
+**Functions:**
 - Keep functions focused and reasonably sized
 - Extract complex conditions into well-named boolean variables
-- Use early returns to reduce nesting and improve readability
+- Use early returns to reduce nesting
 - Prefer simple conditionals over nested ternary operators
 
 **Error Handling:**
@@ -111,32 +111,22 @@ pnpm check            # Full check (lint + format)
 - Prefer early returns over deeply nested error checks
 - Remove `console.log`, `debugger`, `alert` from production code
 
-**Naming Conventions:**
+**Naming:**
 - PascalCase: Classes, React components, types, interfaces
 - camelCase: Variables, functions, properties, methods
 - UPPER_SNAKE_CASE: Constants (rarely needed with const)
 - Descriptive names: `getUserById()` not `getU()`, `isLoading` not `l`
 
-### TypeScript & Type Safety
+### TypeScript & React Patterns
 
-**General:**
-- Use explicit return types for functions when they enhance clarity
-- Prefer `unknown` over `any` when type is genuinely unknown
-- Use const assertions (`as const`) for immutable values and literal types
+**TypeScript:**
+- Use explicit return types when they enhance clarity
+- Prefer `unknown` over `any` when type is unknown
+- Use const assertions (`as const`) for immutable values
 - Leverage type narrowing instead of type assertions
-- Enable strict mode (required by project config)
 
-**React/TSX:**
-- Define prop interfaces explicitly (use `interface Props {}`)
-- Export component types separately from implementation
-- Use `ReactNode` for children prop typing
-- Function components preferred over class components
-
-### React & Next.js Patterns
-
-**Components:**
-- Use function components exclusively
-- Call hooks only at top level, never conditionally
+**React:**
+- Function components only; call hooks at top level only
 - Specify all dependencies correctly in hook arrays
 - Use unique IDs for `key` prop in lists, never array indices
 - Nest children between tags, not as props
@@ -147,12 +137,6 @@ pnpm check            # Full check (lint + format)
 - Mark client boundaries with `"use client"` directive
 - Separate server and client logic clearly
 
-**Performance:**
-- Use Next.js `<Image>` component instead of `<img>`
-- Use `next/head` or metadata API for head elements
-- Avoid spread in loop accumulators
-- Create regex literals at top level, not in loops
-
 **Accessibility & HTML:**
 - Provide meaningful alt text for images
 - Use proper heading hierarchy
@@ -160,17 +144,29 @@ pnpm check            # Full check (lint + format)
 - Include keyboard handlers alongside mouse events
 - Use semantic HTML (`<button>`, `<nav>`, etc.) instead of divs with roles
 - Add `rel="noopener"` to `target="_blank"` links
-- Avoid `dangerouslySetInnerHTML` (validate/sanitize if necessary)
+- See `.github/prompts/web-interface-guidelines.prompt.md` for detailed rules
 
-### Async/Promises
+### Animation & UI Patterns
 
-- Always `await` promises in async functions
-- Use async/await instead of promise chains
-- Handle errors with try-catch blocks
-- Don't use async functions as Promise executors
-- Don't forget to return/use awaited values
+**Stack:**
+- Tailwind CSS defaults unless custom values exist or requested
+- `motion/react` for JavaScript animations (formerly `framer-motion`)
+- `cn` utility (`clsx` + `tailwind-merge`) for class logic
 
-### Testing
+**Animation Rules:**
+- Animate only compositor props (`transform`, `opacity`)
+- Never animate layout properties (`width`, `height`, `top`, `left`, `margin`, `padding`)
+- Use `ease-out` on entrance; never exceed `200ms` for interaction feedback
+- Respect `prefers-reduced-motion`
+- See `.github/skills/ui-skills/SKILL.md` for detailed UI guidelines
+
+**Performance:**
+- Use Next.js `<Image>` component instead of `<img>`
+- Avoid spread in loop accumulators
+- Create regex literals at top level, not in loops
+- Never use `useEffect` for render logic
+
+## Testing
 
 **Structure:**
 - Write assertions inside `it()` or `test()` blocks
@@ -178,10 +174,10 @@ pnpm check            # Full check (lint + format)
 - Avoid `.only` and `.skip` in committed code
 - Keep test suites reasonably flat (minimal `describe` nesting)
 
-**Client Tests:** Vitest with jsdom (DOM environment)
-**Server Tests:** Vitest with Node environment, 30s timeout for hooks/tests
+**Client:** Vitest with jsdom (DOM environment)
+**Server:** Vitest with Node environment, 30s timeout for hooks/tests
 
-### Security
+## Security
 
 - Validate and sanitize user input
 - Avoid `eval()` and direct `document.cookie` assignment
@@ -200,12 +196,9 @@ pnpm check            # Full check (lint + format)
 - Prisma ORM with PostgreSQL
 - Module-based structure (controller/service/schema/routes per domain)
 - Zod for runtime validation
-- Email & file upload services included
 
 **Shared:**
-- Both use Zod for validation
-- TypeScript 5.9+
-- Both enforce strict linting
+- Zod for validation | TypeScript 5.9+ | Strict linting
 
 ## When Uncertain
 
