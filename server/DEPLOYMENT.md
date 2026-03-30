@@ -34,7 +34,7 @@ If you don't have one:
 7.  **Runtime:** `Node`.
 8.  **Build Command:** `pnpm install && pnpm build`
     *   *Note:* Ensure you have set the `pnpm` version or use `npm install && npm run build` if preferred, but our project uses `pnpm`. Render supports `pnpm` by default if `pnpm-lock.yaml` is present.
-9.  **Start Command:** `pnpm start` (This runs `node dist/index.js`).
+9.  **Start Command:** `pnpm start` (This runs `node dist/src/index.js`).
 
 ---
 
