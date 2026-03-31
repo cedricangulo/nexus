@@ -539,7 +539,12 @@ async function main(): Promise<void> {
     const taskIndex = createdTasks.length
     const createdAt = addDays(sprint.startDate, taskIndex % 10)
     const primaryAssignee = taskIndex % 2 === 0 ? member : teamLead
-    const secondaryAssignee = taskIndex % 3 === 0 && member.id !== teamLead.id ? teamLead : null
+    const secondaryAssignee =
+      taskIndex % 3 === 0
+        ? primaryAssignee.id === member.id
+          ? teamLead
+          : member
+        : null
 
     const created = await prisma.task.create({
       data: {
@@ -552,7 +557,9 @@ async function main(): Promise<void> {
         assignments: {
           create: [
             { userId: primaryAssignee.id },
-            ...(secondaryAssignee ? [{ userId: secondaryAssignee.id }] : []),
+            ...(secondaryAssignee && secondaryAssignee.id !== primaryAssignee.id
+              ? [{ userId: secondaryAssignee.id }]
+              : []),
           ],
         },
       },
